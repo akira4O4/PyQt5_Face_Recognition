@@ -14,6 +14,7 @@ class Operate_Sql():
         conn.row_factory = db.Row  # 可访问列信息
         cursor.execute(exectCmd)  # 该例程执行一个 SQL 语句
         rows = cursor.fetchall()  # 该例程获取查询结果集中所有（剩余）的行，返回一个列表。当没有可用的行时，则返回一个空的列表。
+        conn.close()
         return rows
 
     # 构建sql插入语句
@@ -21,15 +22,15 @@ class Operate_Sql():
         str = self.sqlStr_InsertNewName + "'" + fileName + "');"
         return str
 
-    #查询所有信息
+    # 查询所有信息
     def Select_All(self):
-        num=self.Num_Row_All()
+        num = self.Num_Row_All()
         rows = self.readFronSqllite(self.DB_Path, self.sqlStr_SelectAll)
         readLines = num
         lineIndex = 0
         while lineIndex < readLines:
             row = rows[lineIndex]  # 获取某一行的数据,类型是tuple
-            print('第',lineIndex,'条数据是：',row[0], row[1], row[2])
+            print('第', lineIndex, '条数据是：', row[0], row[1], row[2])
             lineIndex += 1
 
     # 查询第一条信息
@@ -39,7 +40,7 @@ class Operate_Sql():
         lineIndex = 0
         while lineIndex < readLines:
             row = rows[lineIndex]  # 获取某一行的数据,类型是tuple
-            print('第一条数据是：',row[0], row[1], row[2],'\n')
+            print('第一条数据是：', row[0], row[1], row[2], '\n')
             lineIndex += 1
 
     # 返回所有行数
@@ -55,12 +56,31 @@ class Operate_Sql():
         print("插入完成\n");
         conn.close()
 
+    # 查询是否存在相同的文件名
+    def Select_Same_Name(self, name):
+        rows = self.readFronSqllite(self.DB_Path, 'select * from fileName where fName =' + name + ';')
+        if len(rows)==0:  # 如果不存在相同名字的文件夹返回假
+            # print(rows)
+            print("不存在")
+            return False
+        else:  # 存在相同名字的文件夹返回真
+            # print(len(rows))
+            print("存在")
+            # row = rows[0]  # 获取某一行的数据,类型是tuple
+            # print('数据是：', row[0], row[1], '\n')
+            return True
+
+
 #
-# if __name__ == "__main__":
-#     opSql = Operate_Sql()
-#
-#     #插入一条新记录
-#     newname=opSql.CreatSqlStr('omega')
+if __name__ == "__main__":
+    pass
+    # name = "123"
+    # print('select * from fileName where fName ="' + name + '";')
+    # opSql = Operate_Sql()
+    # #
+    # #     #插入一条新记录
+    # name='111'
+    # flag = opSql.Select_Same_Name(name)
 #     print('构建的插入语句：'+newname)
 #     opSql.Insert_New_Name(newname)
 #
