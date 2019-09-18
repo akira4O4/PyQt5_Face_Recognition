@@ -53,7 +53,6 @@ class del_window(QDialog, Ui_Form_Del):
                                                     defaultButton=QtWidgets.QMessageBox.Ok)
             self.line_delFaceName.clear()
 
-
 # 添加窗口类
 class add_window(QDialog, Ui_Form):
     def __init__(self):
@@ -107,7 +106,6 @@ class add_window(QDialog, Ui_Form):
                                                          buttons=QtWidgets.QMessageBox.Ok,
                                                          defaultButton=QtWidgets.QMessageBox.Ok)
 
-
 # 主窗口类
 class MainWindow(QMainWindow, Ui_Face_Recognition_window):
     # 构造函数
@@ -121,6 +119,7 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
         self.opsql = Operate_Sql()
         self.opfile = File_Operate()
         self.timer_camera = QtCore.QTimer()  # qt计数器
+
         self.slot_init()
 
         self.photoNum = 0  # 照片计数
@@ -138,12 +137,13 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
         self.btn_openCamera.clicked.connect(self.OpenCamera)
         # self.btn_takePhoto.clicked.connect(self.Take_Photo)
         self.timer_camera.timeout.connect(self.Show_Frame)
+
         self.btn_addFace.clicked.connect(self.open_Add_Win)
         self.comboBox_selectFile.currentIndexChanged.connect(self.Show_Select_Cbb)
         self.btn_delFace.clicked.connect(self.open_Del_Win)
+        self.btn_refresh.clicked.connect(self.Refresh)
 
     def OpenCamera(self):
-
         if self.timer_camera.isActive() == False:
             self.cap = cv2.VideoCapture(0)
             flag = self.cap.open(self.CAM_NUM)
@@ -152,7 +152,7 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
                                                     buttons=QtWidgets.QMessageBox.Ok,
                                                     defaultButton=QtWidgets.QMessageBox.Ok)
             self.btn_openCamera.setText("关闭摄像头")
-            self.timer_camera.start(25)
+            self.timer_camera.start(1000)
         else:
             self.btn_openCamera.setText(u"打开摄像头")
             self.timer_camera.stop()
@@ -175,18 +175,9 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
     # 打开添加窗口
     def open_Add_Win(self):
         self.openAddWin.show()
-
     # 打开删除窗口
     def open_Del_Win(self):
         self.openDelWin.show()
-
-    # 删除人脸文件夹
-    def Delete_Face_File(self):
-        '''
-        1、从数据库中按照文件名删除行
-        2、根据文件地址删除文件夹
-        '''
-        pass
 
     # 拍照
     def Take_Photo(self):
@@ -203,6 +194,7 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
         '''
         1、根据sql语句从数据库中读取所有文件名
         '''
+        self.comboBox_selectFile.clear()
         num = self.opsql.Num_Now_All()
         rows = self.opsql.readFronSqllite(self.DB_Path, self.sqlStr_SelectAll)
         readLines = num
@@ -223,6 +215,10 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
         '''
         pass
 
+    #刷新显示
+    def Refresh(self):
+        self.Combobox_Init()
+        self.lab_faceNumShow.setText(str(self.opsql.Num_Now_All()) + '张')
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
