@@ -24,7 +24,12 @@ class File_Operate():
             # print(path + ' 目录已存在\n')
             return False
 
+    def Delete_File(self, filename):
+        path = self.path + filename
+        path = path.strip()
+        os.rmdir(path)
 
-# if __name__ == "__main__":
-#     fo = File_Operate()
-#     fo.Create_File('new')
+if __name__ == "__main__":
+    fo = File_Operate()
+    # fo.Create_File('new')
+    fo.Delete_File('123')

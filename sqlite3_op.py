@@ -23,14 +23,14 @@ class Operate_Sql():
         return str
 
     # 查询所有信息
-    def Select_All(self):
-        num = self.Num_Row_All()
+    def Select_All_Name(self):
+        num = self.Num_Now_All()
         rows = self.readFronSqllite(self.DB_Path, self.sqlStr_SelectAll)
         readLines = num
         lineIndex = 0
         while lineIndex < readLines:
             row = rows[lineIndex]  # 获取某一行的数据,类型是tuple
-            print('第', lineIndex, '条数据是：', row[0], row[1], row[2])
+            print(row[0])
             lineIndex += 1
 
     # 查询第一条信息
@@ -44,7 +44,7 @@ class Operate_Sql():
             lineIndex += 1
 
     # 返回所有行数
-    def Num_Row_All(self):
+    def Num_Now_All(self):
         num_all = self.readFronSqllite(self.DB_Path, self.sqlStr_count)
         return (num_all[0][0])
 
@@ -59,7 +59,7 @@ class Operate_Sql():
     # 查询是否存在相同的文件名
     def Select_Same_Name(self, name):
         rows = self.readFronSqllite(self.DB_Path, 'select * from fileName where fName =' + name + ';')
-        if len(rows)==0:  # 如果不存在相同名字的文件夹返回假
+        if len(rows) == 0:  # 如果不存在相同名字的文件夹返回假
             # print(rows)
             print("不存在")
             return False
@@ -70,17 +70,27 @@ class Operate_Sql():
             # print('数据是：', row[0], row[1], '\n')
             return True
 
+    def Delete_File_Name(self, filename):
+        conn = db.connect(self.DB_Path)  # 该 API 打开一个到 SQLite 数据库文件 database 的链接，如果数据库成功打开，则返回一个连接对象
+        filename = 'delete from fileName where fName="' + filename + '";'
+        print(filename)
+        conn.execute(filename)
+        conn.commit()
+        print("删除完成")
+        conn.close()
 
 #
-if __name__ == "__main__":
-    pass
-    # name = "123"
-    # print('select * from fileName where fName ="' + name + '";')
-    # opSql = Operate_Sql()
-    # #
-    # #     #插入一条新记录
-    # name='111'
-    # flag = opSql.Select_Same_Name(name)
+# if __name__ == "__main__":
+#     pass
+# name = "123"
+# print('select * from fileName where fName ="' + name + '";')
+#     opSql = Operate_Sql()
+# opSql.Select_All_Name()
+#     opSql.Delete_File_Name('234')
+# #
+# #     #插入一条新记录
+# name='111'
+# flag = opSql.Select_Same_Name(name)
 #     print('构建的插入语句：'+newname)
 #     opSql.Insert_New_Name(newname)
 #

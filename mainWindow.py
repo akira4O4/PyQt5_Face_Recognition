@@ -1,13 +1,57 @@
 import cv2
 from main_ui import Ui_Face_Recognition_window
 from addFace_ui import Ui_Form
+from delwin_ui import Ui_Form_Del
 import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import *
 from PyQt5.QtWidgets import QMainWindow, QApplication
 from file_op import File_Operate
 from sqlite3_op import Operate_Sql
+import sqlite3 as db
 import os
+
+
+# 添加删除窗口
+class del_window(QDialog, Ui_Form_Del):
+    def __init__(self):
+        super(del_window, self).__init__()
+        self.setupUi(self)
+        self.SlotInit()
+        self.opsql = Operate_Sql()
+        self.opfile = File_Operate()
+        self.line_delFaceName.clear()
+
+
+    def SlotInit(self):
+        self.btn_delcancel.clicked.connect(self.btn_hide)
+        self.btn_delconfirm.clicked.connect(self.btn_DelFile)
+
+    def btn_hide(self):
+        self.hide()
+
+    def btn_DelFile(self):
+        '''
+        读取字符串
+        删除数据库对应行
+        删除本地文件夹
+        :return:
+        '''
+        text = self.line_delFaceName.text()
+        flag = self.opsql.Select_Same_Name(text)
+        if flag is False:  # 如果数据库不存在这个目录
+            msg = QtWidgets.QMessageBox.warning(self, u"警告", u"不存在这个文件夹",
+                                                buttons=QtWidgets.QMessageBox.Ok,
+                                                defaultButton=QtWidgets.QMessageBox.Ok)
+
+        else:
+
+            self.opfile.Delete_File(text)
+            self.opsql.Delete_File_Name(text)
+            msg = QtWidgets.QMessageBox.information(self, u"完成", u"删除完成！",
+                                                    buttons=QtWidgets.QMessageBox.Ok,
+                                                    defaultButton=QtWidgets.QMessageBox.Ok)
+            self.line_delFaceName.clear()
 
 
 # 添加窗口类
@@ -34,29 +78,30 @@ class add_window(QDialog, Ui_Form):
         2、向数据库添加新名字
         3、创建新文件夹
         '''
-        text = self.line_addFaceName.text()#获取输入文本
-        flag = self.opsql.Select_Same_Name(text)#查看数据库中是否存在相同的名字
+        text = self.line_addFaceName.text()  # 获取输入文本
+        flag = self.opsql.Select_Same_Name(text)  # 查看数据库中是否存在相同的名字
         print(flag)
         if flag is True:
             msg = QtWidgets.QMessageBox.warning(self, u"警告", u"存在名字以存在，请更改",
                                                 buttons=QtWidgets.QMessageBox.Ok,
                                                 defaultButton=QtWidgets.QMessageBox.Ok)
         else:
-            if len(text) == 0:#如果目录为空
+            if len(text) == 0:  # 如果目录为空
                 msg = QtWidgets.QMessageBox.warning(self, u"警告", u"目录为空",
                                                     buttons=QtWidgets.QMessageBox.Ok,
                                                     defaultButton=QtWidgets.QMessageBox.Ok)
             else:
-                #根据用户名构建插入语句
+                # 根据用户名构建插入语句
                 newName = self.opsql.CreatSqlStr(text)
                 self.opsql.Insert_New_Name(newName)  # 向数据库插入新行
-                self.btn_hide()#隐藏窗口
-                ret = self.opfile.Create_File(text)#创建文件夹
+                self.btn_hide()  # 隐藏窗口
+                ret = self.opfile.Create_File(text)  # 创建文件夹
                 if ret:
                     msg = QtWidgets.QMessageBox.information(self, u"完成", u"个人文件夹创建成功！",
                                                             buttons=QtWidgets.QMessageBox.Ok,
                                                             defaultButton=QtWidgets.QMessageBox.Ok)
                     self.line_addFaceName.clear()
+                    self.opsql.Select_All_Name()
                 else:
                     msg = QtWidgets.QMessageBox.critical(self, u"失败", u"无法创建个人文件夹",
                                                          buttons=QtWidgets.QMessageBox.Ok,
@@ -69,12 +114,24 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
         self.setupUi(self)
-        self.timer_camera = QtCore.QTimer()  # qt计数器
 
-        self.photoNum = 0;  # 照片计数
+        self.DB_Path = '../DB/FileNameDB.db'
+        self.sqlStr_SelectAll = "select * from fileName;"
+
+        self.opsql = Operate_Sql()
+        self.opfile = File_Operate()
+        self.timer_camera = QtCore.QTimer()  # qt计数器
         self.slot_init()
+
+        self.photoNum = 0  # 照片计数
         self.CAM_NUM = 0
-        self.openAddWin = add_window()
+
+        self.openAddWin = add_window()  # 添加窗口实例
+        self.openDelWin = del_window()  # 删除窗口实例
+
+        self.Combobox_Init()  # 初始化下拉列表
+        self.lab_faceNumShow.setText(str(self.opsql.Num_Now_All()) + '张')  # 显示数据库中存在的人脸个数
+        self.lab_selecFile.setText("选择文件夹")
 
     # 槽初始化
     def slot_init(self):
@@ -82,6 +139,8 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
         # self.btn_takePhoto.clicked.connect(self.Take_Photo)
         self.timer_camera.timeout.connect(self.Show_Frame)
         self.btn_addFace.clicked.connect(self.open_Add_Win)
+        self.comboBox_selectFile.currentIndexChanged.connect(self.Show_Select_Cbb)
+        self.btn_delFace.clicked.connect(self.open_Del_Win)
 
     def OpenCamera(self):
 
@@ -117,7 +176,11 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
     def open_Add_Win(self):
         self.openAddWin.show()
 
-    #删除人脸文件夹
+    # 打开删除窗口
+    def open_Del_Win(self):
+        self.openDelWin.show()
+
+    # 删除人脸文件夹
     def Delete_Face_File(self):
         '''
         1、从数据库中按照文件名删除行
@@ -125,7 +188,7 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
         '''
         pass
 
-    #拍照
+    # 拍照
     def Take_Photo(self):
         '''
         1、从数据库中读取所有文件名
@@ -135,14 +198,24 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
         '''
         pass
 
-    #获取文件夹名字列表
-    def Get_File_Name(self):
+    # 获取文件夹名字列表
+    def Combobox_Init(self):
         '''
         1、根据sql语句从数据库中读取所有文件名
         '''
-        pass
+        num = self.opsql.Num_Now_All()
+        rows = self.opsql.readFronSqllite(self.DB_Path, self.sqlStr_SelectAll)
+        readLines = num
+        lineIndex = 0
+        while lineIndex < readLines:
+            row = rows[lineIndex]  # 获取某一行的数据,类型是tuple
+            self.comboBox_selectFile.addItem(str(row[0]))
+            lineIndex += 1
 
-    #训练模型
+    def Show_Select_Cbb(self):
+        self.lab_selecFile.setText('选择了：' + self.comboBox_selectFile.currentText())
+
+    # 训练模型
     def Train(self):
         '''
         1、调用训练文件进行整体训练

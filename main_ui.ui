@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>832</width>
-    <height>662</height>
+    <width>966</width>
+    <height>790</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -28,8 +28,8 @@
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>808</width>
-      <height>604</height>
+      <width>823</width>
+      <height>637</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -138,14 +138,17 @@
               <widget class="QComboBox" name="comboBox_selectFile"/>
              </item>
              <item>
-              <widget class="QLineEdit" name="line_faceNum">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
+              <widget class="QLabel" name="lab_faceNumShow">
                <property name="font">
                 <font>
                  <pointsize>16</pointsize>
                 </font>
+               </property>
+               <property name="text">
+                <string>0</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
                </property>
               </widget>
              </item>
@@ -338,7 +341,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>832</width>
+     <width>966</width>
      <height>23</height>
     </rect>
    </property>
