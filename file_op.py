@@ -1,5 +1,5 @@
 import os
-
+import shutil
 
 class File_Operate():
     def __init__(self):
@@ -27,9 +27,11 @@ class File_Operate():
     def Delete_File(self, filename):
         path = self.path + filename
         path = path.strip()
-        os.rmdir(path)
+
+        shutil.rmtree(path)
+        # os.rmdir(path)
 
 if __name__ == "__main__":
     fo = File_Operate()
-    # fo.Create_File('new')
-    fo.Delete_File('123')
+    fo.Create_File('new')
+    # fo.Delete_File('123')

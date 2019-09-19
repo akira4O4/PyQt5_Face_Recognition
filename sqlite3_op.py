@@ -58,8 +58,8 @@ class Operate_Sql():
 
     # 查询是否存在相同的文件名
     def Select_Same_Name(self, name):
-        rows = self.readFronSqllite(self.DB_Path, 'select * from fileName where fName =' + name + ';')
-        if len(rows) == 0:  # 如果不存在相同名字的文件夹返回假
+        rows = self.readFronSqllite(self.DB_Path, 'select * from fileName where fName ="' + str(name) + '";')
+        if len(rows) == 0 or rows is None:  # 如果不存在相同名字的文件夹返回假
             # print(rows)
             print("不存在")
             return False
@@ -79,12 +79,18 @@ class Operate_Sql():
         print("删除完成")
         conn.close()
 
+
 #
-# if __name__ == "__main__":
+if __name__ == "__main__":
+    opSql = Operate_Sql()
+    opSql.Select_Same_Name("123")
+    # name = 123
+
+    # print('select * from fileName where fName ="' + str(name) + '";')
 #     pass
 # name = "123"
 # print('select * from fileName where fName ="' + name + '";')
-#     opSql = Operate_Sql()
+#
 # opSql.Select_All_Name()
 #     opSql.Delete_File_Name('234')
 # #

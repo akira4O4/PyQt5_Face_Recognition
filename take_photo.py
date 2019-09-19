@@ -8,6 +8,7 @@ class Camera:
     def __init__(self):
         pass
     def openCamera(self):
+            cap.open()
             ret, frame = cap.read()
             frame = cv2.flip(frame, 1)
             frame=cv2.resize(frame, (640, 480))
@@ -23,3 +24,14 @@ class Camera:
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             lable = cv2.putText(frame, '-->Press the space to take a photo', (10, 30), cv2.FONT_HERSHEY_COMPLEX_SMALL,1, (0, 255, 0),
                                 thickness=1, lineType=1)
+
+if __name__=="__main__":
+    # cap=Camera()
+    # cap.openCamera()
+    selectFName='ff'
+    fPaht = '../faces/' + selectFName
+    print(fPaht)
+    # num = 0;  # 照片计数器
+    # selectFName = '123'
+    # fName = '../faces/' + selectFName + '/photo_%s.jpg' % num
+    # print(fName)

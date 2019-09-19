@@ -22,7 +22,6 @@ class del_window(QDialog, Ui_Form_Del):
         self.opfile = File_Operate()
         self.line_delFaceName.clear()
 
-
     def SlotInit(self):
         self.btn_delcancel.clicked.connect(self.btn_hide)
         self.btn_delconfirm.clicked.connect(self.btn_DelFile)
@@ -45,13 +44,13 @@ class del_window(QDialog, Ui_Form_Del):
                                                 defaultButton=QtWidgets.QMessageBox.Ok)
 
         else:
-
             self.opfile.Delete_File(text)
             self.opsql.Delete_File_Name(text)
             msg = QtWidgets.QMessageBox.information(self, u"完成", u"删除完成！",
                                                     buttons=QtWidgets.QMessageBox.Ok,
                                                     defaultButton=QtWidgets.QMessageBox.Ok)
             self.line_delFaceName.clear()
+
 
 # 添加窗口类
 class add_window(QDialog, Ui_Form):
@@ -78,7 +77,7 @@ class add_window(QDialog, Ui_Form):
         3、创建新文件夹
         '''
         text = self.line_addFaceName.text()  # 获取输入文本
-        flag = self.opsql.Select_Same_Name(text)  # 查看数据库中是否存在相同的名字
+        flag = self.opsql.Select_Same_Name(str(text))  # 查看数据库中是否存在相同的名字
         print(flag)
         if flag is True:
             msg = QtWidgets.QMessageBox.warning(self, u"警告", u"存在名字以存在，请更改",
@@ -106,6 +105,7 @@ class add_window(QDialog, Ui_Form):
                                                          buttons=QtWidgets.QMessageBox.Ok,
                                                          defaultButton=QtWidgets.QMessageBox.Ok)
 
+
 # 主窗口类
 class MainWindow(QMainWindow, Ui_Face_Recognition_window):
     # 构造函数
@@ -131,11 +131,13 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
         self.Combobox_Init()  # 初始化下拉列表
         self.lab_faceNumShow.setText(str(self.opsql.Num_Now_All()) + '张')  # 显示数据库中存在的人脸个数
         self.lab_selecFile.setText("选择文件夹")
+        self.pNum = 0;  # 照片计数器
+        self.photo_transmission=0#图片传输变量
 
     # 槽初始化
     def slot_init(self):
         self.btn_openCamera.clicked.connect(self.OpenCamera)
-        # self.btn_takePhoto.clicked.connect(self.Take_Photo)
+        self.btn_takePhoto.clicked.connect(self.Take_Photo)
         self.timer_camera.timeout.connect(self.Show_Frame)
 
         self.btn_addFace.clicked.connect(self.open_Add_Win)
@@ -152,7 +154,7 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
                                                     buttons=QtWidgets.QMessageBox.Ok,
                                                     defaultButton=QtWidgets.QMessageBox.Ok)
             self.btn_openCamera.setText("关闭摄像头")
-            self.timer_camera.start(1000)
+            self.timer_camera.start(25)
         else:
             self.btn_openCamera.setText(u"打开摄像头")
             self.timer_camera.stop()
@@ -162,19 +164,21 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
     def Show_Frame(self):
         ret, frame = self.cap.read()
         if frame is None:
-            print(1)
             return
         frame = cv2.flip(frame, 1)
         frame = cv2.resize(frame, (640, 480))
+        self.photo_transmission = frame
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         lable = cv2.putText(frame, '-->Camera OK', (10, 30), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 255, 0),
                             thickness=1, lineType=1)
         showFrame = QtGui.QImage(frame.data, frame.shape[1], frame.shape[0], QtGui.QImage.Format_RGB888)
         self.lab_frame.setPixmap(QtGui.QPixmap.fromImage(showFrame))
 
+
     # 打开添加窗口
     def open_Add_Win(self):
         self.openAddWin.show()
+
     # 打开删除窗口
     def open_Del_Win(self):
         self.openDelWin.show()
@@ -187,7 +191,27 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
         3、调用拍照程序对当前画面进行拍照
         4、更新拍照数量
         '''
-        pass
+
+        selectFName=self.comboBox_selectFile.currentText()
+        fName='../faces/'+selectFName+'/photo_%s.jpg'%self.pNum
+        fPaht = '../faces/' + selectFName
+        # print(os.path.isdir(fName))
+        if self.btn_openCamera.text()!='关闭摄像头':
+            msg = QtWidgets.QMessageBox.warning(self, u"Warning", u"请打开摄像头!",
+                                                buttons=QtWidgets.QMessageBox.Ok,
+                                                defaultButton=QtWidgets.QMessageBox.Ok)
+        else:
+            if os.path.isdir(fPaht) is False:
+                msg = QtWidgets.QMessageBox.warning(self, u"Warning", u"不存在这个目录!",
+                                                    buttons=QtWidgets.QMessageBox.Ok,
+                                                    defaultButton=QtWidgets.QMessageBox.Ok)
+            else:
+                self.pNum += 1
+                self.lab_faceNumDisplay.setText('%d' %self.pNum)
+                # print(selectFName)
+                # print(fName)
+                # print(self.pNum)
+                cv2.imwrite(fName,self.photo_transmission)
 
     # 获取文件夹名字列表
     def Combobox_Init(self):
@@ -215,10 +239,11 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
         '''
         pass
 
-    #刷新显示
+    # 刷新显示
     def Refresh(self):
         self.Combobox_Init()
         self.lab_faceNumShow.setText(str(self.opsql.Num_Now_All()) + '张')
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
