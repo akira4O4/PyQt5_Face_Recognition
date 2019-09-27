@@ -33,18 +33,18 @@ class del_window(QDialog, Ui_Form_Del):
         '''
         读取字符串
         删除数据库对应行
-        删除本地文件夹
+
         :return:
         '''
         text = self.line_delFaceName.text()
         flag = self.opsql.Select_Same_Name(text)
         if flag is False:  # 如果数据库不存在这个目录
-            msg = QtWidgets.QMessageBox.warning(self, u"警告", u"不存在这个文件夹",
+            msg = QtWidgets.QMessageBox.warning(self, u"警告", u"不存在这个用户",
                                                 buttons=QtWidgets.QMessageBox.Ok,
                                                 defaultButton=QtWidgets.QMessageBox.Ok)
 
         else:
-            self.opfile.Delete_File(text)
+            # self.opfile.Delete_File(text)
             self.opsql.Delete_File_Name(text)
             msg = QtWidgets.QMessageBox.information(self, u"完成", u"删除完成！",
                                                     buttons=QtWidgets.QMessageBox.Ok,
@@ -74,7 +74,7 @@ class add_window(QDialog, Ui_Form):
         '''
         1、触发确认按钮
         2、向数据库添加新名字
-        3、创建新文件夹
+        3、从数据库读取名字列表
         '''
         text = self.line_addFaceName.text()  # 获取输入文本
         flag = self.opsql.Select_Same_Name(str(text))  # 查看数据库中是否存在相同的名字
@@ -93,17 +93,17 @@ class add_window(QDialog, Ui_Form):
                 newName = self.opsql.CreatSqlStr(text)
                 self.opsql.Insert_New_Name(newName)  # 向数据库插入新行
                 self.btn_hide()  # 隐藏窗口
-                ret = self.opfile.Create_File(text)  # 创建文件夹
-                if ret:
-                    msg = QtWidgets.QMessageBox.information(self, u"完成", u"个人文件夹创建成功！",
-                                                            buttons=QtWidgets.QMessageBox.Ok,
-                                                            defaultButton=QtWidgets.QMessageBox.Ok)
-                    self.line_addFaceName.clear()
-                    self.opsql.Select_All_Name()
-                else:
-                    msg = QtWidgets.QMessageBox.critical(self, u"失败", u"无法创建个人文件夹",
-                                                         buttons=QtWidgets.QMessageBox.Ok,
-                                                         defaultButton=QtWidgets.QMessageBox.Ok)
+                # ret = self.opfile.Create_File(text)  # 创建文件夹
+                # if ret:
+                #     msg = QtWidgets.QMessageBox.information(self, u"完成", u"个人文件夹创建成功！",
+                #                                             buttons=QtWidgets.QMessageBox.Ok,
+                #                                             defaultButton=QtWidgets.QMessageBox.Ok)
+                #     self.line_addFaceName.clear()
+                #     self.opsql.Select_All_Name()
+                # else:
+                #     msg = QtWidgets.QMessageBox.critical(self, u"失败", u"无法创建个人文件夹",
+                #                                          buttons=QtWidgets.QMessageBox.Ok,
+                #                                          defaultButton=QtWidgets.QMessageBox.Ok)
 
 
 # 主窗口类
