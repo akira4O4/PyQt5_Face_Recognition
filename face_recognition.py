@@ -69,7 +69,7 @@ def main():
                         print('数据库名字：:', all_obj_name)
                         # 为bounding_box 匹配标签
                         for i in range(pre_person_num):
-                            dist_list = []#距离列表
+                            dist_list = []  # 距离列表
                             for j in range(compare_num):
                                 # 求误差(欧氏距离)，存储每个embadding-compare_embadding对应的distance
                                 dist = np.sqrt(np.sum(np.square(np.subtract(emb[i, :], compare_emb[j, :]))))
@@ -124,15 +124,7 @@ def load_and_align_data(img, image_size, margin):
     # 如果未发现目标 直接返回
     if len(bounding_boxes) < 1:
         return 0, 0, 0
-
     det = bounding_boxes
-    # print('det shape type')
-    # print(det.shape)
-    # print(type(det))
-    # det[:, 0] = np.maximum(det[:, 0] - margin / 2, 0)
-    # det[:, 1] = np.maximum(det[:, 1] - margin / 2, 0)
-    # det[:, 2] = np.minimum(det[:, 2] + margin / 2, img_size[1] - 1)
-    # det[:, 3] = np.minimum(det[:, 3] + margin / 2, img_size[0] - 1)
     det = det.astype(int)
     crop = []
     for i in range(len(bounding_boxes)):
