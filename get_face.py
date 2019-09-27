@@ -7,9 +7,8 @@ import facenet
 import align.detect_face
 import argparse
 
-
 # 获取人脸部分
-def align_data(image_path, imgae_size, margin, gpu_memory_faction):
+def align_data(image_path, imgae_size, gpu_memory_faction):
     minsize = 20
     threshhold = [0.6, 0.7, 0.7]
     factor = 0.709
@@ -66,7 +65,7 @@ def detection():
         # print('单文件名:', f)
         img_path_set.append(one_img)
     print(img_path_set)
-    images = align_data(img_path_set, 160, 44, 1.0)
+    images = align_data(img_path_set, 160, 1.0)
     # print(images)
 
     # 如果不存在这个目录就新建一个
@@ -84,7 +83,6 @@ def parse_arguments(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument('--img_size', type=int, default=160)
     return parser.parse_args(argv)
-
 
 def main(args):
     detection()
