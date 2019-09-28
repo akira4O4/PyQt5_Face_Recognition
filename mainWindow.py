@@ -1,19 +1,27 @@
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import cv2
+import sys
+import os
+import get_face
+import tensorflow as tf
+from PyQt5.QtWidgets import *
 from main_ui import Ui_Face_Recognition_window
 from addFace_ui import Ui_Form_add
 from delwin_ui import Ui_Form_Del
 from prompt import Ui_For_prompt
-import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import *
 from PyQt5.QtWidgets import QMainWindow, QApplication
 from file_op import File_Operate
 from sqlite3_op import Operate_Sql
-import sqlite3 as db
-import os
-import get_face
 import face_recognition
-import time
+from scipy import misc
+import numpy as np
+import os
+import facenet
+import align.detect_face
 
 # class prompt(QDialog,Ui_For_prompt):
 #     def __init__(self):
@@ -130,23 +138,18 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
         self.setupUi(self)
-
         self.DB_Path = '../DB/FileNameDB.db'
         self.sqlStr_SelectAll = "select * from fileName;"
-
         self.opsql = Operate_Sql()
         self.opfile = File_Operate()
-        self.timer_camera = QtCore.QTimer()  # qt计数器
-
+        self.timer_camera_test = QtCore.QTimer()  # qt计数器
+        self.timer_camera_face = QtCore.QTimer()  # qt计数器
         self.slot_init()
-
         self.photoNum = 0  # 照片计数
         self.CAM_NUM = 0
-
         self.openAddWin = add_window()  # 添加窗口实例
         self.openDelWin = del_window()  # 删除窗口实例
         # self.promptWin=prompt()
-
         self.Combobox_Init()  # 初始化下拉列表
         self.lab_faceNumShow.setText(str(self.opsql.Num_Now_All()) + '张')  # 显示数据库中存在的人脸个数
         self.lab_selecFile.setText("选择标签：")
@@ -157,16 +160,19 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
     def slot_init(self):
         self.btn_openCamera.clicked.connect(self.OpenCamera)
         self.btn_takePhoto.clicked.connect(self.Take_Photo)
-        self.timer_camera.timeout.connect(self.Show_Frame)
+
+        self.timer_camera_test.timeout.connect(self.Show_Frame)
+        self.timer_camera_face.timeout.connect(self.show_face_recognition)
 
         self.btn_addFace.clicked.connect(self.open_Add_Win)
         self.comboBox_selectFile.currentIndexChanged.connect(self.Show_Select_Cbb)
         self.btn_delFace.clicked.connect(self.open_Del_Win)
         self.btn_refresh.clicked.connect(self.Refresh)
         self.btn_train.clicked.connect(self.train)
+        self.btn_recogniton.clicked.connect(self.open_recognition_camera)
 
     def OpenCamera(self):
-        if self.timer_camera.isActive() == False:
+        if self.timer_camera_test.isActive() == False:
             self.cap = cv2.VideoCapture(0)
             flag = self.cap.open(self.CAM_NUM)
             if flag is None:
@@ -174,10 +180,10 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
                                                     buttons=QtWidgets.QMessageBox.Ok,
                                                     defaultButton=QtWidgets.QMessageBox.Ok)
             self.btn_openCamera.setText("关闭摄像头")
-            self.timer_camera.start(25)
+            self.timer_camera_test.start(25)
         else:
             self.btn_openCamera.setText(u"打开摄像头")
-            self.timer_camera.stop()
+            self.timer_camera_test.stop()
             self.lab_frame.setText(u"无图像输入")
             self.cap.release()
 
@@ -267,10 +273,30 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
                                                 defaultButton=QtWidgets.QMessageBox.Ok)
         get_face.detection()
 
+    #打开识别摄像头
+    def open_recognition_camera(self):
+        if self.timer_camera_face.isActive() == False:
 
-def face_recognition(self):
-    pass
+            if self.btn_openCamera.text()=='关闭摄像头':
+                msg = QtWidgets.QMessageBox.warning(self, u"警告", u"请先关闭摄像头!",
+                                                    buttons=QtWidgets.QMessageBox.Ok,
+                                                    defaultButton=QtWidgets.QMessageBox.Ok)
+            else:
+                self.timer_camera_face.start(25)
+                self.btn_openCamera.setText("关闭摄像头")
+        else:
+            self.btn_openCamera.setText("打开摄像头")
+            self.timer_camera_face.stop()
+            self.lab_frame.setText(u"无图像输入")
 
+    def show_face_recognition(self):
+        frame=face_recognition.main()
+        frame = cv2.resize(frame, (640, 480))
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        lable = cv2.putText(frame, '-->Camera OK', (10, 30), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 255, 0),
+                            thickness=1, lineType=1)
+        showFrame = QtGui.QImage(frame.data, frame.shape[1], frame.shape[0], QtGui.QImage.Format_RGB888)
+        self.lab_frame.setPixmap(QtGui.QPixmap.fromImage(showFrame))
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

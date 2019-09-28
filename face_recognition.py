@@ -10,22 +10,49 @@ import facenet
 import align.detect_face
 
 
+# 计算数据库后台所有的embadding
+def computing_compare_emb():
+    with tf.Graph().as_default():
+        with tf.Session() as sess:
+            # 加载facenet参数
+            model = '../20170512-110547/'
+            facenet.load_model(model)
+            images_placeholder = tf.get_default_graph().get_tensor_by_name("input:0")
+            embeddings = tf.get_default_graph().get_tensor_by_name("embeddings:0")
+            phase_train_placeholder = tf.get_default_graph().get_tensor_by_name("phase_train:0")
+            image = []
+            emb_dir = '../emb_img'
+            global all_obj_name
+            all_obj_name = []
+            for i in os.listdir(emb_dir):
+                all_obj_name.append(i)
+                img = misc.imread(os.path.join(emb_dir, i), mode='RGB')
+                print('img.shape:', img.shape)
+                prewhitened = facenet.prewhiten(img)  # 预白化去除冗余信息
+                image.append(prewhitened)
+                nrof_images = nrof_images + 1
+            images = np.stack(image)  # 沿着新轴连接数组的序列。
+            feed_dict = {images_placeholder: images, phase_train_placeholder: False}
+            # 计算对比图片embadding，embdadding是一个128维的张量
+            compare_emb = sess.run(embeddings, feed_dict=feed_dict)
+            # print('compare_emb:', compare_emb)
+            print('compare_emb_shape:', compare_emb.shape)
+            compare_num = len(compare_emb)
+        return compare_num, compare_emb
+
+
 def main():
     with tf.Graph().as_default():
         with tf.Session() as sess:
             # 加载facenet参数
             model = '../20170512-110547/'
             facenet.load_model(model)
-
-            # Get input and output tensors
             images_placeholder = tf.get_default_graph().get_tensor_by_name("input:0")
             embeddings = tf.get_default_graph().get_tensor_by_name("embeddings:0")
             phase_train_placeholder = tf.get_default_graph().get_tensor_by_name("phase_train:0")
 
             image = []
             nrof_images = 0
-
-            # 这里要改为自己emb_img文件夹的位置
             emb_dir = '../emb_img'
             all_obj_name = []
             for i in os.listdir(emb_dir):
@@ -44,19 +71,15 @@ def main():
             print('compare_emb_shape:', compare_emb.shape)
             compare_num = len(compare_emb)
 
-            # capture =cv2.VideoCapture(video)
+            # compare_num, compare_emb = computing_compare_emb()
             capture = cv2.VideoCapture(0)
             cv2.namedWindow("camera", 1)
-            timer = 0
             while True:
                 ret, frame = capture.read()
-                # rgb frame np.ndarray 480*640*3
                 rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 # 获取 判断标识 bounding_box crop_image
                 mark, bounding_box, crop_image = load_and_align_data(rgb_frame, 160, 44)
-                # timer += 1
                 if (1):
-                    # print(timer)
                     if (mark):
                         # 计算视频帧的embadding
                         feed_dict = {images_placeholder: crop_image, phase_train_placeholder: False}
@@ -80,7 +103,6 @@ def main():
                             else:
                                 # 从dist.list里面选择最接近的index并在obj_name里面查找对应的name
                                 find_obj.append(all_obj_name[dist_list.index(min_value)])
-
                                 # 在frame上绘制边框和文字
                         for rec_position in range(pre_person_num):
                             # 利用回归边框给input image画框
@@ -99,7 +121,7 @@ def main():
                                 (0, 0, 255),
                                 thickness=2,
                                 lineType=2)
-
+                # return frame
                         cv2.imshow('camera', frame)
                 key = cv2.waitKey(3)
                 if key == 27:
@@ -132,7 +154,6 @@ def load_and_align_data(img, image_size, margin):
         aligned = misc.imresize(temp_crop, (image_size, image_size))
         prewhitened = facenet.prewhiten(aligned)
         crop.append(prewhitened)
-
     # np.stack 将crop由一维list变为二维
     crop_image = np.stack(crop)
     return 1, det, crop_image  # mark标记位置，回归边框，切割图片
