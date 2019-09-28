@@ -78,7 +78,7 @@
                 </font>
                </property>
                <property name="text">
-                <string>选择人脸文件夹：</string>
+                <string>选择标签：</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -93,7 +93,7 @@
                 </font>
                </property>
                <property name="text">
-                <string>当前人脸个数:</string>
+                <string>当前人脸标签个数:</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -368,7 +368,7 @@
      <x>0</x>
      <y>0</y>
      <width>849</width>
-     <height>23</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

@@ -10,6 +10,8 @@ from file_op import File_Operate
 from sqlite3_op import Operate_Sql
 import sqlite3 as db
 import os
+import get_face
+import face_recognition
 
 
 # 添加删除窗口
@@ -33,7 +35,7 @@ class del_window(QDialog, Ui_Form_Del):
         '''
         读取字符串
         删除数据库对应行
-
+        删除对应文件
         :return:
         '''
         text = self.line_delFaceName.text()
@@ -44,12 +46,21 @@ class del_window(QDialog, Ui_Form_Del):
                                                 defaultButton=QtWidgets.QMessageBox.Ok)
 
         else:
-            # self.opfile.Delete_File(text)
-            self.opsql.Delete_File_Name(text)
+            # 从本地删除src_img文件
+            if (os.path.exists('../src_img/' + text + '.jpg') == True):
+                os.remove('../src_img/' + text + '.jpg')
+
+            # 从本地删除emb_img文件
+            if (os.path.exists('../emb_img/' + text + '.jpg') == True):
+                os.remove('../emb_img/' + text + '.jpg')
+
+            self.opsql.Delete_File_Name(text)  # 从数据库中删除这个文件名
             msg = QtWidgets.QMessageBox.information(self, u"完成", u"删除完成！",
                                                     buttons=QtWidgets.QMessageBox.Ok,
                                                     defaultButton=QtWidgets.QMessageBox.Ok)
+
             self.line_delFaceName.clear()
+            self.btn_hide()  # 隐藏窗口
 
 
 # 添加窗口类
@@ -92,6 +103,7 @@ class add_window(QDialog, Ui_Form):
                 # 根据用户名构建插入语句
                 newName = self.opsql.CreatSqlStr(text)
                 self.opsql.Insert_New_Name(newName)  # 向数据库插入新行
+                self.line_addFaceName.clear()
                 self.btn_hide()  # 隐藏窗口
                 # ret = self.opfile.Create_File(text)  # 创建文件夹
                 # if ret:
@@ -130,9 +142,9 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
 
         self.Combobox_Init()  # 初始化下拉列表
         self.lab_faceNumShow.setText(str(self.opsql.Num_Now_All()) + '张')  # 显示数据库中存在的人脸个数
-        self.lab_selecFile.setText("选择文件夹")
+        self.lab_selecFile.setText("选择标签：")
         self.pNum = 0;  # 照片计数器
-        self.photo_transmission=0#图片传输变量
+        self.photo_transmission = 0  # 图片传输变量
 
     # 槽初始化
     def slot_init(self):
@@ -144,6 +156,7 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
         self.comboBox_selectFile.currentIndexChanged.connect(self.Show_Select_Cbb)
         self.btn_delFace.clicked.connect(self.open_Del_Win)
         self.btn_refresh.clicked.connect(self.Refresh)
+        self.btn_train.clicked.connect(self.train)
 
     def OpenCamera(self):
         if self.timer_camera.isActive() == False:
@@ -174,7 +187,6 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
         showFrame = QtGui.QImage(frame.data, frame.shape[1], frame.shape[0], QtGui.QImage.Format_RGB888)
         self.lab_frame.setPixmap(QtGui.QPixmap.fromImage(showFrame))
 
-
     # 打开添加窗口
     def open_Add_Win(self):
         self.openAddWin.show()
@@ -192,26 +204,32 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
         4、更新拍照数量
         '''
 
-        selectFName=self.comboBox_selectFile.currentText()
-        fName='../faces/'+selectFName+'/photo_%s.jpg'%self.pNum
-        fPaht = '../faces/' + selectFName
+        # fPaht = '../faces/' + selectFName
         # print(os.path.isdir(fName))
-        if self.btn_openCamera.text()!='关闭摄像头':
+        #如果摄像头没有打开
+        if self.btn_openCamera.text() != '关闭摄像头':
             msg = QtWidgets.QMessageBox.warning(self, u"Warning", u"请打开摄像头!",
                                                 buttons=QtWidgets.QMessageBox.Ok,
                                                 defaultButton=QtWidgets.QMessageBox.Ok)
         else:
-            if os.path.isdir(fPaht) is False:
-                msg = QtWidgets.QMessageBox.warning(self, u"Warning", u"不存在这个目录!",
+            selectFName = self.comboBox_selectFile.currentText()
+            flag = self.opsql.Select_Same_Name(selectFName)
+            #如果数据库没有这个标签
+            if flag==False:
+                msg = QtWidgets.QMessageBox.warning(self, u"Warning", u"不存在这个标签，请尝试刷新!",
                                                     buttons=QtWidgets.QMessageBox.Ok,
                                                     defaultButton=QtWidgets.QMessageBox.Ok)
             else:
-                self.pNum += 1
-                self.lab_faceNumDisplay.setText('%d' %self.pNum)
-                # print(selectFName)
-                # print(fName)
-                # print(self.pNum)
-                cv2.imwrite(fName,self.photo_transmission)
+                fName = '../src_img/' + selectFName + '.jpg'
+                #如果遇到空白标签
+                if len(selectFName) == 0 or selectFName == '':
+                    msg = QtWidgets.QMessageBox.warning(self, u"Warning", u"没有这个人脸标签!",
+                                                        buttons=QtWidgets.QMessageBox.Ok,
+                                                        defaultButton=QtWidgets.QMessageBox.Ok)
+                else:
+                    self.pNum += 1
+                    self.lab_faceNumDisplay.setText('%d' % self.pNum)
+                    cv2.imwrite(fName, self.photo_transmission)
 
     # 获取文件夹名字列表
     def Combobox_Init(self):
@@ -244,6 +262,11 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
         self.Combobox_Init()
         self.lab_faceNumShow.setText(str(self.opsql.Num_Now_All()) + '张')
 
+    def train(self):
+        get_face.detection()
+
+    def face_recognition(self):
+        pass
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
