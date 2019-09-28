@@ -1,7 +1,8 @@
 import cv2
 from main_ui import Ui_Face_Recognition_window
-from addFace_ui import Ui_Form
+from addFace_ui import Ui_Form_add
 from delwin_ui import Ui_Form_Del
+from prompt import Ui_For_prompt
 import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import *
@@ -12,7 +13,12 @@ import sqlite3 as db
 import os
 import get_face
 import face_recognition
+import time
 
+# class prompt(QDialog,Ui_For_prompt):
+#     def __init__(self):
+#         super(prompt,self).__init__()
+#         self.setupUi(self)
 
 # 添加删除窗口
 class del_window(QDialog, Ui_Form_Del):
@@ -64,7 +70,7 @@ class del_window(QDialog, Ui_Form_Del):
 
 
 # 添加窗口类
-class add_window(QDialog, Ui_Form):
+class add_window(QDialog, Ui_Form_add):
     def __init__(self):
         super(add_window, self).__init__()
         self.setupUi(self)
@@ -139,6 +145,7 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
 
         self.openAddWin = add_window()  # 添加窗口实例
         self.openDelWin = del_window()  # 删除窗口实例
+        # self.promptWin=prompt()
 
         self.Combobox_Init()  # 初始化下拉列表
         self.lab_faceNumShow.setText(str(self.opsql.Num_Now_All()) + '张')  # 显示数据库中存在的人脸个数
@@ -206,7 +213,7 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
 
         # fPaht = '../faces/' + selectFName
         # print(os.path.isdir(fName))
-        #如果摄像头没有打开
+        # 如果摄像头没有打开
         if self.btn_openCamera.text() != '关闭摄像头':
             msg = QtWidgets.QMessageBox.warning(self, u"Warning", u"请打开摄像头!",
                                                 buttons=QtWidgets.QMessageBox.Ok,
@@ -214,14 +221,14 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
         else:
             selectFName = self.comboBox_selectFile.currentText()
             flag = self.opsql.Select_Same_Name(selectFName)
-            #如果数据库没有这个标签
-            if flag==False:
+            # 如果数据库没有这个标签
+            if flag == False:
                 msg = QtWidgets.QMessageBox.warning(self, u"Warning", u"不存在这个标签，请尝试刷新!",
                                                     buttons=QtWidgets.QMessageBox.Ok,
                                                     defaultButton=QtWidgets.QMessageBox.Ok)
             else:
                 fName = '../src_img/' + selectFName + '.jpg'
-                #如果遇到空白标签
+                # 如果遇到空白标签
                 if len(selectFName) == 0 or selectFName == '':
                     msg = QtWidgets.QMessageBox.warning(self, u"Warning", u"没有这个人脸标签!",
                                                         buttons=QtWidgets.QMessageBox.Ok,
@@ -249,24 +256,21 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
     def Show_Select_Cbb(self):
         self.lab_selecFile.setText('选择了：' + self.comboBox_selectFile.currentText())
 
-    # 训练模型
-    def Train(self):
-        '''
-        1、调用训练文件进行整体训练
-        2、更新进度条和提示字符串
-        '''
-        pass
-
     # 刷新显示
     def Refresh(self):
         self.Combobox_Init()
         self.lab_faceNumShow.setText(str(self.opsql.Num_Now_All()) + '张')
 
     def train(self):
+        msg = QtWidgets.QMessageBox.information(self, u"提示", u"训练过程中，画面无法更新。",
+                                                buttons=QtWidgets.QMessageBox.Ok,
+                                                defaultButton=QtWidgets.QMessageBox.Ok)
         get_face.detection()
 
-    def face_recognition(self):
-        pass
+
+def face_recognition(self):
+    pass
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

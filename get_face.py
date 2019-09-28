@@ -6,6 +6,7 @@ import copy
 import facenet
 import align.detect_face
 import argparse
+import sys
 
 
 # 获取人脸部分
@@ -74,7 +75,8 @@ def detection():
         # print('单文件名:', f)
         img_path_set.append(one_img)
     print(img_path_set)
-    images = align_data(img_path_set, 160, 1.0)
+    if len(img_path_set) != 0:
+        images = align_data(img_path_set, 160, 1.0)
 
     # 保存切割好的图片
     count = 0
@@ -83,6 +85,7 @@ def detection():
         count = count + 1
         # 删除被剪裁的图片
         os.remove(os.path.join(img_src, f))
+    return True
 
 
 def parse_arguments(argv):
@@ -96,5 +99,5 @@ def main(args):
 
 
 if __name__ == "__main__":
-    # main(parse_arguments(sys.argv[1:]))
-    detection()
+    main(parse_arguments(sys.argv[1:]))
+    # detection()

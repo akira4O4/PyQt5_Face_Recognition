@@ -135,7 +135,6 @@ def load_and_align_data(img, image_size, margin):
 
     # np.stack 将crop由一维list变为二维
     crop_image = np.stack(crop)
-
     return 1, det, crop_image  # mark标记位置，回归边框，切割图片
 
 

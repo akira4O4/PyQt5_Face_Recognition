@@ -10,7 +10,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 class Ui_Form_Del(object):
     def setupUi(self, Form_Del):
-        Form_Del.setObjectName("Form_Del")
+        Form_Del.setObjectName("delFace")
         Form_Del.resize(451, 320)
         self.widget = QtWidgets.QWidget(Form_Del)
         self.widget.setGeometry(QtCore.QRect(40, 30, 381, 271))
@@ -63,7 +63,7 @@ class Ui_Form_Del(object):
 
     def retranslateUi(self, Form_Del):
         _translate = QtCore.QCoreApplication.translate
-        Form_Del.setWindowTitle(_translate("Form_Del", "Form"))
+        Form_Del.setWindowTitle(_translate("Form_Del", "删除"))
         self.lab_delTest.setText(_translate("Form_Del", "请输入需要删除的文件夹名"))
         self.btn_delconfirm.setText(_translate("Form_Del", "确定"))
         self.btn_delcancel.setText(_translate("Form_Del", "取消"))

@@ -8,9 +8,9 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-class Ui_Form(object):
+class Ui_Form_add(object):
     def setupUi(self, Form):
-        Form.setObjectName("Form")
+        Form.setObjectName("addFaceWin")
         Form.resize(454, 285)
         self.widget = QtWidgets.QWidget(Form)
         self.widget.setGeometry(QtCore.QRect(22, 30, 401, 231))
@@ -67,7 +67,7 @@ class Ui_Form(object):
 
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
-        Form.setWindowTitle(_translate("Form", "Form"))
+        Form.setWindowTitle(_translate("Form", "添加"))
         self.lab_addTest.setText(_translate("Form", "请添加新用户文件名（不支持中文）"))
         self.btn_confirm.setText(_translate("Form", "确定"))
         self.btn_cancel.setText(_translate("Form", "取消"))
