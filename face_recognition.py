@@ -13,6 +13,9 @@ import align.detect_face
 class face():
     def __init__(self):
         self.init_mtcnn()
+        self.train = True
+        if self.train == False:
+            self.init_pre_embdading()
 
     def init_mtcnn(self):
         with tf.Graph().as_default():
@@ -26,7 +29,7 @@ class face():
     def init_pre_embdading(slef):
         with tf.Graph().as_default():
             with tf.Session() as sess:
-                model = '20170512-110547/'
+                model = '../20170512-110547/'
                 facenet.load_model(model)
                 images_placeholder = tf.get_default_graph().get_tensor_by_name("input:0")
                 embeddings = tf.get_default_graph().get_tensor_by_name("embeddings:0")
@@ -34,10 +37,11 @@ class face():
                 image = []
                 nrof_images = 0
                 # 这里要改为自己emb_img文件夹的位置
-                emb_dir = './emb_img'
-                all_obj = []
+                global compare_emb, compare_num, all_obj_name
+                emb_dir = '../emb_img'
+                all_obj_name = []
                 for i in os.listdir(emb_dir):
-                    all_obj.append(i)
+                    all_obj_name.append(i)
                     img = misc.imread(os.path.join(emb_dir, i), mode='RGB')
                     print('img.shape:', img.shape)
                     prewhitened = facenet.prewhiten(img)  # 预白化去除冗余信息
@@ -52,9 +56,9 @@ class face():
                 print('compare_emb_shape:', compare_emb.shape)
                 compare_num = len(compare_emb)
                 print("pre_embadding计算完成")
-        return compare_emb, compare_num, all_obj
+        # return compare_emb, compare_num, all_obj
 
-    def main(self):
+    def main(self, stop):
         with tf.Graph().as_default():
             with tf.Session() as sess:
                 model = '../20170512-110547/'
@@ -62,23 +66,23 @@ class face():
                 images_placeholder = tf.get_default_graph().get_tensor_by_name("input:0")
                 embeddings = tf.get_default_graph().get_tensor_by_name("embeddings:0")
                 phase_train_placeholder = tf.get_default_graph().get_tensor_by_name("phase_train:0")
-                image = []
-                nrof_images = 0
-                emb_dir = '../emb_img'
-                all_obj_name = []
-                for i in os.listdir(emb_dir):
-                    all_obj_name.append(i)
-                    img = misc.imread(os.path.join(emb_dir, i), mode='RGB')
-                    print('img.shape:', img.shape)
-                    prewhitened = facenet.prewhiten(img)  # 预白化去除冗余信息
-                    image.append(prewhitened)
-                    nrof_images = nrof_images + 1
-                images = np.stack(image)  # 沿着新轴连接数组的序列。
-                feed_dict = {images_placeholder: images, phase_train_placeholder: False}
-                compare_emb = sess.run(embeddings, feed_dict=feed_dict)  # 计算对比图片embadding，embdadding是一个128维的张量
-                print('compare_emb_shape:', compare_emb.shape)
-                compare_num = len(compare_emb)
-
+                if self.train == True:
+                    image = []
+                    nrof_images = 0
+                    emb_dir = '../emb_img'
+                    all_obj_name = []
+                    for i in os.listdir(emb_dir):
+                        all_obj_name.append(i)
+                        img = misc.imread(os.path.join(emb_dir, i), mode='RGB')
+                        print('img.shape:', img.shape)
+                        prewhitened = facenet.prewhiten(img)  # 预白化去除冗余信息
+                        image.append(prewhitened)
+                        nrof_images = nrof_images + 1
+                    images = np.stack(image)  # 沿着新轴连接数组的序列。
+                    feed_dict = {images_placeholder: images, phase_train_placeholder: False}
+                    compare_emb = sess.run(embeddings, feed_dict=feed_dict)  # 计算对比图片embadding，embdadding是一个128维的张量
+                    print('compare_emb_shape:', compare_emb.shape)
+                    compare_num = len(compare_emb)
                 capture = cv2.VideoCapture(0)
                 cv2.namedWindow("camera", 1)
                 while True:
@@ -95,7 +99,10 @@ class face():
 
                         find_obj = []
                         print('识别到的人数:', pre_person_num)
-                        print('数据库名字：:', all_obj_name)
+
+                        image1 = cv2.putText(frame, 'Press esc to exit', (10, 30), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1,
+                                             (0, 0, 255),
+                                             thickness=1, lineType=1)
 
                         for i in range(pre_person_num):  # 为bounding_box 匹配标签
                             dist_list = []  # 距离列表
@@ -130,6 +137,8 @@ class face():
                         # return frame
                         cv2.imshow('camera', frame)
                     key = cv2.waitKey(3)
+                    if stop == True:
+                        break
                     if key == 27:
                         break
                 capture.release()
@@ -160,4 +169,4 @@ class face():
 
 if __name__ == '__main__':
     face_test = face()
-    face_test.main()
+    face_test.main(False)

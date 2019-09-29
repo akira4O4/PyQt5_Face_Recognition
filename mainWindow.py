@@ -17,11 +17,13 @@ from PyQt5.QtWidgets import QMainWindow, QApplication
 from file_op import File_Operate
 from sqlite3_op import Operate_Sql
 import face_recognition
+import time
 from scipy import misc
 import numpy as np
 import os
 import facenet
 import align.detect_face
+
 
 # class prompt(QDialog,Ui_For_prompt):
 #     def __init__(self):
@@ -155,6 +157,8 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
         self.lab_selecFile.setText("选择标签：")
         self.pNum = 0;  # 照片计数器
         self.photo_transmission = 0  # 图片传输变量
+        self.frame_out = 0
+        self.face = face_recognition.face()
 
     # 槽初始化
     def slot_init(self):
@@ -162,7 +166,7 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
         self.btn_takePhoto.clicked.connect(self.Take_Photo)
 
         self.timer_camera_test.timeout.connect(self.Show_Frame)
-        self.timer_camera_face.timeout.connect(self.show_face_recognition)
+        # self.timer_camera_face.timeout.connect(self.show_face_recognition)
 
         self.btn_addFace.clicked.connect(self.open_Add_Win)
         self.comboBox_selectFile.currentIndexChanged.connect(self.Show_Select_Cbb)
@@ -217,8 +221,6 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
         4、更新拍照数量
         '''
 
-        # fPaht = '../faces/' + selectFName
-        # print(os.path.isdir(fName))
         # 如果摄像头没有打开
         if self.btn_openCamera.text() != '关闭摄像头':
             msg = QtWidgets.QMessageBox.warning(self, u"Warning", u"请打开摄像头!",
@@ -272,32 +274,54 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
                                                 buttons=QtWidgets.QMessageBox.Ok,
                                                 defaultButton=QtWidgets.QMessageBox.Ok)
         get_face.detection()
+        # self.btn_train.setText('训练完成')
+        # time.sleep(10000)
+        self.btn_train.setText('重新训练')
 
-    #打开识别摄像头
+
+    # 打开识别摄像头
     def open_recognition_camera(self):
-        if self.timer_camera_face.isActive() == False:
+        msg = QtWidgets.QMessageBox.information(self, u"启动提示", u"1、启动时间根据设备性能强弱决定\n\n2、程序启动后按下esc退出检测窗口",
+                                                buttons=QtWidgets.QMessageBox.Ok,
+                                                defaultButton=QtWidgets.QMessageBox.Ok)
 
-            if self.btn_openCamera.text()=='关闭摄像头':
-                msg = QtWidgets.QMessageBox.warning(self, u"警告", u"请先关闭摄像头!",
-                                                    buttons=QtWidgets.QMessageBox.Ok,
-                                                    defaultButton=QtWidgets.QMessageBox.Ok)
-            else:
-                self.timer_camera_face.start(25)
-                self.btn_openCamera.setText("关闭摄像头")
+        if self.btn_openCamera.text() == '关闭摄像头':
+            msg = QtWidgets.QMessageBox.warning(self, u"警告", u"请先关闭摄像头!",
+                                                buttons=QtWidgets.QMessageBox.Ok,
+                                                defaultButton=QtWidgets.QMessageBox.Ok)
         else:
-            self.btn_openCamera.setText("打开摄像头")
-            self.timer_camera_face.stop()
-            self.lab_frame.setText(u"无图像输入")
+            print('开启摄像头')
+            self.face.main(False)
+            # self.lab_frame.setText(u"正在加载并启动程序...")
 
+        # if self.timer_camera_face.isActive() == False:
+        #
+        #     if self.btn_openCamera.text() == '关闭摄像头':
+        #         msg = QtWidgets.QMessageBox.warning(self, u"警告", u"请先关闭摄像头!",
+        #                                             buttons=QtWidgets.QMessageBox.Ok,
+        #                                             defaultButton=QtWidgets.QMessageBox.Ok)
+        #     else:
+        #         # self.timer_camera_face.start(25)
+        #         print('开启摄像头')
+        #         # self.begin(False)
+        #         self.face.main(False)
+        #         # self.btn_openCamera.setText("关闭摄像头")
+        #         self.lab_frame.setText(u"正在加载并启动程序...")
+        # else:
+        #     # self.btn_openCamera.setText("打开摄像头")
+        #     # self.begin(True)
+        #     # self.timer_camera_face.stop()
+        #     self.lab_frame.setText(u"无图像输入")
+    #弃用
     def show_face_recognition(self):
-        face=face_recognition.face()
-        frame=face.main()
-        frame = cv2.resize(frame, (640, 480))
+        print('frame_out:',len(self.frame_out))
+        frame = cv2.resize(self.frame_out, (640, 480))
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         lable = cv2.putText(frame, '-->Camera OK', (10, 30), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 255, 0),
                             thickness=1, lineType=1)
         showFrame = QtGui.QImage(frame.data, frame.shape[1], frame.shape[0], QtGui.QImage.Format_RGB888)
         self.lab_frame.setPixmap(QtGui.QPixmap.fromImage(showFrame))
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

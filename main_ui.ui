@@ -115,21 +115,6 @@
                </property>
               </widget>
              </item>
-             <item>
-              <widget class="QLabel" name="lab_trainBar">
-               <property name="font">
-                <font>
-                 <pointsize>16</pointsize>
-                </font>
-               </property>
-               <property name="text">
-                <string>训练完成度：</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-               </property>
-              </widget>
-             </item>
             </layout>
            </item>
            <item>
@@ -164,13 +149,6 @@
                </property>
                <property name="alignment">
                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QProgressBar" name="progressBar_trainBar">
-               <property name="value">
-                <number>24</number>
                </property>
               </widget>
              </item>
@@ -368,7 +346,7 @@
      <x>0</x>
      <y>0</y>
      <width>849</width>
-     <height>26</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuHelp">
