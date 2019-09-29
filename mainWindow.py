@@ -11,6 +11,7 @@ from PyQt5.QtWidgets import *
 from main_ui import Ui_Face_Recognition_window
 from addFace_ui import Ui_Form_add
 from delwin_ui import Ui_Form_Del
+from help import Ui_help
 from prompt import Ui_For_prompt
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QApplication
@@ -133,6 +134,11 @@ class add_window(QDialog, Ui_Form_add):
                 #                                          buttons=QtWidgets.QMessageBox.Ok,
                 #                                          defaultButton=QtWidgets.QMessageBox.Ok)
 
+#提示窗口
+class help_window(QDialog,Ui_help):
+    def __init__(self):
+        super(help_window, self).__init__()
+        self.setupUi(self)
 
 # 主窗口类
 class MainWindow(QMainWindow, Ui_Face_Recognition_window):
@@ -146,11 +152,12 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
         self.opfile = File_Operate()
         self.timer_camera_test = QtCore.QTimer()  # qt计数器
         self.timer_camera_face = QtCore.QTimer()  # qt计数器
+        self.openAddWin = add_window()  # 添加窗口实例
+        self.openDelWin = del_window()  # 删除窗口实例
+        self.helpWin = help_window()
         self.slot_init()
         self.photoNum = 0  # 照片计数
         self.CAM_NUM = 0
-        self.openAddWin = add_window()  # 添加窗口实例
-        self.openDelWin = del_window()  # 删除窗口实例
         # self.promptWin=prompt()
         self.Combobox_Init()  # 初始化下拉列表
         self.lab_faceNumShow.setText(str(self.opsql.Num_Now_All()) + '张')  # 显示数据库中存在的人脸个数
@@ -164,16 +171,18 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
     def slot_init(self):
         self.btn_openCamera.clicked.connect(self.OpenCamera)
         self.btn_takePhoto.clicked.connect(self.Take_Photo)
-
         self.timer_camera_test.timeout.connect(self.Show_Frame)
         # self.timer_camera_face.timeout.connect(self.show_face_recognition)
-
         self.btn_addFace.clicked.connect(self.open_Add_Win)
         self.comboBox_selectFile.currentIndexChanged.connect(self.Show_Select_Cbb)
         self.btn_delFace.clicked.connect(self.open_Del_Win)
         self.btn_refresh.clicked.connect(self.Refresh)
         self.btn_train.clicked.connect(self.train)
         self.btn_recogniton.clicked.connect(self.open_recognition_camera)
+        self.actionHelp.triggered.connect(self.open_help)
+
+    def open_help(self):
+        self.helpWin.show()
 
     def OpenCamera(self):
         if self.timer_camera_test.isActive() == False:
@@ -278,7 +287,6 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
         # time.sleep(10000)
         self.btn_train.setText('重新训练')
 
-
     # 打开识别摄像头
     def open_recognition_camera(self):
         msg = QtWidgets.QMessageBox.information(self, u"启动提示", u"1、启动时间根据设备性能强弱决定\n\n2、程序启动后按下esc退出检测窗口",
@@ -312,9 +320,10 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
         #     # self.begin(True)
         #     # self.timer_camera_face.stop()
         #     self.lab_frame.setText(u"无图像输入")
-    #弃用
+
+    # 弃用
     def show_face_recognition(self):
-        print('frame_out:',len(self.frame_out))
+        print('frame_out:', len(self.frame_out))
         frame = cv2.resize(self.frame_out, (640, 480))
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         lable = cv2.putText(frame, '-->Camera OK', (10, 30), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 255, 0),
