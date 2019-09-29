@@ -290,7 +290,8 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
             self.lab_frame.setText(u"无图像输入")
 
     def show_face_recognition(self):
-        frame=face_recognition.main()
+        face=face_recognition.face()
+        frame=face.main()
         frame = cv2.resize(frame, (640, 480))
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         lable = cv2.putText(frame, '-->Camera OK', (10, 30), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 255, 0),
