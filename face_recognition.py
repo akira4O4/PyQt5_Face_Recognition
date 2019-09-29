@@ -84,7 +84,7 @@ class face():
                     print('compare_emb_shape:', compare_emb.shape)
                     compare_num = len(compare_emb)
                 capture = cv2.VideoCapture(0)
-                cv2.namedWindow("camera", 1)
+                cv2.namedWindow("face recognition", 1)
                 while True:
                     ret, frame = capture.read()
                     rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -135,7 +135,7 @@ class face():
                                 thickness=2,
                                 lineType=2)
                         # return frame
-                        cv2.imshow('camera', frame)
+                        cv2.imshow('face recognition', frame)
                     key = cv2.waitKey(3)
                     if stop == True:
                         break
