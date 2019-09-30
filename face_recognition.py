@@ -8,7 +8,7 @@ import numpy as np
 import os
 import facenet
 import align.detect_face
-
+import sqlite3_op
 
 class face():
     def __init__(self):
@@ -56,7 +56,7 @@ class face():
                 print('compare_emb_shape:', compare_emb.shape)
                 compare_num = len(compare_emb)
                 print("pre_embadding计算完成")
-        # return compare_emb, compare_num, all_obj
+        return compare_emb, compare_num, all_obj_name#数据库embadding，人数，目录标签
 
     def main(self, stop):
         with tf.Graph().as_default():
@@ -83,7 +83,7 @@ class face():
                     feed_dict = {images_placeholder: images, phase_train_placeholder: False}
                     compare_emb = sess.run(embeddings, feed_dict=feed_dict)  # 计算对比图片embadding，embdadding是一个128维的张量
                     print('compare_emb_shape:', compare_emb.shape)
-                    compare_num = len(compare_emb)
+                    compare_num = len(compare_emb)#emb_img中的人数
 
                 capture = cv2.VideoCapture(0)
                 cv2.namedWindow("face recognition", 1)
@@ -98,10 +98,8 @@ class face():
                         emb = sess.run(embeddings, feed_dict=feed_dict)
                         print("emb shape:", emb.shape)
                         pre_person_num = len(emb)  # 存在多个人脸，embadding.shape为[n,128]，（n:人数）
-
                         find_obj = []
                         print('识别到的人数:', pre_person_num)
-
                         image1 = cv2.putText(frame, 'Press esc to exit', (10, 30), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1,
                                              (0, 0, 255),
                                              thickness=1, lineType=1)
@@ -170,5 +168,45 @@ class face():
 
 
 if __name__ == '__main__':
-    face_test = face()
-    face_test.main(False)
+    # face_test = face()
+    # face_test.main(False)
+
+    opsql = sqlite3_op.Operate_Sql()
+    f = face()
+    emb_received, ret1, ret2 = f.init_pre_embdading()  # 接受第一张图片的embadding
+    list_emb = []
+    emb_temp = np.zeros(128)
+    emb_sql_read=np.zeros(128)
+    str_emb = ''
+    len_emb=len(emb_received)
+    print(type(emb_received))
+    print('len:',len_emb)
+    for i in range(len_emb):
+        emb_sql_read=emb_received[i]
+    print(emb_sql_read)
+    print(type(emb_sql_read))
+
+    # print('emb_received:', emb_received)
+    # print('emb_receivedtype:', type(emb_received))
+    #
+    # for i in range(128):
+    #     list_emb.append(str(emb_received[i]))  # 加入到list
+    #     str_emb = str_emb + ' ' + list_emb[i]  # list转str
+    #
+    # print('ndarray转list:', list_emb)
+    # print('list_emb的type:', type(list_emb))
+    # print('str_emb:', str_emb)  # 存入数据库
+    # print('str_emb的type：:', type(str_emb))
+    # str_to_list = str_emb.split()
+    # print('str转list', str_to_list, '\nstr_to_list的type：', type(str_to_list))
+    #
+    # for i in range(128):
+    #     emb_temp[i] = float(list_emb[i])
+    # print('list转ndarray:', emb_temp)
+    # print('emb_arr1.type:', type(emb_temp))
+    #
+    # fname = 'llf'
+    #
+    # opsql.insert_emb(fname, str_emb)
+
+

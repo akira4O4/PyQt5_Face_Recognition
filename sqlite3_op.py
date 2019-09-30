@@ -1,6 +1,7 @@
 import sqlite3 as db
 import numpy as np
 
+
 class Operate_Sql():
     def __init__(self):
         self.DB_Path = '../DB/FileNameDB.db'
@@ -30,7 +31,7 @@ class Operate_Sql():
         lineIndex = 0
         while lineIndex < readLines:
             row = rows[lineIndex]  # 获取某一行的数据,类型是tuple
-            print(row[0])
+            print(row[0], row[1], row[2])
             lineIndex += 1
 
     # 查询第一条信息
@@ -79,24 +80,48 @@ class Operate_Sql():
         print("删除完成")
         conn.close()
 
-    def inster_emb(self,fname):
-        rows = self.readFronSqllite(self.DB_Path, 'select * from fileName where fName ="' + str(fname) + '";')
-        row = rows[0]  # 获取某一行的数据,类型是tuple
-        # print('embadding：',row[2], '\n')
-        return row[2]
-#
-if __name__ == "__main__":
-    inster_sql= "insert into fileName(embadding) values ("
+    #插入embadding
+    def insert_emb(self, fname, str_emb):
+        sql_find = 'select * from fileName where fName="' + fname + '";'
+        sql_update_emb = 'update fileName set embadding= "'+str_emb+'" where fName="' + fname + '";'
+        sql_insert_emb = 'insert into fileName(fName,embadding) values ("' + fname + '","' + str_emb + '");'
+        conn = db.connect(self.DB_Path)
+        rows = self.readFronSqllite(self.DB_Path, sql_find)  # 查询这个fname有没有embadding
+        row = rows[0]
+        if len(rows) == 0 or rows is None:  # 如果不存在相同名字的文件夹返回假
+            print("不存在")
+        else:
+            print('存在')
+            print(rows)
+            if len(row[2]) == 0 or row[2] == '':#当前label没有embadding
+                print('没有embadding')
+                conn.execute(sql_insert_emb)
+                conn.commit()
+                print("插入完成\n");
+                conn.close()
+            else:
+                print('有embadding')
+                conn.execute(sql_update_emb)
+                conn.commit()
+                print("更新完成\n");
+                conn.close()
 
+
+if __name__ == "__main__":
+    fname = 'llf'
+    str_emb = 'test'
     opSql = Operate_Sql()
-    list_emb = np.zeros(254, dtype=np.int32)
-    sql_emb=opSql.inster_emb('test')
-    print(type(sql_emb))
-    print(type(list_emb))
+    # opSql.insert_emb(fname,str_emb)
+    sql_insert_emb = 'insert into fileName(fName,embadding) values ("' + fname + '","' + str_emb + '");'
+    sql_find = 'select * from fileName where fName="' + fname + '";'
+    sql_update_emb = 'update fileName set embadding= "test" where fName="' + fname + '";'
+    print(sql_update_emb)
+
+    opSql.insert_emb('llf', 's')
+
     # print(sql_emb[0])
     # list_emb=sql_emb
     # print(list_emb[0])
-
 
     # print(type(list))
     # print(list)
