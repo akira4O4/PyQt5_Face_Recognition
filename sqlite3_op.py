@@ -1,5 +1,5 @@
 import sqlite3 as db
-
+import numpy as np
 
 class Operate_Sql():
     def __init__(self):
@@ -79,11 +79,27 @@ class Operate_Sql():
         print("删除完成")
         conn.close()
 
-
+    def inster_emb(self,fname):
+        rows = self.readFronSqllite(self.DB_Path, 'select * from fileName where fName ="' + str(fname) + '";')
+        row = rows[0]  # 获取某一行的数据,类型是tuple
+        # print('embadding：',row[2], '\n')
+        return row[2]
 #
 if __name__ == "__main__":
+    inster_sql= "insert into fileName(embadding) values ("
+
     opSql = Operate_Sql()
-    opSql.Select_Same_Name("123")
+    list_emb = np.zeros(254, dtype=np.int32)
+    sql_emb=opSql.inster_emb('test')
+    print(type(sql_emb))
+    print(type(list_emb))
+    # print(sql_emb[0])
+    # list_emb=sql_emb
+    # print(list_emb[0])
+
+
+    # print(type(list))
+    # print(list)
     # name = 123
 
     # print('select * from fileName where fName ="' + str(name) + '";')

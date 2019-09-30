@@ -66,6 +66,7 @@ class face():
                 images_placeholder = tf.get_default_graph().get_tensor_by_name("input:0")
                 embeddings = tf.get_default_graph().get_tensor_by_name("embeddings:0")
                 phase_train_placeholder = tf.get_default_graph().get_tensor_by_name("phase_train:0")
+
                 if self.train == True:
                     image = []
                     nrof_images = 0
@@ -83,6 +84,7 @@ class face():
                     compare_emb = sess.run(embeddings, feed_dict=feed_dict)  # 计算对比图片embadding，embdadding是一个128维的张量
                     print('compare_emb_shape:', compare_emb.shape)
                     compare_num = len(compare_emb)
+
                 capture = cv2.VideoCapture(0)
                 cv2.namedWindow("face recognition", 1)
                 while True:
@@ -142,7 +144,7 @@ class face():
                     if key == 27:
                         break
                 capture.release()
-                cv2.destroyWindow("camera")
+                cv2.destroyWindow("face recognition")
 
     def load_and_align_data(self, img, image_size):
         minsize = 20
