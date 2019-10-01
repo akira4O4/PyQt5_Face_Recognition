@@ -7,6 +7,7 @@ import facenet
 import align.detect_face
 import argparse
 import sys
+import sqlite3_op
 
 
 # 获取人脸部分
@@ -76,16 +77,63 @@ def detection():
         img_path_set.append(one_img)
     print(img_path_set)
     if len(img_path_set) != 0:
-        images = align_data(img_path_set, 160, 1.0)
+        images_align = align_data(img_path_set, 160, 1.0)
 
     # 保存切割好的图片
     count = 0
     for f in os.listdir(img_src):
-        misc.imsave(os.path.join(emb_file, f), images[count])
+        misc.imsave(os.path.join(emb_file, f), images_align[count])
         count = count + 1
         # 删除被剪裁的图片
         os.remove(os.path.join(img_src, f))
+    computing_emb()
     return True
+
+
+# 计算embadding并存入数据库
+def computing_emb():
+    with tf.Graph().as_default():
+        with tf.Session() as sess:
+            opsql = sqlite3_op.Operate_Sql()
+            model = '../20170512-110547/'
+            emb_file = '../emb_img'
+            facenet.load_model(model)
+            images_placeholder = tf.get_default_graph().get_tensor_by_name("input:0")
+            embeddings = tf.get_default_graph().get_tensor_by_name("embeddings:0")
+            phase_train_placeholder = tf.get_default_graph().get_tensor_by_name("phase_train:0")
+            image = []
+            nrof_images = 0
+            # 这里要改为自己emb_img文件夹的位置
+            global compare_emb, compare_num, all_obj_name
+            emb_dir = '../emb_img'
+            all_obj_name = []
+            for i in os.listdir(emb_dir):
+                all_obj_name.append(i)
+                img = misc.imread(os.path.join(emb_dir, i), mode='RGB')
+                print('img.shape:', img.shape)
+                prewhitened = facenet.prewhiten(img)  # 预白化去除冗余信息
+                image.append(prewhitened)
+                nrof_images = nrof_images + 1
+            images = np.stack(image)  # 沿着新轴连接数组的序列。
+            feed_dict = {images_placeholder: images, phase_train_placeholder: False}
+            # 计算对比图片embadding，embdadding是一个128维的张量
+            compare_emb = sess.run(embeddings, feed_dict=feed_dict)
+            compare_num = len(compare_emb)
+            print('compare_emb:', compare_emb)
+            print('compare_emb_shape:', compare_emb.shape)
+            print("pre_embadding计算完成")
+
+            for i in os.listdir(emb_dir):
+                index = 0
+                name = i.split(".")
+                print(name[0])
+                opsql.insert_emb(name[0], compare_emb[index])
+                index+=1
+
+            # 移除已经计算过的image
+            for f in os.listdir(emb_file):
+                pass
+                # os.remove(os.path.join(emb_file, f))
 
 
 def parse_arguments(argv):
@@ -101,3 +149,7 @@ def main(args):
 if __name__ == "__main__":
     main(parse_arguments(sys.argv[1:]))
     # detection()
+    # emb_file = '../emb_img'
+    # for i in os.listdir(emb_file):
+    #     name = i.split(".")
+    #     print(name[0])

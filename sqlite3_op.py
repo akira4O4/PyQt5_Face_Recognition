@@ -89,8 +89,8 @@ class Operate_Sql():
             str_emb = str_emb + ' ' + list_emb[i]  # list转str
 
         sql_find = 'select * from fileName where fName="' + fname + '";'
-        sql_update_emb = 'update fileName set embadding= "' + str_emb + '" where fName="' + fname + '";'
-        sql_insert_emb = 'insert into fileName(fName,embadding) values ("' + fname + '","' + str_emb + '");'
+        sql_update_emb = 'update fileName set flag=1, embadding= "' + str_emb + '" where fName="' + fname + '";'
+        sql_insert_emb = 'insert into fileName(fName,falg,embadding) values ("' + fname + '",1,"' + str_emb + '");'
         conn = db.connect(self.DB_Path)
         rows = self.readFronSqllite(self.DB_Path, sql_find)  # 查询这个fname有没有embadding
 
@@ -103,47 +103,60 @@ class Operate_Sql():
         else:
             print('存在')
             row = rows[0]
-            print(rows)
-            if len(row[2]) == 0 or row[2] == '':  # 当前label没有embadding，直接插入embadding
-                print('没有embadding')
-                conn.execute(sql_insert_emb)
-                conn.commit()
-                print("插入完成\n");
-                conn.close()
-            else:  # 更新embadding
-                print('有embadding')
-                conn.execute(sql_update_emb)
-                conn.commit()
-                print("更新完成\n");
-                conn.close()
+            print(row)
+            # if len(row[1]) == 0: #or row[2] is None:  # 当前label没有embadding，直接插入embadding
+            print('没有embadding')
+            conn.execute(sql_update_emb)
+            conn.commit()
+            print("插入完成\n");
+            conn.close()
+            # else:  # 更新embadding
+            #     print('有embadding')
+            #     conn.execute(sql_update_emb)
+            #     conn.commit()
+            #     print("更新完成\n");
+            #     conn.close()
 
     def get_sql_emb(self):
         list_emb = []
         emb_temp = np.zeros(128)
         num = self.Num_Now_All()
         emb_arr = np.zeros([num, 128])
-        name=[]
-        str_emb=np.empty([num,128],dtype=float)
+        name = []
+        str_emb = np.empty([num, 128], dtype=float)
 
-        #获取所有行
+        # 获取所有行
         rows = self.readFronSqllite(self.DB_Path, self.sqlStr_SelectAll)
         lineIndex = 0
-        while lineIndex < num:
-            row = rows[lineIndex]  # 获取某一行的数据,类型是tuple
-            # print(row[0])
-            name.append(row[0])#获取名字
+        if len(rows) == 0 or rows == '':
+            emb_arr = 0
+        else:
+            while lineIndex < num:
+                row = rows[lineIndex]  # 获取某一行的数据,类型是tuple
+                # print(row[0])
+                name.append(row[0])  # 获取名字
+                if row[1] == 0:
+                    emb_arr[lineIndex] = np.full((1, 128), 10)
+                else:
+                    str_to_list = row[2].split()  # 以空格分割字符串
+                    for i in range(128):
+                        emb_arr[lineIndex][i] = float(str_to_list[i])  # 'list转ndarray:'，str->float
+                lineIndex += 1
 
-            str_to_list = row[2].split()#以空格分割字符串
-            for i in range(128):
-                emb_arr[lineIndex][i] = float(str_to_list[i])#'list转ndarray:'，str->float
-            lineIndex += 1
-
-        return name,emb_arr,num
+        return name, emb_arr, num
 
 
 if __name__ == "__main__":
     fname = 'llf'
     str_emb = 'test'
+    sql_insert_emb = 'insert into fileName(fName,falg,embadding) values ("' + fname + '",1,"' + str_emb + '");'
+    sql_update_emb = 'update fileName set flag=1, embadding= "' + str_emb + '" where fName="' + fname + '";'
+    print(sql_update_emb)
+    # print(sql_insert_emb)
+    # emb_arr = np.zeros([2, 128])
+    # print(emb_arr)
+    # emb_arr[0] = np.full((1, 128), 10)
+    # print(emb_arr)
     # opSql = Operate_Sql()
     # opSql.insert_emb('llf', 's')
 

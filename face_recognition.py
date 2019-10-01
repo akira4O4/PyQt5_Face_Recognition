@@ -15,7 +15,7 @@ class face():
     def __init__(self):
         self.init_mtcnn()
         self.train = False
-        self.opsql=sqlite3_op.Operate_Sql()
+        self.opsql = sqlite3_op.Operate_Sql()
         # if self.train == False:
         #     self.init_pre_embdading()
 
@@ -69,25 +69,26 @@ class face():
                 embeddings = tf.get_default_graph().get_tensor_by_name("embeddings:0")
                 phase_train_placeholder = tf.get_default_graph().get_tensor_by_name("phase_train:0")
 
-                if self.train == True:
-                    image = []
-                    nrof_images = 0
-                    emb_dir = '../emb_img'
-                    all_obj_name = []
-                    for i in os.listdir(emb_dir):
-                        all_obj_name.append(i)
-                        img = misc.imread(os.path.join(emb_dir, i), mode='RGB')
-                        print('img.shape:', img.shape)
-                        prewhitened = facenet.prewhiten(img)  # 预白化去除冗余信息
-                        image.append(prewhitened)
-                        nrof_images = nrof_images + 1
-                    images = np.stack(image)  # 沿着新轴连接数组的序列。
-                    feed_dict = {images_placeholder: images, phase_train_placeholder: False}
-                    compare_emb = sess.run(embeddings, feed_dict=feed_dict)  # 计算对比图片embadding，embdadding是一个128维的张量
-                    print('compare_emb_shape:', compare_emb.shape)
-                    compare_num = len(compare_emb)  # emb_img中的人数
+                # if self.train == True:
+                #     image = []
+                #     nrof_images = 0
+                #     emb_dir = '../emb_img'
+                #     all_obj_name = []
+                #     for i in os.listdir(emb_dir):
+                #         all_obj_name.append(i)
+                #         img = misc.imread(os.path.join(emb_dir, i), mode='RGB')
+                #         print('img.shape:', img.shape)
+                #         prewhitened = facenet.prewhiten(img)  # 预白化去除冗余信息
+                #         image.append(prewhitened)
+                #         nrof_images = nrof_images + 1
+                #     images = np.stack(image)  # 沿着新轴连接数组的序列。
+                #     feed_dict = {images_placeholder: images, phase_train_placeholder: False}
+                #     compare_emb = sess.run(embeddings, feed_dict=feed_dict)  # 计算对比图片embadding，embdadding是一个128维的张量
+                #     print('compare_emb_shape:', compare_emb.shape)
+                #     compare_num = len(compare_emb)  # emb_img中的人数
 
-                all_obj_name,compare_emb,compare_num=self.opsql.get_sql_emb()
+                all_obj_name, compare_emb, compare_num = self.opsql.get_sql_emb()
+                print(compare_emb)
                 capture = cv2.VideoCapture(0)
                 cv2.namedWindow("face recognition", 1)
                 while True:
@@ -109,11 +110,14 @@ class face():
 
                         for i in range(pre_person_num):  # 为bounding_box 匹配标签
                             dist_list = []  # 距离列表
-                            for j in range(compare_num):
-                                # 求误差(欧氏距离)，存储每个embadding-compare_embadding对应的distance
-                                dist = np.sqrt(np.sum(np.square(np.subtract(emb[i, :], compare_emb[j, :]))))
-                                dist_list.append(dist)
-                            min_value = min(dist_list)  # 求视频帧和对比图直接最小的差值，即表示为最相似的图片
+                            if compare_num == 0:
+                                min_value=1
+                            else:
+                                for j in range(compare_num):
+                                    # 求误差(欧氏距离)，存储每个embadding-compare_embadding对应的distance
+                                    dist = np.sqrt(np.sum(np.square(np.subtract(emb[i, :], compare_emb[j, :]))))
+                                    dist_list.append(dist)
+                                min_value = min(dist_list)  # 求视频帧和对比图直接最小的差值，即表示为最相似的图片
                             if (min_value > 0.65):  # margin==0.65
                                 find_obj.append('Unknow')
                             else:
@@ -198,8 +202,6 @@ if __name__ == '__main__':
     # print(type(emb))
     # print(emb_arr)
     # print(type(emb_sql_read))
-
-
 
     # print('emb_received:', emb_received)
     # print('emb_receivedtype:', type(emb_received))
