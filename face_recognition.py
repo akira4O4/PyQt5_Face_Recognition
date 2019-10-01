@@ -10,12 +10,14 @@ import facenet
 import align.detect_face
 import sqlite3_op
 
+
 class face():
     def __init__(self):
         self.init_mtcnn()
-        self.train = True
-        if self.train == False:
-            self.init_pre_embdading()
+        self.train = False
+        self.opsql=sqlite3_op.Operate_Sql()
+        # if self.train == False:
+        #     self.init_pre_embdading()
 
     def init_mtcnn(self):
         with tf.Graph().as_default():
@@ -56,7 +58,7 @@ class face():
                 print('compare_emb_shape:', compare_emb.shape)
                 compare_num = len(compare_emb)
                 print("pre_embadding计算完成")
-        return compare_emb, compare_num, all_obj_name#数据库embadding，人数，目录标签
+        return compare_emb, compare_num, all_obj_name  # 数据库embadding，人数，目录标签
 
     def main(self, stop):
         with tf.Graph().as_default():
@@ -83,8 +85,9 @@ class face():
                     feed_dict = {images_placeholder: images, phase_train_placeholder: False}
                     compare_emb = sess.run(embeddings, feed_dict=feed_dict)  # 计算对比图片embadding，embdadding是一个128维的张量
                     print('compare_emb_shape:', compare_emb.shape)
-                    compare_num = len(compare_emb)#emb_img中的人数
+                    compare_num = len(compare_emb)  # emb_img中的人数
 
+                all_obj_name,compare_emb,compare_num=self.opsql.get_sql_emb()
                 capture = cv2.VideoCapture(0)
                 cv2.namedWindow("face recognition", 1)
                 while True:
@@ -168,23 +171,35 @@ class face():
 
 
 if __name__ == '__main__':
-    # face_test = face()
-    # face_test.main(False)
+    face_test = face()
+    face_test.main(False)
 
-    opsql = sqlite3_op.Operate_Sql()
-    f = face()
-    emb_received, ret1, ret2 = f.init_pre_embdading()  # 接受第一张图片的embadding
-    list_emb = []
-    emb_temp = np.zeros(128)
-    emb_sql_read=np.zeros(128)
-    str_emb = ''
-    len_emb=len(emb_received)
-    print(type(emb_received))
-    print('len:',len_emb)
-    for i in range(len_emb):
-        emb_sql_read=emb_received[i]
-    print(emb_sql_read)
-    print(type(emb_sql_read))
+    # opsql = sqlite3_op.Operate_Sql()
+    # f = face()
+    # emb_received, ret1, ret2 = f.init_pre_embdading()  # 接受第一张图片的embadding
+    # list_emb = []
+    # emb_temp = np.zeros(128)
+    # emb_sql_read = np.zeros(128)
+    # str_emb = ''
+    # len_emb = len(emb_received)
+    # print(type(emb_received))
+    # print('len:', len_emb)
+    #
+    # emb_arr = np.zeros([len_emb, 128])
+    #
+    # for i in range(len_emb):
+    #     print(emb_received[i])
+    # opsql.insert_emb('llf',emb_received[0])
+    # opsql.insert_emb('nana',emb_received[1])
+
+    # name,emb=opsql.get_sql_emb()
+    # print(name)
+    # print(emb)
+    # print(type(emb))
+    # print(emb_arr)
+    # print(type(emb_sql_read))
+
+
 
     # print('emb_received:', emb_received)
     # print('emb_receivedtype:', type(emb_received))
@@ -204,9 +219,7 @@ if __name__ == '__main__':
     #     emb_temp[i] = float(list_emb[i])
     # print('list转ndarray:', emb_temp)
     # print('emb_arr1.type:', type(emb_temp))
-    #
+
     # fname = 'llf'
     #
     # opsql.insert_emb(fname, str_emb)
-
-
