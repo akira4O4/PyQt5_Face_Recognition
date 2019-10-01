@@ -191,7 +191,7 @@ class Ui_Face_Recognition_window(object):
 
     def retranslateUi(self, Face_Recognition_window):
         _translate = QtCore.QCoreApplication.translate
-        Face_Recognition_window.setWindowTitle(_translate("Face_Recognition_window", "人脸识别1.0"))
+        Face_Recognition_window.setWindowTitle(_translate("Face_Recognition_window", "人脸识别V2.0"))
         self.lab_frame.setText(_translate("Face_Recognition_window", "没有图像输入"))
         self.lab_selecFile.setText(_translate("Face_Recognition_window", "选择标签："))
         self.lab_faceNum.setText(_translate("Face_Recognition_window", "当前人脸标签个数:"))

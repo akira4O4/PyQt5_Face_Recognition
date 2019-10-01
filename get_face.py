@@ -133,7 +133,7 @@ def computing_emb():
             # 移除已经计算过的image
             for f in os.listdir(emb_file):
                 pass
-                # os.remove(os.path.join(emb_file, f))
+                os.remove(os.path.join(emb_file, f))
 
 
 def parse_arguments(argv):
