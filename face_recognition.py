@@ -111,7 +111,7 @@ class face():
                         for i in range(pre_person_num):  # 为bounding_box 匹配标签
                             dist_list = []  # 距离列表
                             if compare_num == 0:
-                                min_value=1
+                                min_value = 1
                             else:
                                 for j in range(compare_num):
                                     # 求误差(欧氏距离)，存储每个embadding-compare_embadding对应的distance
@@ -142,7 +142,7 @@ class face():
                                 thickness=2,
                                 lineType=2)
                         # return frame
-                        cv2.imshow('face recognition', frame)
+                    cv2.imshow('face recognition', frame)
                     key = cv2.waitKey(3)
                     if stop == True:
                         break

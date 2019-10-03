@@ -121,6 +121,7 @@ def computing_emb():
             compare_num = len(compare_emb)
             print('compare_emb:', compare_emb)
             print('compare_emb_shape:', compare_emb.shape)
+            print('type:',type(compare_emb))
             print("pre_embadding计算完成")
 
             for i in os.listdir(emb_dir):
