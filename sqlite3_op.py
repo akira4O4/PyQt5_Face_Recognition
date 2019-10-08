@@ -87,7 +87,6 @@ class Operate_Sql():
         for i in range(128):
             list_emb.append(str(emb[i]))  # 加入到list
             str_emb = str_emb + ' ' + list_emb[i]  # list转str
-
         sql_find = 'select * from fileName where fName="' + fname + '";'
         sql_update_emb = 'update fileName set flag=1, embadding= "' + str_emb + '" where fName="' + fname + '";'
         sql_insert_emb = 'insert into fileName(fName,falg,embadding) values ("' + fname + '",1,"' + str_emb + '");'
@@ -110,12 +109,6 @@ class Operate_Sql():
             conn.commit()
             print("插入完成\n");
             conn.close()
-            # else:  # 更新embadding
-            #     print('有embadding')
-            #     conn.execute(sql_update_emb)
-            #     conn.commit()
-            #     print("更新完成\n");
-            #     conn.close()
 
     def get_sql_emb(self):
         list_emb = []

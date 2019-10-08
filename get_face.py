@@ -9,7 +9,6 @@ import argparse
 import sys
 import sqlite3_op
 
-
 # 获取人脸部分
 def align_data(image_path, imgae_size, gpu_memory_faction):
     minsize = 20
@@ -56,7 +55,7 @@ def align_data(image_path, imgae_size, gpu_memory_faction):
         aligned = misc.imresize(cropped, (imgae_size, imgae_size), interp='bilinear')  # 默认双线性插值
         prewhitened = facenet.prewhiten(aligned)  # 取出冗余数据
         image_list.append(prewhitened)
-    images = np.stack(image_list)  # 沿着新轴连接数组的序列
+    images = np.stack(image_list)
     return images
 
 
@@ -103,7 +102,6 @@ def computing_emb():
             phase_train_placeholder = tf.get_default_graph().get_tensor_by_name("phase_train:0")
             image = []
             nrof_images = 0
-            # 这里要改为自己emb_img文件夹的位置
             global compare_emb, compare_num, all_obj_name
             emb_dir = '../emb_img'
             all_obj_name = []
