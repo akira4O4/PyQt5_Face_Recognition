@@ -1,6 +1,6 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+# from __future__ import absolute_import
+# from __future__ import division
+# from __future__ import print_function
 
 import cv2
 import sys
@@ -134,11 +134,13 @@ class add_window(QDialog, Ui_Form_add):
                 #                                          buttons=QtWidgets.QMessageBox.Ok,
                 #                                          defaultButton=QtWidgets.QMessageBox.Ok)
 
-#提示窗口
-class help_window(QDialog,Ui_help):
+
+# 提示窗口
+class help_window(QDialog, Ui_help):
     def __init__(self):
         super(help_window, self).__init__()
         self.setupUi(self)
+
 
 # 主窗口类
 class MainWindow(QMainWindow, Ui_Face_Recognition_window):
