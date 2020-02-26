@@ -2,15 +2,18 @@ import tensorflow as tf
 import numpy as np
 import os
 from scipy import misc
+from skimage import transform
 import copy
 import facenet
 import align.detect_face
 import argparse
 import sys
 import sqlite3_op
+import cv2
+import imageio
 
 
-# 获取人脸部分
+# 对其人脸
 def align_data(image_path, imgae_size, gpu_memory_faction):
     minsize = 20
     threshhold = [0.6, 0.7, 0.7]
@@ -26,35 +29,30 @@ def align_data(image_path, imgae_size, gpu_memory_faction):
 
     temp_image_path = copy.copy(image_path)  # 浅拷贝文件目录
     image_list = []  # 图片列表
-    for i_path in temp_image_path:
-        img = misc.imread(os.path.expanduser(i_path), mode='RGB')  # 这样读出来的图片格式为numpy类型，后面就不需要再转换了
+    for path in temp_image_path:
+        img = misc.imread(os.path.expanduser(path), mode='RGB')  # 这样读出来的图片格式为numpy类型，后面就不需要再转换了
         img_size = np.asarray(img.shape)[0:2]  # 获取数据尺寸类型为ndarray
-        print(i_path)
-
-        # print('img.shape:', img.shape)
-        # print('img_size:', img_size)
+        print(path)
 
         bounding_boxes, _ = align.detect_face.detect_face(img, minsize, pnet, onet, rnet, threshhold, factor)
         if len(bounding_boxes) < 1:
-            image_path.remove(i_path)
-            print("无法检测到脸部，删除", i_path)
+            image_path.remove(path)
+            print("无法检测到脸部，删除", path)
             continue
 
-        # print('bounding_boxes:', bounding_boxes)
         det = np.squeeze(bounding_boxes[0, 0:4])  # 从数组的形状中删除单维度条目，即把shape中为1的维度去掉,数据降维
-        # print('bounding_boxes降维:', det)
-        # 切片操作需要整数类型
 
+        # 切片操作需要整数类型
         bb = np.zeros(4, dtype=np.int32)
         bb[0] = det[0]
         bb[1] = det[1]
         bb[2] = det[2]
         bb[3] = det[3]
-        cropped = img[bb[1]:bb[3], bb[0]:bb[2], :]  # 四角坐标
-        # print('cropped shape:', cropped.shape)
-        # 改变图像大小并且隐藏归一化到0-255区间，根据cropped位置对原图重定义size
-        aligned = misc.imresize(cropped, (imgae_size, imgae_size), interp='bilinear')  # 默认双线性插值
-        prewhitened = facenet.prewhiten(aligned)  # 取出冗余数据
+        cropped = img[bb[1]:bb[3], bb[0]:bb[2], :]  # 对角坐标
+
+        # aligned = misc.imresize(cropped, (imgae_size, imgae_size), interp='bicubic')  # 默认双三线性插值
+        cropped = cv2.resize(cropped, (imgae_size, imgae_size), interpolation=cv2.INTER_AREA)# 默认双三线性插值
+        prewhitened = facenet.prewhiten(cropped)  # 欲白化，取出冗余数据
         image_list.append(prewhitened)
     images = np.stack(image_list)
     return images
@@ -62,31 +60,31 @@ def align_data(image_path, imgae_size, gpu_memory_faction):
 
 def detection():
     img_src = '../src_img/'  # 图片输入目录
+    emb_file = '../emb_img'  # 人脸目录
     img_path_set = []
-    emb_file = '../emb_img'
 
     # 如果不存在这个目录就新建一个
-    if (os.path.exists(emb_file) == False):
+    if os.path.exists(emb_file) == False :
         os.mkdir(emb_file)
 
-    # 获取目录下所有作品的路径
-    for f in os.listdir(img_src):  # os.listdir() 方法用于返回指定的文件夹包含的文件或文件夹的名字的列表
+    # 获取目录下所有图片的路径
+    # os.listdir() 方法用于返回指定的文件夹包含的文件或文件夹的名字的列表
+    for f in os.listdir(img_src):
         one_img = os.path.join(img_src, f)
-        # print('组合路径:', one_img)
-        # print('单文件名:', f)
         img_path_set.append(one_img)
     print(img_path_set)
     if len(img_path_set) != 0:
+        # 重新切割图片
         images_align = align_data(img_path_set, 160, 1.0)
 
     # 保存切割好的图片
     count = 0
     for f in os.listdir(img_src):
-        misc.imsave(os.path.join(emb_file, f), images_align[count])
+        imageio.imwrite(os.path.join(emb_file, f), images_align[count])
         count = count + 1
-        # 删除被剪裁的图片
-        os.remove(os.path.join(img_src, f))
-    computing_emb()
+        # 删除已经被剪裁的图片
+        # os.remove(os.path.join(img_src, f))
+    # computing_emb()
     return True
 
 
