@@ -13,7 +13,7 @@ import cv2
 import imageio
 
 
-# 对其人脸
+# MTCNN人脸检测
 def align_data(image_path, imgae_size, gpu_memory_faction):
     minsize = 20
     threshhold = [0.6, 0.7, 0.7]
@@ -49,22 +49,22 @@ def align_data(image_path, imgae_size, gpu_memory_faction):
         bb[2] = det[2]
         bb[3] = det[3]
         cropped = img[bb[1]:bb[3], bb[0]:bb[2], :]  # 对角坐标
-
         # aligned = misc.imresize(cropped, (imgae_size, imgae_size), interp='bicubic')  # 默认双三线性插值
-        cropped = cv2.resize(cropped, (imgae_size, imgae_size), interpolation=cv2.INTER_AREA)# 默认双三线性插值
+        cropped = cv2.resize(cropped, (imgae_size, imgae_size), interpolation=cv2.INTER_AREA)  # 默认双三线性插值
         prewhitened = facenet.prewhiten(cropped)  # 欲白化，取出冗余数据
         image_list.append(prewhitened)
     images = np.stack(image_list)
     return images
 
 
+# 文件夹人脸检测
 def detection():
     img_src = '../src_img/'  # 图片输入目录
     emb_file = '../emb_img'  # 人脸目录
     img_path_set = []
 
     # 如果不存在这个目录就新建一个
-    if os.path.exists(emb_file) == False :
+    if os.path.exists(emb_file) == False:
         os.mkdir(emb_file)
 
     # 获取目录下所有图片的路径
@@ -88,7 +88,7 @@ def detection():
     return True
 
 
-# 计算embadding并存入数据库
+# Facenet计算embadding并存入数据库
 def computing_emb():
     with tf.Graph().as_default():
         with tf.Session() as sess:
@@ -130,7 +130,6 @@ def computing_emb():
 
             # 移除已经计算过的image
             for f in os.listdir(emb_file):
-                pass
                 os.remove(os.path.join(emb_file, f))
 
 
