@@ -9,6 +9,7 @@ import argparse
 import sys
 import sqlite3_op
 
+
 # 获取人脸部分
 def align_data(image_path, imgae_size, gpu_memory_faction):
     minsize = 20
@@ -119,7 +120,7 @@ def computing_emb():
             compare_num = len(compare_emb)
             print('compare_emb:', compare_emb)
             print('compare_emb_shape:', compare_emb.shape)
-            print('type:',type(compare_emb))
+            print('type:', type(compare_emb))
             print("pre_embadding计算完成")
 
             for i in os.listdir(emb_dir):
@@ -127,7 +128,7 @@ def computing_emb():
                 name = i.split(".")
                 print(name[0])
                 opsql.insert_emb(name[0], compare_emb[index])
-                index+=1
+                index += 1
 
             # 移除已经计算过的image
             for f in os.listdir(emb_file):
@@ -147,8 +148,3 @@ def main(args):
 
 if __name__ == "__main__":
     main(parse_arguments(sys.argv[1:]))
-    # detection()
-    # emb_file = '../emb_img'
-    # for i in os.listdir(emb_file):
-    #     name = i.split(".")
-    #     print(name[0])

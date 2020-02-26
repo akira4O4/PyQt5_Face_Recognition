@@ -9,7 +9,6 @@ import os
 import facenet
 import align.detect_face
 import sqlite3_op
-import align.detect_face
 
 
 class face():
@@ -20,6 +19,7 @@ class face():
         # if self.train == False:
         #     self.init_pre_embdading()
 
+    # 初始化MTCNN
     def init_mtcnn(self):
         with tf.Graph().as_default():
             gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=1.0)
@@ -75,6 +75,7 @@ class face():
                 cv2.namedWindow("face recognition", 1)
                 while True:
                     ret, frame = capture.read()
+                    frame = cv2.flip(frame, 1)
                     rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                     # 获取 判断标识 bounding_box crop_image
                     mark, bounding_box, crop_image = self.load_and_align_data(rgb_frame, 160)
@@ -86,7 +87,8 @@ class face():
                         pre_person_num = len(emb)  # 存在多个人脸，embadding.shape为[n,128]，（n:人数）
                         find_obj = []
                         print('识别到的人数:', pre_person_num)
-                        image1 = cv2.putText(frame, 'Press esc to exit', (10, 30), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1,
+                        image1 = cv2.putText(frame, 'Press esc to exit', (10, 30),
+                                             cv2.FONT_HERSHEY_COMPLEX_SMALL, 1,
                                              (0, 0, 255),
                                              thickness=1, lineType=1)
 
@@ -100,6 +102,7 @@ class face():
                                     dist = np.sqrt(np.sum(np.square(np.subtract(emb[i, :], compare_emb[j, :]))))
                                     dist_list.append(dist)
                                 min_value = min(dist_list)  # 求视频帧和对比图直接最小的差值，即表示为最相似的图片
+                                print("最小差值：", min_value)
                             if (min_value > 0.65):  # margin==0.65
                                 find_obj.append('Unknow')
                             else:
@@ -107,22 +110,28 @@ class face():
                                 find_obj.append(all_obj_name[dist_list.index(min_value)])
                                 # 在frame上绘制边框和文字
                         for rec_position in range(pre_person_num):
+                            # if(bounding_box[rec_position, 0]<10 or bounding_box[rec_position, 1]<10 or bounding_box[rec_position, 2]>350 or bounding_box[rec_position, 3]>350):
+                            #     pass
                             # 利用回归边框给input image画框
-                            cv2.rectangle(frame,
-                                          (bounding_box[rec_position, 0], bounding_box[rec_position, 1]),
-                                          (bounding_box[rec_position, 2], bounding_box[rec_position, 3]),
-                                          (0, 255, 0),
-                                          1, 8, 0)
-
-                            cv2.putText(
-                                frame,
-                                find_obj[rec_position],
-                                (bounding_box[rec_position, 0], bounding_box[rec_position, 1]),
-                                cv2.FONT_HERSHEY_COMPLEX_SMALL,
-                                1,
-                                (0, 0, 255),
-                                thickness=2,
-                                lineType=2)
+                            if (bounding_box[rec_position, 0] > 10 and bounding_box[rec_position, 1] > 10):
+                                cv2.rectangle(frame,
+                                              (bounding_box[rec_position, 0], bounding_box[rec_position, 1]),
+                                              (bounding_box[rec_position, 2], bounding_box[rec_position, 3]),
+                                              (0, 255, 0),
+                                              1, 8, 0)
+                                cv2.putText(
+                                    frame,
+                                    find_obj[rec_position],
+                                    (bounding_box[rec_position, 0], bounding_box[rec_position, 1]),
+                                    cv2.FONT_HERSHEY_COMPLEX_SMALL,
+                                    1,
+                                    (0, 0, 255),
+                                    thickness=2,
+                                    lineType=2)
+                            print("0", bounding_box[rec_position, 0], )
+                            print("1", bounding_box[rec_position, 1])
+                            print("2", bounding_box[rec_position, 2])
+                            print("3", bounding_box[rec_position, 3])
                         # return frame
                     cv2.imshow('face recognition', frame)
                     key = cv2.waitKey(3)
@@ -159,51 +168,3 @@ class face():
 if __name__ == '__main__':
     face_test = face()
     face_test.main(False)
-
-    # opsql = sqlite3_op.Operate_Sql()
-    # f = face()
-    # emb_received, ret1, ret2 = f.init_pre_embdading()  # 接受第一张图片的embadding
-    # list_emb = []
-    # emb_temp = np.zeros(128)
-    # emb_sql_read = np.zeros(128)
-    # str_emb = ''
-    # len_emb = len(emb_received)
-    # print(type(emb_received))
-    # print('len:', len_emb)
-    #
-    # emb_arr = np.zeros([len_emb, 128])
-    #
-    # for i in range(len_emb):
-    #     print(emb_received[i])
-    # opsql.insert_emb('llf',emb_received[0])
-    # opsql.insert_emb('nana',emb_received[1])
-
-    # name,emb=opsql.get_sql_emb()
-    # print(name)
-    # print(emb)
-    # print(type(emb))
-    # print(emb_arr)
-    # print(type(emb_sql_read))
-
-    # print('emb_received:', emb_received)
-    # print('emb_receivedtype:', type(emb_received))
-    #
-    # for i in range(128):
-    #     list_emb.append(str(emb_received[i]))  # 加入到list
-    #     str_emb = str_emb + ' ' + list_emb[i]  # list转str
-    #
-    # print('ndarray转list:', list_emb)
-    # print('list_emb的type:', type(list_emb))
-    # print('str_emb:', str_emb)  # 存入数据库
-    # print('str_emb的type：:', type(str_emb))
-    # str_to_list = str_emb.split()
-    # print('str转list', str_to_list, '\nstr_to_list的type：', type(str_to_list))
-    #
-    # for i in range(128):
-    #     emb_temp[i] = float(list_emb[i])
-    # print('list转ndarray:', emb_temp)
-    # print('emb_arr1.type:', type(emb_temp))
-
-    # fname = 'llf'
-    #
-    # opsql.insert_emb(fname, str_emb)
