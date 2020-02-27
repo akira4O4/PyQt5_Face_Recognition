@@ -30,7 +30,7 @@ def align_data(image_path, imgae_size, gpu_memory_faction):
     temp_image_path = copy.copy(image_path)  # 浅拷贝文件目录
     image_list = []  # 图片列表
     for path in temp_image_path:
-        img = misc.imread(os.path.expanduser(path), mode='RGB')  # 这样读出来的图片格式为numpy类型，后面就不需要再转换了
+        img = imageio.imread(os.path.expanduser(path))  # 这样读出来的图片格式为numpy类型，后面就不需要再转换了
         img_size = np.asarray(img.shape)[0:2]  # 获取数据尺寸类型为ndarray
         print(path)
 
@@ -83,8 +83,8 @@ def detection():
         imageio.imwrite(os.path.join(emb_file, f), images_align[count])
         count = count + 1
         # 删除已经被剪裁的图片
-        # os.remove(os.path.join(img_src, f))
-    # computing_emb()
+        os.remove(os.path.join(img_src, f))
+    computing_emb()
     return True
 
 
@@ -95,6 +95,7 @@ def computing_emb():
             opsql = sqlite3_op.Operate_Sql()
             model = '../20170512-110547/'
             emb_file = '../emb_img'
+            # 加载facenet模型
             facenet.load_model(model)
             images_placeholder = tf.get_default_graph().get_tensor_by_name("input:0")
             embeddings = tf.get_default_graph().get_tensor_by_name("embeddings:0")
@@ -102,26 +103,26 @@ def computing_emb():
             image = []
             nrof_images = 0
             global compare_emb, compare_num, all_obj_name
-            emb_dir = '../emb_img'
+
             all_obj_name = []
-            for i in os.listdir(emb_dir):
+            for i in os.listdir(emb_file):
                 all_obj_name.append(i)
-                img = misc.imread(os.path.join(emb_dir, i), mode='RGB')
-                print('img.shape:', img.shape)
+                img = imageio.imread(os.path.join(emb_file, i))
                 prewhitened = facenet.prewhiten(img)  # 预白化去除冗余信息
                 image.append(prewhitened)
                 nrof_images = nrof_images + 1
+
             images = np.stack(image)  # 沿着新轴连接数组的序列。
-            feed_dict = {images_placeholder: images, phase_train_placeholder: False}
+            # feed_dict = {images_placeholder: images, phase_train_placeholder: False}
             # 计算对比图片embadding，embdadding是一个128维的张量
-            compare_emb = sess.run(embeddings, feed_dict=feed_dict)
+            compare_emb = sess.run(embeddings, feed_dict={images_placeholder: images, phase_train_placeholder: False})
             compare_num = len(compare_emb)
             print('compare_emb:', compare_emb)
             print('compare_emb_shape:', compare_emb.shape)
             print('type:', type(compare_emb))
             print("pre_embadding计算完成")
 
-            for i in os.listdir(emb_dir):
+            for i in os.listdir(emb_file):
                 index = 0
                 name = i.split(".")
                 print(name[0])
@@ -144,4 +145,5 @@ def main(args):
 
 
 if __name__ == "__main__":
-    main(parse_arguments(sys.argv[1:]))
+    # main(parse_arguments(sys.argv[1:]))
+    detection()
