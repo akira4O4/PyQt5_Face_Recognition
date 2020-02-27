@@ -89,7 +89,7 @@ class Operate_Sql():
             str_emb = str_emb + ' ' + list_emb[i]  # list转str
         sql_find = 'select * from fileName where fName="' + fname + '";'
         sql_update_emb = 'update fileName set flag=1, embadding= "' + str_emb + '" where fName="' + fname + '";'
-        sql_insert_emb = 'insert into fileName(fName,falg,embadding) values ("' + fname + '",1,"' + str_emb + '");'
+        sql_insert_emb = 'insert into fileName(fName,flag,embadding) values ("' + fname + '",1,"' + str_emb + '");'
         conn = db.connect(self.DB_Path)
         rows = self.readFronSqllite(self.DB_Path, sql_find)  # 查询这个fname有没有embadding
 
@@ -97,7 +97,7 @@ class Operate_Sql():
             print("不存在")
             conn.execute(sql_insert_emb)
             conn.commit()
-            print("插入完成\n");
+            print("插入完成\n")
             conn.close()
         else:
             print('存在')
@@ -107,7 +107,7 @@ class Operate_Sql():
             print('没有embadding')
             conn.execute(sql_update_emb)
             conn.commit()
-            print("插入完成\n");
+            print("插入完成\n")
             conn.close()
 
     def get_sql_emb(self):
