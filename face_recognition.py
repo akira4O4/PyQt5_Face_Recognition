@@ -138,37 +138,13 @@ class face():
                                           (bounding_box[0], bounding_box[1]),
                                           (bounding_box[2], bounding_box[3]),
                                           (0, 255, 0), 1, 8, 0)
-                            print('bbox:', (bounding_box[0], bounding_box[1]),
-                                  (bounding_box[2], bounding_box[3]))
-                            cv2.putText(frame,
-                                        # find_obj[bounding_box],
-                                        'face',
-                                        (bounding_box[0],
-                                         bounding_box[1]),
+                            cv2.putText(frame, find_obj[0],
+                                        (bounding_box[0], bounding_box[1]),
                                         cv2.FONT_HERSHEY_COMPLEX_SMALL,
                                         1,
                                         (0, 0, 255),
                                         thickness=2,
                                         lineType=2)
-
-                        # for rec_position in range(pre_person_num):
-                        #     # 利用回归边框给input image画框
-                        #     if bounding_box[rec_position, 0] > 10 and bounding_box[rec_position, 1] > 10:
-                        #         cv2.rectangle(frame,
-                        #                       (bounding_box[rec_position, 0], bounding_box[rec_position, 1]),
-                        #                       (bounding_box[rec_position, 2], bounding_box[rec_position, 3]),
-                        #                       (0, 255, 0),
-                        #                       1, 8, 0)
-                        #         cv2.putText(
-                        #             frame,
-                        #             find_obj[rec_position],
-                        #             (bounding_box[rec_position, 0], bounding_box[rec_position, 1]),
-                        #             cv2.FONT_HERSHEY_COMPLEX_SMALL,
-                        #             1,
-                        #             (0, 0, 255),
-                        #             thickness=2,
-                        #             lineType=2)
-
                     cv2.imshow('face recognition', frame)
                     key = cv2.waitKey(3)
                     if stop:
@@ -209,8 +185,8 @@ class face():
             h = face_position[3] - face_position[1]
             S = w * h
             print('第:', i)
-            print('w:', face_position[2], '-', face_position[0], '=', w)
-            print('h:', face_position[3], '-', face_position[1], '=', h)
+            print('w:', w)
+            print('h:', h)
 
             Index.append(i)
             Area.append(S)
@@ -218,32 +194,13 @@ class face():
 
         max_face_position = max_face(Area, Position)
 
-        print('bbox:',
-              (max_face_position[0], max_face_position[1]),
+        print('bbox:', (max_face_position[0], max_face_position[1]),
               (max_face_position[2], max_face_position[3]))
 
-        # # 绘制面部边框
-        # cv2.rectangle(img,
-        #               (max_face_position[0], max_face_position[1]),
-        #               (max_face_position[2], max_face_position[3]),
-        #               (0, 255, 0), 1)
-        # cv2.circle(img, (max_face_position[0], max_face_position[1]), 2, (0, 0, 255), -1)
-        # cv2.circle(img, (max_face_position[2], max_face_position[3]), 2, (0, 0, 255), -1)
-        # cv2.putText(img,
-        #             'Max Face',
-        #             (max_face_position[0], max_face_position[1]),
-        #             cv2.FONT_HERSHEY_COMPLEX_SMALL,
-        #             1,
-        #             (0, 0, 255),
-        #             thickness=1,
-        #             lineType=1)
-
-        # 裁剪
         # 裁剪
         temp_crop = img[max_face_position[1]:max_face_position[3], max_face_position[0]:max_face_position[2], :]
-        aligned = cv2.resize(temp_crop,
-                             (image_size, image_size),
-                             interpolation=cv2.INTER_AREA)
+        aligned = cv2.resize(temp_crop, (image_size, image_size),
+                             interpolation=cv2.INTER_CUBIC)
         face_out = facenet.prewhiten(aligned)
         crop_image = []
         crop_image.append(np.stack(face_out))
