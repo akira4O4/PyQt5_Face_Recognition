@@ -53,7 +53,6 @@ class face():
                 phase_train_placeholder = tf.get_default_graph().get_tensor_by_name("phase_train:0")
                 image = []
                 nrof_images = 0
-                # 这里要改为自己emb_img文件夹的位置
                 global compare_emb, compare_num, all_obj_name
                 emb_dir = '../emb_img'
                 all_obj_name = []
@@ -163,11 +162,7 @@ class face():
         #                  interpolation=cv2.INTER_AREA)
 
         # bounding_boxes shape:(1,5)  type:np.ndarray
-        bounding_boxes, _ = align.detect_face.detect_face(img,
-                                                          minsize,
-                                                          pnet, rnet, onet,
-                                                          threshold,
-                                                          factor)
+        bounding_boxes, _ = align.detect_face.detect_face(img, minsize, pnet, rnet, onet, threshold, factor)
         Index = []  # 序列
         Area = []  # 面积
         Position = []  # 坐标
