@@ -1,7 +1,3 @@
-# from __future__ import absolute_import
-# from __future__ import division
-# from __future__ import print_function
-
 import cv2
 import sys
 import os
@@ -9,7 +5,7 @@ import get_face
 import tensorflow as tf
 from PyQt5.QtWidgets import *
 from main_ui import Ui_Face_Recognition_window
-from addFace_ui import Ui_Form_add
+from addFace_ui import Ui_Form_Add_Face
 from delwin_ui import Ui_Form_Del
 from help import Ui_help
 from prompt import Ui_For_prompt
@@ -25,11 +21,6 @@ import os
 import facenet
 import align.detect_face
 
-
-# class prompt(QDialog,Ui_For_prompt):
-#     def __init__(self):
-#         super(prompt,self).__init__()
-#         self.setupUi(self)
 
 # 添加删除窗口
 class del_window(QDialog, Ui_Form_Del):
@@ -81,7 +72,7 @@ class del_window(QDialog, Ui_Form_Del):
 
 
 # 添加窗口类
-class add_window(QDialog, Ui_Form_add):
+class add_window(QDialog, Ui_Form_Add_Face):
     def __init__(self):
         super(add_window, self).__init__()
         self.setupUi(self)
@@ -164,10 +155,10 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
         self.Combobox_Init()  # 初始化下拉列表
         self.lab_faceNumShow.setText(str(self.opsql.Num_Now_All()) + '张')  # 显示数据库中存在的人脸个数
         self.lab_selecFile.setText("选择标签：")
-        self.pNum = 0;  # 照片计数器
+        self.pNum = 0  # 照片计数器
         self.photo_transmission = 0  # 图片传输变量
         self.frame_out = 0
-        self.face = face_recognition.face()
+        # self.face = face_recognition.face()
 
     # 槽初始化
     def slot_init(self):
