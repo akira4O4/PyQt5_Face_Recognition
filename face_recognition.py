@@ -1,15 +1,16 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
+
+import imageio
 import cv2
-from scipy import misc
 import tensorflow as tf
 import numpy as np
 import os
+
 import facenet
 import align.detect_face
 import sqlite3_op
-import imageio
 
 
 # 获取最大人脸索引
@@ -44,6 +45,7 @@ class face():
 
     # 提前计算pre_embadding
     def init_pre_embdading(slef):
+        print('初始化 Facenet')
         with tf.Graph().as_default():
             with tf.Session() as sess:
                 model = '../20170512-110547/'
@@ -155,6 +157,7 @@ class face():
 
     def load_and_align_data(self, img, image_size):
         minsize = 20
+
         threshold = [0.6, 0.7, 0.7]
         factor = 0.709
 
