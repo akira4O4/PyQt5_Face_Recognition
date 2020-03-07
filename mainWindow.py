@@ -5,7 +5,7 @@ import get_face
 import tensorflow as tf
 from PyQt5.QtWidgets import *
 from main_ui import Ui_Face_Recognition_window
-from addFace_ui import Ui_Form_Add_Face
+from addStudent import Ui_Form_Add_Face
 from delwin_ui import Ui_Form_Del
 from help import Ui_help
 from prompt import Ui_For_prompt
