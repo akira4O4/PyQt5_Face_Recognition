@@ -111,7 +111,6 @@ class Operate_Sql():
             print("插入完成\n")
             conn.close()
 
-
     def get_sql_emb(self):
         list_emb = []
         emb_temp = np.zeros(128)
@@ -140,7 +139,7 @@ class Operate_Sql():
 
         return name, emb_arr, num
 
-    #删除班级表
+    # 删除班级表
     def delete_pc_table(self, profession, class_):
         table = profession + class_
         # 先检查是否存在这个表
@@ -153,12 +152,12 @@ class Operate_Sql():
         if rows[0][0] == 0:
             print('不存在这个表')
             return False
-        sql_drop='drop table {table}'.format(table=table)
+        sql_drop = 'drop table {table}'.format(table=table)
         print(sql_drop)
         conn.execute(sql_drop)
         conn.commit()
         conn.close()
-        print('删除完成:',table)
+        print('删除完成:', table)
         return True
 
     # 插入新的班级表
@@ -177,21 +176,48 @@ class Operate_Sql():
             return False
         # 插入新表
         sql_createnewtable = 'CREATE TABLE {tablename}(' \
-                     'name varchar(10) not null,' \
-                     'sex varchar(1) not null,' \
-                     'id int primary key not null,' \
-                     'profession varchar(50) not null,' \
-                     'features int not null,' \
-                     'flag int default 0 not null' \
-                     ');'.format(tablename=table)
+                             'name varchar(10) not null,' \
+                             'sex varchar(1) not null,' \
+                             'id int primary key not null,' \
+                             'profession varchar(50) not null,' \
+                             'features int not null,' \
+                             'flag int default 0 not null' \
+                             ');'.format(tablename=table)
         conn.execute(sql_createnewtable)
         conn.commit()
         conn.close()
         print('创建完成')
         return True
 
+    # 查询所有表名
+    def select_all_table(self):
+
+        conn = db.connect(self.New_DB_Path)
+        cursor = conn.cursor()
+        conn.row_factory = db.Row
+
+        # 查询所有表名
+        sql_all_table = 'SELECT name FROM sqlite_master WHERE type="table" ORDER BY name;'
+        # 查询表个数
+        sql_all_num = 'select count(*) from sqlite_master where type="table"; '
+
+        cursor.execute(sql_all_num)
+        rows = cursor.fetchall()
+        num = rows[0][0]
+        print('总共有{num}个表'.format(num=num))
+
+        cursor.execute(sql_all_table)
+        rows = cursor.fetchall()
+        print(rows)
+        table_name = []
+        for i in range(num):
+            table_name.append(rows[i][0])
+
+        return table_name
+
 
 if __name__ == "__main__":
     sql = Operate_Sql()
     # sql.create_new_pc_table('CS', '172')
-    sql.delete_pc_table('CS', '172')
+    # sql.delete_pc_table('CS', '172')
+    sql.select_all_table()
