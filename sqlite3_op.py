@@ -5,6 +5,7 @@ import numpy as np
 class Operate_Sql():
     def __init__(self):
         self.DB_Path = '../DB/FileNameDB.db'
+        self.New_DB_Path = '../DB/StudentCheckWork.db'
         self.sqlStr_SelectAll = "select * from fileName;"
         self.sqlStr_InsertNewName = "insert into fileName(fName) values ("
         self.sqlStr_count = " select count(*) from fileName;"
@@ -138,54 +139,36 @@ class Operate_Sql():
 
         return name, emb_arr, num
 
+    # 插入新的班级表
+    def create_new_pc_table(self, profession, class_):
+        table = profession + class_
+        # 先检查是否存在相同名字的表
+        sql = "SELECT COUNT(*) FROM sqlite_master where type='table' and name='{str}';".format(str=table)
+        # print(sql)
+        conn = db.connect(self.New_DB_Path)
+        cursor = conn.cursor()
+        conn.row_factory = db.Row
+        cursor.execute(sql)
+        rows = cursor.fetchall()
+        if rows[0][0] == 1:
+            print('存在相同名字的表')
+            return False
+        # 插入新表
+        sql_createnewtable = 'CREATE TABLE {tablename}(' \
+                     'name varchar(10) not null,' \
+                     'sex varchar(1) not null,' \
+                     'id int primary key not null,' \
+                     'profession varchar(50) not null,' \
+                     'features int not null,' \
+                     'flag int default 0 not null' \
+                     ');'.format(tablename=table)
+        conn.execute(sql_createnewtable)
+        conn.commit()
+        conn.close()
+        print('创建完成')
+        return True
+
 
 if __name__ == "__main__":
-    fname = 'llf'
-    str_emb = 'test'
-    sql_insert_emb = 'insert into fileName(fName,falg,embadding) values ("' + fname + '",1,"' + str_emb + '");'
-    sql_update_emb = 'update fileName set flag=1, embadding= "' + str_emb + '" where fName="' + fname + '";'
-    print(sql_update_emb)
-    # print(sql_insert_emb)
-    # emb_arr = np.zeros([2, 128])
-    # print(emb_arr)
-    # emb_arr[0] = np.full((1, 128), 10)
-    # print(emb_arr)
-    # opSql = Operate_Sql()
-    # opSql.insert_emb('llf', 's')
-
-    # print(sql_emb[0])
-    # list_emb=sql_emb
-    # print(list_emb[0])
-
-    # print(type(list))
-    # print(list)
-    # name = 123
-
-    # print('select * from fileName where fName ="' + str(name) + '";')
-#     pass
-# name = "123"
-# print('select * from fileName where fName ="' + name + '";')
-#
-# opSql.Select_All_Name()
-#     opSql.Delete_File_Name('234')
-# #
-# #     #插入一条新记录
-# name='111'
-# flag = opSql.Select_Same_Name(name)
-#     print('构建的插入语句：'+newname)
-#     opSql.Insert_New_Name(newname)
-#
-#     # 查询总行数
-#     num = opSql.Num_Row_All()
-#     print('总行数为：', num,'\n')
-#
-#     # 查询第一条记录
-#     opSql.SelcetFirst()
-#
-#     # 查询所有记录
-#     opSql.Select_All()
-#
-#     # # 测试sql构建语句
-#     # print(opSql.CreatSqlStr('llf'))
-#     # print("insert into fileName(fName) values ('llf');")
-#
+    sql = Operate_Sql()
+    sql.create_new_pc_table('CS', '172')
