@@ -7,6 +7,8 @@ from PyQt5.QtWidgets import *
 from MainUI import Ui_Face_Recognition_window
 from addStudent import Ui_Form_Student
 from delwin_ui import Ui_Form_Del
+from addClassTable import Ui_AddClassTable
+from deleteClassTable import Ui_DelClassTable
 from help import Ui_help
 from prompt import Ui_For_prompt
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -71,15 +73,27 @@ class del_window(QDialog, Ui_Form_Del):
             self.btn_hide()  # 隐藏窗口
 
 
-# 添加窗口类
-class add_window(QDialog, Ui_Form_Student):
+class DelClassTable(QDialog, Ui_DelClassTable):
     def __init__(self):
-        super(add_window, self).__init__()
+        super(DelClassTable, self).__init__()
+        self.setupUi(self)
+
+
+# 添加班级表
+class AddClassTable(QDialog, Ui_AddClassTable):
+    def __init__(self):
+        super(AddClassTable, self).__init__()
+        self.setupUi(self)
+
+
+# 添加窗口类
+class AddStudent(QDialog, Ui_Form_Student):
+    def __init__(self):
+        super(AddStudent, self).__init__()
         self.setupUi(self)
         self.slotInit()
         self.opsql = Operate_Sql()
         self.opfile = File_Operate()
-        self.line_addFaceName.clear()
 
     def slotInit(self):
         self.btn_cancel.clicked.connect(self.btn_hide)
@@ -127,9 +141,9 @@ class add_window(QDialog, Ui_Form_Student):
 
 
 # 提示窗口
-class help_window(QDialog, Ui_help):
+class HelpWindow(QDialog, Ui_help):
     def __init__(self):
-        super(help_window, self).__init__()
+        super(HelpWindow, self).__init__()
         self.setupUi(self)
 
 
@@ -139,25 +153,33 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
         self.setupUi(self)
+
         self.DB_Path = '../DB/FileNameDB.db'
         self.sqlStr_SelectAll = "select * from fileName;"
+
         self.opsql = Operate_Sql()
         self.opfile = File_Operate()
+
         self.timer_camera_test = QtCore.QTimer()  # qt计数器
         self.timer_camera_face = QtCore.QTimer()  # qt计数器
-        self.openAddWin = add_window()  # 添加窗口实例
+
+        self.openAddWin = AddStudent()  # 添加窗口实例
         self.openDelWin = del_window()  # 删除窗口实例
-        self.helpWin = help_window()
+        self.helpWin = HelpWindow()  # 帮助窗口实例
+        self.openAddClass = AddClassTable()  # 添加班级表实例
+        self.openDelClass = DelClassTable()  # 删除班级表实例
+
         self.slot_init()
         self.photoNum = 0  # 照片计数
         self.CAM_NUM = 0
         # self.promptWin=prompt()
         self.Combobox_Init()  # 初始化下拉列表
-        self.lab_faceNumShow.setText(str(self.opsql.Num_Now_All()) + '张')  # 显示数据库中存在的人脸个数
-        self.lab_selecFile.setText("选择标签：")
+        # self.lab_faceNumShow.setText(str(self.opsql.Num_Now_All()) + '张')  # 显示数据库中存在的人脸个数
+        # self.lab_selecFile.setText("选择标签：")
         self.pNum = 0  # 照片计数器
         self.photo_transmission = 0  # 图片传输变量
         self.frame_out = 0
+        # 启动Facenet模块
         # self.face = face_recognition.face()
 
     # 槽初始化
@@ -165,17 +187,25 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
         self.btn_openCamera.clicked.connect(self.OpenCamera)
         self.btn_takePhoto.clicked.connect(self.Take_Photo)
         self.timer_camera_test.timeout.connect(self.Show_Frame)
-        # self.timer_camera_face.timeout.connect(self.show_face_recognition)
-        self.btn_addFace.clicked.connect(self.open_Add_Win)
-        self.comboBox_selectFile.currentIndexChanged.connect(self.Show_Select_Cbb)
+
+        self.btn_addNewFace.clicked.connect(self.open_Add_Win)
+        # self.comboBox_selectFile.currentIndexChanged.connect(self.Show_Select_Cbb)
         self.btn_delFace.clicked.connect(self.open_Del_Win)
         self.btn_refresh.clicked.connect(self.Refresh)
         self.btn_train.clicked.connect(self.train)
         self.btn_recogniton.clicked.connect(self.open_recognition_camera)
         self.actionHelp.triggered.connect(self.open_help)
+        self.actionAddClass.triggered.connect(self.open_add_class)
+        self.actionDelClass.triggered.connect(self.open_del_class)
 
     def open_help(self):
         self.helpWin.show()
+
+    def open_del_class(self):
+        self.openDelClass.show()
+
+    def open_add_class(self):
+        self.openAddClass.show()
 
     def OpenCamera(self):
         if self.timer_camera_test.isActive() == False:
@@ -253,23 +283,20 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
         '''
         1、根据sql语句从数据库中读取所有文件名
         '''
-        self.comboBox_selectFile.clear()
+        self.comboBox_selectClass.clear()
         num = self.opsql.Num_Now_All()
         rows = self.opsql.readFronSqllite(self.DB_Path, self.sqlStr_SelectAll)
         readLines = num
         lineIndex = 0
         while lineIndex < readLines:
             row = rows[lineIndex]  # 获取某一行的数据,类型是tuple
-            self.comboBox_selectFile.addItem(str(row[0]))
+            self.comboBox_selectClass.addItem(str(row[0]))
             lineIndex += 1
-
-    def Show_Select_Cbb(self):
-        self.lab_selecFile.setText('选择了：' + self.comboBox_selectFile.currentText())
 
     # 刷新显示
     def Refresh(self):
         self.Combobox_Init()
-        self.lab_faceNumShow.setText(str(self.opsql.Num_Now_All()) + '张')
+        # self.lab_faceNumShow.setText(str(self.opsql.Num_Now_All()) + '张')
 
     def train(self):
         msg = QtWidgets.QMessageBox.information(self, u"提示", u"训练过程中，画面无法更新。",
