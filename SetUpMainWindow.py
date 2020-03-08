@@ -166,7 +166,7 @@ class AddStudent(QDialog, Ui_Form_Student):
 
     def slotInit(self):
         self.btn_cancel.clicked.connect(self.btn_hide)
-        self.btn_confirm.clicked.connect(self.btn_addNewFile)
+        self.btn_confirm.clicked.connect(self.btn_add_new_student)
         # 隐藏窗口
 
     def btn_hide(self):
@@ -182,30 +182,34 @@ class AddStudent(QDialog, Ui_Form_Student):
             self.SelectClass.addItem(table_name[lineindex])
             lineindex += 1
 
-    def btn_addNewFile(self):
-
+    def btn_add_new_student(self):
+        student_info = []
+        proclass = self.SelectClass.currentText()
         lable = self.line_addLabel.text()
         name = self.line_addName.text()
         sex = self.line_addSex.text()
         id = self.line_addId.text()
-        profession = self.line_addProfession.text()
 
-        # print(flag)
-        # if flag is True:
-        #     msg = QtWidgets.QMessageBox.warning(self, u"警告", u"存在名字以存在，请更改",
-        #                                         buttons=QtWidgets.QMessageBox.Ok,
-        #                                         defaultButton=QtWidgets.QMessageBox.Ok)
-        # else:
-        #     if len(text) == 0:  # 如果目录为空
-        #         msg = QtWidgets.QMessageBox.warning(self, u"警告", u"目录为空",
-        #                                             buttons=QtWidgets.QMessageBox.Ok,
-        #                                             defaultButton=QtWidgets.QMessageBox.Ok)
-        #     else:
-        #         # 根据用户名构建插入语句
-        #         newName = self.opsql.CreatSqlStr(text)
-        #         self.opsql.Insert_New_Name(newName)  # 向数据库插入新行
-        #         self.line_addFaceName.clear()
-        #         self.btn_hide()  # 隐藏窗口
+        student_info.append(lable)
+        student_info.append(name)
+        student_info.append(sex)
+        student_info.append(id)
+        student_info.append(proclass)
+
+        # 检查学号是否唯一存在
+        flag = self.opsql.insert_new_student(student_info)
+        if flag:
+            msg = QtWidgets.QMessageBox.information(self, u"完成", u"添加个人信息完成！",
+                                                    buttons=QtWidgets.QMessageBox.Ok,
+                                                    defaultButton=QtWidgets.QMessageBox.Ok)
+            self.line_addLabel.clear()
+            self.line_addName.clear()
+            self.line_addSex.clear()
+            self.line_addId.clear()
+        else:
+            msg = QtWidgets.QMessageBox.warning(self, u"警告", u"存在相学号，请更改",
+                                                buttons=QtWidgets.QMessageBox.Ok,
+                                                defaultButton=QtWidgets.QMessageBox.Ok)
 
 
 # 提示窗口

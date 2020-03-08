@@ -53,9 +53,9 @@ class Operate_Sql():
     # 插入一条信息
     def Insert_New_Name(self, filename):
         conn = db.connect(self.DB_Path)  # 该 API 打开一个到 SQLite 数据库文件 database 的链接，如果数据库成功打开，则返回一个连接对象
-        conn.execute(filename);
+        conn.execute(filename)
         conn.commit()
-        print("插入完成\n");
+        print("插入完成\n")
         conn.close()
 
     # 查询是否存在相同的文件名
@@ -176,11 +176,12 @@ class Operate_Sql():
             return False
         # 插入新表
         sql_createnewtable = 'CREATE TABLE {tablename}(' \
-                             'name varchar(10) not null,' \
+                             'lable varchar(10) not null,' \
+                             ' name varchar(10) not null,' \
                              'sex varchar(1) not null,' \
                              'id int primary key not null,' \
                              'profession varchar(50) not null,' \
-                             'features int not null,' \
+                             'features int,' \
                              'flag int default 0 not null' \
                              ');'.format(tablename=table)
         conn.execute(sql_createnewtable)
@@ -213,7 +214,39 @@ class Operate_Sql():
         for i in range(table_nmu):
             table_name.append(rows[i][0])
 
-        return table_name,table_nmu
+        return table_name, table_nmu
+
+    # 插入新成员信息
+    def insert_new_student(self, student_info):
+        conn = db.connect(self.New_DB_Path)
+
+        # 检测学号是否唯一
+        sql_checkid = 'select COUNT(*) from {proclass} where id="{id}";'\
+            .format(proclass=student_info[4], id=student_info[3])
+        print(sql_checkid)
+
+        cursor = conn.cursor()
+        conn.row_factory = db.Row
+        cursor.execute(sql_checkid)
+        rows = cursor.fetchall()
+
+        if rows[0][0] == 1:
+            print('存在这个学号')
+            return False
+        print('新的个人数据')
+        sql_insert = 'INSERT INTO {proclass} (lable,name,sex,id,profession) VALUES ' \
+                     '("{lable}","{name}", "{sex}","{id}","{profession}");' \
+            .format(proclass=student_info[4],
+                    lable=student_info[0],
+                    name=student_info[1],
+                    sex=student_info[2],
+                    id=student_info[3],
+                    profession=student_info[4])
+        print(sql_insert)
+        conn.execute(sql_insert)
+        conn.commit()
+        conn.close()
+        return True
 
 
 if __name__ == "__main__":
