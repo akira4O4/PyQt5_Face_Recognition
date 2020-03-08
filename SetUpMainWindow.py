@@ -57,11 +57,11 @@ class del_window(QDialog, Ui_Form_Del):
 
         else:
             # 从本地删除src_img文件
-            if (os.path.exists('../src_img/' + text + '.jpg') == True):
+            if os.path.exists('../src_img/' + text + '.jpg') == True:
                 os.remove('../src_img/' + text + '.jpg')
 
             # 从本地删除emb_img文件
-            if (os.path.exists('../emb_img/' + text + '.jpg') == True):
+            if os.path.exists('../emb_img/' + text + '.jpg') == True:
                 os.remove('../emb_img/' + text + '.jpg')
 
             self.opsql.Delete_File_Name(text)  # 从数据库中删除这个文件名
@@ -84,6 +84,40 @@ class AddClassTable(QDialog, Ui_AddClassTable):
     def __init__(self):
         super(AddClassTable, self).__init__()
         self.setupUi(self)
+        self.initslot()
+        self.opsql = Operate_Sql()
+        self.opfile = File_Operate()
+        self.line_profession.clear()
+        self.line_class.clear()
+
+    # 初始化信号槽
+    def initslot(self):
+        self.btn_cancel.clicked.connect(self.btn_hide)
+        self.btn_confirm.clicked.connect(self.confirm)
+
+    def btn_hide(self):
+        self.hide()
+
+    def confirm(self):
+        # 获取院系班级
+        profession = self.line_profession.text()
+        class_ = self.line_class.text()
+        flag = self.opsql.create_new_pc_table(profession, class_)
+        self.line_profession.clear()
+        self.line_class.clear()
+        if flag:
+            print("完成")
+            msg = QtWidgets.QMessageBox.information(self, u"完成", u"个人文件夹创建成功！",
+                                                    buttons=QtWidgets.QMessageBox.Ok,
+                                                    defaultButton=QtWidgets.QMessageBox.Ok)
+            time.sleep(0.3)
+            self.hide()
+
+        else:
+            print('失败')
+            msg = QtWidgets.QMessageBox.warning(self, u"警告", u"存在相同表名，请更改",
+                                                buttons=QtWidgets.QMessageBox.Ok,
+                                                defaultButton=QtWidgets.QMessageBox.Ok)
 
 
 # 添加窗口类
