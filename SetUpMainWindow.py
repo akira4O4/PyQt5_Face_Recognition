@@ -77,6 +77,40 @@ class DelClassTable(QDialog, Ui_DelClassTable):
     def __init__(self):
         super(DelClassTable, self).__init__()
         self.setupUi(self)
+        self.initslot()
+        self.opsql = Operate_Sql()
+        self.opfile = File_Operate()
+        self.line_profession.clear()
+        self.line_class.clear()
+        # 初始化信号槽
+
+    def initslot(self):
+        self.btn_cancel.clicked.connect(self.btn_hide)
+        self.btn_confirm.clicked.connect(self.confirm)
+
+    def btn_hide(self):
+        self.hide()
+
+    def confirm(self):
+        # 获取院系班级
+        profession = self.line_profession.text()
+        class_ = self.line_class.text()
+        flag = self.opsql.delete_pc_table(profession, class_)
+        self.line_profession.clear()
+        self.line_class.clear()
+        if flag:
+            print("完成")
+            msg = QtWidgets.QMessageBox.information(self, u"完成", u"删除成功！",
+                                                    buttons=QtWidgets.QMessageBox.Ok,
+                                                    defaultButton=QtWidgets.QMessageBox.Ok)
+            time.sleep(0.2)
+            self.hide()
+
+        else:
+            print('失败')
+            msg = QtWidgets.QMessageBox.warning(self, u"警告", u"不存在这个表，请更改",
+                                                buttons=QtWidgets.QMessageBox.Ok,
+                                                defaultButton=QtWidgets.QMessageBox.Ok)
 
 
 # 添加班级表

@@ -111,6 +111,7 @@ class Operate_Sql():
             print("插入完成\n")
             conn.close()
 
+
     def get_sql_emb(self):
         list_emb = []
         emb_temp = np.zeros(128)
@@ -138,6 +139,27 @@ class Operate_Sql():
                 lineIndex += 1
 
         return name, emb_arr, num
+
+    #删除班级表
+    def delete_pc_table(self, profession, class_):
+        table = profession + class_
+        # 先检查是否存在这个表
+        sql = "SELECT COUNT(*) FROM sqlite_master where type='table' and name='{str}';".format(str=table)
+        conn = db.connect(self.New_DB_Path)
+        cursor = conn.cursor()
+        conn.row_factory = db.Row
+        cursor.execute(sql)
+        rows = cursor.fetchall()
+        if rows[0][0] == 0:
+            print('不存在这个表')
+            return False
+        sql_drop='drop table {table}'.format(table=table)
+        print(sql_drop)
+        conn.execute(sql_drop)
+        conn.commit()
+        conn.close()
+        print('删除完成:',table)
+        return True
 
     # 插入新的班级表
     def create_new_pc_table(self, profession, class_):
@@ -171,4 +193,5 @@ class Operate_Sql():
 
 if __name__ == "__main__":
     sql = Operate_Sql()
-    sql.create_new_pc_table('CS', '172')
+    # sql.create_new_pc_table('CS', '172')
+    sql.delete_pc_table('CS', '172')
