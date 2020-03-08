@@ -162,6 +162,7 @@ class AddStudent(QDialog, Ui_Form_Student):
         self.slotInit()
         self.opsql = Operate_Sql()
         self.opfile = File_Operate()
+        self.combobox_init()
 
     def slotInit(self):
         self.btn_cancel.clicked.connect(self.btn_hide)
@@ -171,41 +172,40 @@ class AddStudent(QDialog, Ui_Form_Student):
     def btn_hide(self):
         self.hide()
 
+    # 初始化班级列表
+    def combobox_init(self):
+        table_name, table_nmu = self.opsql.select_all_table()
+        readlines = table_nmu
+        lineindex = 0
+        while lineindex < readlines:
+            row = table_name[lineindex]  #
+            self.SelectClass.addItem(table_name[lineindex])
+            lineindex += 1
+
     def btn_addNewFile(self):
-        '''
-        1、触发确认按钮
-        2、向数据库添加新名字
-        3、从数据库读取名字列表
-        '''
-        text = self.line_addFaceName.text()  # 获取输入文本
-        flag = self.opsql.Select_Same_Name(str(text))  # 查看数据库中是否存在相同的名字
-        print(flag)
-        if flag is True:
-            msg = QtWidgets.QMessageBox.warning(self, u"警告", u"存在名字以存在，请更改",
-                                                buttons=QtWidgets.QMessageBox.Ok,
-                                                defaultButton=QtWidgets.QMessageBox.Ok)
-        else:
-            if len(text) == 0:  # 如果目录为空
-                msg = QtWidgets.QMessageBox.warning(self, u"警告", u"目录为空",
-                                                    buttons=QtWidgets.QMessageBox.Ok,
-                                                    defaultButton=QtWidgets.QMessageBox.Ok)
-            else:
-                # 根据用户名构建插入语句
-                newName = self.opsql.CreatSqlStr(text)
-                self.opsql.Insert_New_Name(newName)  # 向数据库插入新行
-                self.line_addFaceName.clear()
-                self.btn_hide()  # 隐藏窗口
-                # ret = self.opfile.Create_File(text)  # 创建文件夹
-                # if ret:
-                #     msg = QtWidgets.QMessageBox.information(self, u"完成", u"个人文件夹创建成功！",
-                #                                             buttons=QtWidgets.QMessageBox.Ok,
-                #                                             defaultButton=QtWidgets.QMessageBox.Ok)
-                #     self.line_addFaceName.clear()
-                #     self.opsql.Select_All_Name()
-                # else:
-                #     msg = QtWidgets.QMessageBox.critical(self, u"失败", u"无法创建个人文件夹",
-                #                                          buttons=QtWidgets.QMessageBox.Ok,
-                #                                          defaultButton=QtWidgets.QMessageBox.Ok)
+
+        lable = self.line_addLabel.text()
+        name = self.line_addName.text()
+        sex = self.line_addSex.text()
+        id = self.line_addId.text()
+        profession = self.line_addProfession.text()
+
+        # print(flag)
+        # if flag is True:
+        #     msg = QtWidgets.QMessageBox.warning(self, u"警告", u"存在名字以存在，请更改",
+        #                                         buttons=QtWidgets.QMessageBox.Ok,
+        #                                         defaultButton=QtWidgets.QMessageBox.Ok)
+        # else:
+        #     if len(text) == 0:  # 如果目录为空
+        #         msg = QtWidgets.QMessageBox.warning(self, u"警告", u"目录为空",
+        #                                             buttons=QtWidgets.QMessageBox.Ok,
+        #                                             defaultButton=QtWidgets.QMessageBox.Ok)
+        #     else:
+        #         # 根据用户名构建插入语句
+        #         newName = self.opsql.CreatSqlStr(text)
+        #         self.opsql.Insert_New_Name(newName)  # 向数据库插入新行
+        #         self.line_addFaceName.clear()
+        #         self.btn_hide()  # 隐藏窗口
 
 
 # 提示窗口

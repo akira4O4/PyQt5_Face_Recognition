@@ -203,21 +203,21 @@ class Operate_Sql():
 
         cursor.execute(sql_all_num)
         rows = cursor.fetchall()
-        num = rows[0][0]
-        print('总共有{num}个表'.format(num=num))
+        table_nmu = rows[0][0]
+        print('总共有{num}个表'.format(num=table_nmu))
 
         cursor.execute(sql_all_table)
         rows = cursor.fetchall()
         print(rows)
         table_name = []
-        for i in range(num):
+        for i in range(table_nmu):
             table_name.append(rows[i][0])
 
-        return table_name
+        return table_name,table_nmu
 
 
 if __name__ == "__main__":
     sql = Operate_Sql()
-    # sql.create_new_pc_table('CS', '172')
+    sql.create_new_pc_table('CS', '172')
     # sql.delete_pc_table('CS', '172')
     sql.select_all_table()
