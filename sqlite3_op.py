@@ -62,14 +62,10 @@ class Operate_Sql():
     def Select_Same_Name(self, name):
         rows = self.readFronSqllite(self.DB_Path, 'select * from fileName where fName ="' + str(name) + '";')
         if len(rows) == 0 or rows is None:  # 如果不存在相同名字的文件夹返回假
-            # print(rows)
             print("不存在")
             return False
         else:  # 存在相同名字的文件夹返回真
-            # print(len(rows))
             print("存在")
-            # row = rows[0]  # 获取某一行的数据,类型是tuple
-            # print('数据是：', row[0], row[1], '\n')
             return True
 
     def Delete_File_Name(self, filename):

@@ -329,24 +329,13 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
                                                 buttons=QtWidgets.QMessageBox.Ok,
                                                 defaultButton=QtWidgets.QMessageBox.Ok)
         else:
-            selectFName = self.comboBox_selectFile.currentText()
-            flag = self.opsql.Select_Same_Name(selectFName)
-            # 如果数据库没有这个标签
-            if flag == False:
-                msg = QtWidgets.QMessageBox.warning(self, u"Warning", u"不存在这个标签，请尝试刷新!",
-                                                    buttons=QtWidgets.QMessageBox.Ok,
-                                                    defaultButton=QtWidgets.QMessageBox.Ok)
-            else:
-                fName = '../src_img/' + selectFName + '.jpg'
-                # 如果遇到空白标签
-                if len(selectFName) == 0 or selectFName == '':
-                    msg = QtWidgets.QMessageBox.warning(self, u"Warning", u"没有这个人脸标签!",
-                                                        buttons=QtWidgets.QMessageBox.Ok,
-                                                        defaultButton=QtWidgets.QMessageBox.Ok)
-                else:
-                    self.pNum += 1
-                    self.lab_faceNumDisplay.setText('%d' % self.pNum)
-                    cv2.imwrite(fName, self.photo_transmission)
+            selectClass = self.comboBox_selectClass.currentText()
+            selectid = self.comboBox_selectId.currentText()
+
+            name = '{CLASS}_{id}'.format(CLASS=selectClass, id=selectid)
+            name = '../src_img/{name}.jpg'.format(name=name)
+            print(name)
+            cv2.imwrite(name, self.photo_transmission)
 
     # 获取班级列表
     def combobox_init(self, proclass=None):
@@ -367,7 +356,7 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
         id = self.opsql.show_student_id(proclass)
         for i in range(len(id)):
             print(id[i])
-            self.comboBox_selectLabel.addItem(str(id[i]))
+            self.comboBox_selectId.addItem(str(id[i]))
 
     def train(self):
         msg = QtWidgets.QMessageBox.information(self, u"提示", u"训练过程中，画面无法更新。",
