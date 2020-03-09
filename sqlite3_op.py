@@ -221,7 +221,7 @@ class Operate_Sql():
         conn = db.connect(self.New_DB_Path)
 
         # 检测学号是否唯一
-        sql_checkid = 'select COUNT(*) from {proclass} where id="{id}";'\
+        sql_checkid = 'select COUNT(*) from {proclass} where id="{id}";' \
             .format(proclass=student_info[4], id=student_info[3])
         print(sql_checkid)
 
@@ -248,9 +248,26 @@ class Operate_Sql():
         conn.close()
         return True
 
+    # 根据班级显示所有学号
+    def show_student_id(self, proclass):
+        conn = db.connect(self.New_DB_Path)
+        sql = 'select id from {proclass} ;'.format(proclass=proclass)
+        cursor = conn.cursor()
+        conn.row_factory = db.Row
+        cursor.execute(sql)
+        rows = cursor.fetchall()
+        id = []
+        for i in range(len(rows)):
+            id.append(rows[i][0])
+        print('检索完成')
+        return id
+
 
 if __name__ == "__main__":
     sql = Operate_Sql()
-    sql.create_new_pc_table('CS', '172')
+    # sql.create_new_pc_table('CS', '172')
+    # sql.create_new_pc_table('CS', '171')
+    # sql.create_new_pc_table('CS', '173')
     # sql.delete_pc_table('CS', '172')
-    sql.select_all_table()
+    # sql.select_all_table()
+    sql.show_student_id('CS172')

@@ -182,7 +182,7 @@ class Ui_Face_Recognition_window(object):
         Face_Recognition_window.setWindowTitle(_translate("Face_Recognition_window", "人脸识别1.0"))
         self.lab_frame.setText(_translate("Face_Recognition_window", "没有图像输入"))
         self.lab_selecCalss.setText(_translate("Face_Recognition_window", "选择班级"))
-        self.lab_selecLable.setText(_translate("Face_Recognition_window", "选择标签"))
+        self.lab_selecLable.setText(_translate("Face_Recognition_window", "选择学号"))
         self.btn_openCamera.setText(_translate("Face_Recognition_window", "打开摄像头"))
         self.btn_addNewFace.setText(_translate("Face_Recognition_window", "添加新用户"))
         self.btn_takePhoto.setText(_translate("Face_Recognition_window", "录入人脸"))
