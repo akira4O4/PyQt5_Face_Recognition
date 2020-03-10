@@ -32,45 +32,57 @@ class del_window(QDialog, Ui_Form_Del):
         self.SlotInit()
         self.opsql = Operate_Sql()
         self.opfile = File_Operate()
-        self.line_delFaceName.clear()
+        self.combobox_init()
 
     def SlotInit(self):
-        self.btn_delcancel.clicked.connect(self.btn_hide)
-        self.btn_delconfirm.clicked.connect(self.btn_DelFile)
+        self.btn_Cancel.clicked.connect(self.btn_hide)
+        self.btn_Enter.clicked.connect(self.btn_enter)
+        self.btn_Refresh.clicked.connect(self.refresh)
 
     def btn_hide(self):
         self.hide()
 
-    def btn_DelFile(self):
-        '''
-        读取字符串
-        删除数据库对应行
-        删除对应文件
-        :return:
-        '''
-        text = self.line_delFaceName.text()
-        flag = self.opsql.Select_Same_Name(text)
-        if flag is False:  # 如果数据库不存在这个目录
-            msg = QtWidgets.QMessageBox.warning(self, u"警告", u"不存在这个用户",
+    def refresh(self):
+        proclass = self.comboBox_selectClass.currentText()
+        self.combobox_init(proclass=proclass)
+        id = self.opsql.show_student_id(proclass)
+        self.comboBox_selectId.clear()
+        for i in range(len(id)):
+            print(id[i])
+            self.comboBox_selectId.addItem(str(id[i]))
+
+    # 获取班级列表
+    def combobox_init(self, proclass=None):
+        self.comboBox_selectClass.clear()
+        table_name, table_nmu = self.opsql.select_all_table()
+        readlines = table_nmu
+        lineindex = 0
+        while lineindex < readlines:
+            self.comboBox_selectClass.addItem(table_name[lineindex])
+            lineindex += 1
+        if proclass != '':
+            self.comboBox_selectClass.setCurrentText(proclass)
+
+    def btn_enter(self):
+        CLASS = self.comboBox_selectClass.currentText()
+        id = self.comboBox_selectId.currentText()
+
+        # 从本地删除src_img文件
+        path_src = '../src_img/{CLASS}_{id}.jpg'.format(CLASS=CLASS, id=id)
+        path_emb = '../emb_img/{CLASS}_{id}.jpg'.format(CLASS=CLASS, id=id)
+
+        if os.path.exists(path_src):
+            os.remove(path_src)
+        # 从本地删除emb_img文件
+        if os.path.exists(path_emb):
+            os.remove(path_emb)
+
+        self.opsql.Delete_File_Name(CLASS, id)  # 从数据库中删除这个文件名
+        msg = QtWidgets.QMessageBox.information(self, u"完成", u"删除完成！",
                                                 buttons=QtWidgets.QMessageBox.Ok,
                                                 defaultButton=QtWidgets.QMessageBox.Ok)
 
-        else:
-            # 从本地删除src_img文件
-            if os.path.exists('../src_img/' + text + '.jpg') == True:
-                os.remove('../src_img/' + text + '.jpg')
-
-            # 从本地删除emb_img文件
-            if os.path.exists('../emb_img/' + text + '.jpg') == True:
-                os.remove('../emb_img/' + text + '.jpg')
-
-            self.opsql.Delete_File_Name(text)  # 从数据库中删除这个文件名
-            msg = QtWidgets.QMessageBox.information(self, u"完成", u"删除完成！",
-                                                    buttons=QtWidgets.QMessageBox.Ok,
-                                                    defaultButton=QtWidgets.QMessageBox.Ok)
-
-            self.line_delFaceName.clear()
-            self.btn_hide()  # 隐藏窗口
+        self.combobox_init()
 
 
 # 删除班级表
@@ -142,7 +154,7 @@ class AddClassTable(QDialog, Ui_AddClassTable):
         self.line_class.clear()
         if flag:
             print("完成")
-            msg = QtWidgets.QMessageBox.information(self, u"完成", u"个人文件夹创建成功！",
+            msg = QtWidgets.QMessageBox.information(self, u"完成", u"创建成功！",
                                                     buttons=QtWidgets.QMessageBox.Ok,
                                                     defaultButton=QtWidgets.QMessageBox.Ok)
             time.sleep(0.3)
@@ -357,10 +369,11 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
     def refresh(self):
         proclass = self.comboBox_selectClass.currentText()
         self.combobox_init(proclass=proclass)
-        id = self.opsql.show_student_id(proclass)
-        for i in range(len(id)):
-            print(id[i])
-            self.comboBox_selectId.addItem(str(id[i]))
+        id_set = self.opsql.show_student_id(proclass)
+        self.comboBox_selectId.clear()
+        for i in range(len(id_set)):
+            print(id_set[i])
+            self.comboBox_selectId.addItem(str(id_set[i]))
 
     def train(self):
         msg = QtWidgets.QMessageBox.information(self, u"提示", u"训练过程中，画面无法更新。",

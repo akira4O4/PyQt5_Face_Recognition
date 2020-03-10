@@ -68,10 +68,9 @@ class Operate_Sql():
             print("存在")
             return True
 
-    def Delete_File_Name(self, filename):
-        conn = db.connect(self.DB_Path)  # 该 API 打开一个到 SQLite 数据库文件 database 的链接，如果数据库成功打开，则返回一个连接对象
-        filename = 'delete from fileName where fName="' + filename + '";'
-        print(filename)
+    def Delete_File_Name(self, CLASS, id):
+        conn = db.connect(self.New_DB_Path)  # 该 API 打开一个到 SQLite 数据库文件 database 的链接，如果数据库成功打开，则返回一个连接对象
+        filename = 'delete from {CLASS} where id="{id}";'.format(CLASS=CLASS, id=id)
         conn.execute(filename)
         conn.commit()
         print("删除完成")

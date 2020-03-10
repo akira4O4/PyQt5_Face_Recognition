@@ -13,6 +13,24 @@ import align.detect_face
 import sqlite3_op
 
 
+# 交并比
+def iou(a, b):
+    area_a = (a[2] - a[0]) * (a[3] - a[1])
+    area_b = (b[2] - b[0]) * (b[3] - b[1])
+
+    iou_x1 = np.maximum(a[0], b[0])
+    iou_y1 = np.maximum(a[1], b[1])
+    iou_x2 = np.minimum(a[2], b[2])
+    iou_y2 = np.minimum(a[3], b[3])
+
+    iou_w = iou_x2 - iou_x1
+    iou_h = iou_y2 - iou_y1
+    area_iou = iou_w * iou_h
+    iou = area_iou / (area_a + area_b - area_iou)
+
+    return iou
+
+
 # 获取最大人脸索引
 def max_face(area, position):
     max_face_position = []
@@ -96,19 +114,25 @@ class face():
                     ret, frame = capture.read()
                     frame = cv2.flip(frame, 1)
                     rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                    # 640x480
+
+                    # 识别框
+                    cv2.putText(frame, 'Identification Box', (200, 90),
+                                cv2.FONT_HERSHEY_COMPLEX_SMALL,
+                                1, (0, 0, 255),
+                                thickness=2,
+                                lineType=1)
                     cv2.rectangle(frame,
-                                  (210, 120),
-                                  (400, 360),
-                                  (255, 255, 0), 1, 8, 0)
+                                  (150, 100),
+                                  (490, 380),
+                                  (165, 245, 25), 2)
+                    box1 = [150, 100, 490, 380]
                     # 获取视频流中的人脸 判断标识 bounding_box crop_image
                     mark, bounding_box, crop_image = self.load_and_align_data(rgb_frame, 160)
 
                     if mark:
                         print('计算视频帧的embadding')
-                        emb = sess.run(embeddings, feed_dict={
-                            images_placeholder: crop_image,
-                            phase_train_placeholder: False})
+                        emb = sess.run(embeddings, feed_dict={images_placeholder: crop_image,
+                                                              phase_train_placeholder: False})
                         print("emb shape:", emb.shape)
                         pre_person_num = len(emb)
                         find_obj = []
@@ -137,20 +161,21 @@ class face():
                                 # 从dist.list里面选择最接近的index并在obj_name里面查找对应的name
                                 find_obj.append(
                                     all_obj_name[dist_list.index(min_value)])
-
+                        th = 0.6
+                        IOU = iou(box1, bounding_box)
+                        print('IOU:', IOU)
                         # 在frame上绘制边框和文字
-                        if bounding_box[0] > 10 and bounding_box[1] > 10:
-                            cv2.rectangle(frame,
-                                          (bounding_box[0], bounding_box[1]),
-                                          (bounding_box[2], bounding_box[3]),
-                                          (0, 255, 0), 1, 8, 0)
-                            cv2.putText(frame, find_obj[0],
-                                        (bounding_box[0], bounding_box[1]),
-                                        cv2.FONT_HERSHEY_COMPLEX_SMALL,
-                                        1,
-                                        (0, 0, 255),
-                                        thickness=2,
-                                        lineType=2)
+                        cv2.rectangle(frame,
+                                      (bounding_box[0], bounding_box[1]),
+                                      (bounding_box[2], bounding_box[3]),
+                                      (0, 255, 0), 1, 8, 0)
+                        cv2.putText(frame, find_obj[0],
+                                    (bounding_box[0], bounding_box[1]),
+                                    cv2.FONT_HERSHEY_COMPLEX_SMALL,
+                                    1,
+                                    (0, 0, 255),
+                                    thickness=2,
+                                    lineType=2)
                     cv2.imshow('face recognition', frame)
                     key = cv2.waitKey(3)
                     if stop:
