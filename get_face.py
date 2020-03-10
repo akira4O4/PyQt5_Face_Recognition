@@ -31,8 +31,8 @@ def align_data(image_path, imgae_size, gpu_memory_faction):
     image_list = []  # 图片列表
     for path in temp_image_path:
         img = imageio.imread(os.path.expanduser(path))  # 这样读出来的图片格式为numpy类型，后面就不需要再转换了
-        img_size = np.asarray(img.shape)[0:2]  # 获取数据尺寸类型为ndarray
-        print(path)
+        # img_size = np.asarray(img.shape)[0:2]  # 获取数据尺寸类型为ndarray
+        print('读取:', path)
 
         bounding_boxes, _ = align.detect_face.detect_face(img, minsize, pnet, onet, rnet, threshhold, factor)
         if len(bounding_boxes) < 1:
@@ -49,7 +49,6 @@ def align_data(image_path, imgae_size, gpu_memory_faction):
         bb[2] = det[2]
         bb[3] = det[3]
         cropped = img[bb[1]:bb[3], bb[0]:bb[2], :]  # 对角坐标
-        # aligned = misc.imresize(cropped, (imgae_size, imgae_size), interp='bicubic')  # 默认双三线性插值
         cropped = cv2.resize(cropped, (imgae_size, imgae_size), interpolation=cv2.INTER_AREA)  # 默认双三线性插值
         prewhitened = facenet.prewhiten(cropped)  # 欲白化，取出冗余数据
         image_list.append(prewhitened)
@@ -64,17 +63,15 @@ def detection():
     img_path_set = []
 
     # 如果不存在这个目录就新建一个
-    if os.path.exists(emb_file) == False:
+    if os.path.exists(emb_file) is False:
         os.mkdir(emb_file)
 
-    # 获取目录下所有图片的路径
-    # os.listdir() 方法用于返回指定的文件夹包含的文件或文件夹的名字的列表
     for f in os.listdir(img_src):
         one_img = os.path.join(img_src, f)
         img_path_set.append(one_img)
     print(img_path_set)
     if len(img_path_set) != 0:
-        # 重新切割图片
+        # 提取人脸
         images_align = align_data(img_path_set, 160, 1.0)
 
     # 保存切割好的图片
@@ -84,6 +81,7 @@ def detection():
         count = count + 1
         # 删除已经被剪裁的图片
         os.remove(os.path.join(img_src, f))
+    # 计算特征值
     computing_emb()
     return True
 
@@ -113,20 +111,18 @@ def computing_emb():
                 nrof_images = nrof_images + 1
 
             images = np.stack(image)  # 沿着新轴连接数组的序列。
-            # feed_dict = {images_placeholder: images, phase_train_placeholder: False}
             # 计算对比图片embadding，embdadding是一个128维的张量
             compare_emb = sess.run(embeddings, feed_dict={images_placeholder: images, phase_train_placeholder: False})
             compare_num = len(compare_emb)
-            print('compare_emb:', compare_emb)
-            print('compare_emb_shape:', compare_emb.shape)
-            print('type:', type(compare_emb))
+            print('compare_emb len:', len(compare_emb[0]))
             print("pre_embadding计算完成")
 
             for i in os.listdir(emb_file):
                 index = 0
-                name = i.split(".")
-                print(name[0])
-                opsql.insert_emb(name[0], compare_emb[index])
+                info = i.split("_")
+                print(info[0], info[1])
+                id = info[1].split(".")
+                opsql.insert_emb_(info[0], id[0], compare_emb[index])
                 index += 1
 
             # 移除已经计算过的image

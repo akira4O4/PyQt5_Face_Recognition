@@ -92,10 +92,15 @@ class face():
                 cv2.namedWindow("face recognition", 1)
 
                 while True:
+
                     ret, frame = capture.read()
                     frame = cv2.flip(frame, 1)
                     rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
+                    # 640x480
+                    cv2.rectangle(frame,
+                                  (210, 120),
+                                  (400, 360),
+                                  (255, 255, 0), 1, 8, 0)
                     # 获取视频流中的人脸 判断标识 bounding_box crop_image
                     mark, bounding_box, crop_image = self.load_and_align_data(rgb_frame, 160)
 

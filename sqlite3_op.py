@@ -77,35 +77,12 @@ class Operate_Sql():
         print("删除完成")
         conn.close()
 
-    # 插入embadding
-    def insert_emb(self, fname, emb):
-        list_emb = []
-        str_emb = ''
-        for i in range(128):
-            list_emb.append(str(emb[i]))  # 加入到list
-            str_emb = str_emb + ' ' + list_emb[i]  # list转str
-        sql_find = 'select * from fileName where fName="' + fname + '";'
-        sql_update_emb = 'update fileName set flag=1, embadding= "' + str_emb + '" where fName="' + fname + '";'
-        sql_insert_emb = 'insert into fileName(fName,flag,embadding) values ("' + fname + '",1,"' + str_emb + '");'
-        conn = db.connect(self.DB_Path)
-        rows = self.readFronSqllite(self.DB_Path, sql_find)  # 查询这个fname有没有embadding
-
-        if len(rows) == 0 or rows is None:  # 如果不存在相同名字的文件夹返回假
-            print("不存在")
-            conn.execute(sql_insert_emb)
-            conn.commit()
-            print("插入完成\n")
-            conn.close()
-        else:
-            print('存在')
-            row = rows[0]
-            print(row)
-            # if len(row[1]) == 0: #or row[2] is None:  # 当前label没有embadding，直接插入embadding
-            print('没有embadding')
-            conn.execute(sql_update_emb)
-            conn.commit()
-            print("插入完成\n")
-            conn.close()
+    def insert_emb_(self, CLASS, id, emb):
+        conn = db.connect(self.New_DB_Path)
+        sql_update_emb = 'UPDATE {CLASS} SET features = "{emb}" WHERE id = {id};'.format(CLASS=CLASS, emb=emb, id=id)
+        conn.execute(sql_update_emb)
+        conn.commit()
+        conn.close()
 
     def get_sql_emb(self):
         list_emb = []
@@ -188,7 +165,6 @@ class Operate_Sql():
 
     # 查询所有表名
     def select_all_table(self):
-
         conn = db.connect(self.New_DB_Path)
         cursor = conn.cursor()
         conn.row_factory = db.Row
@@ -266,4 +242,5 @@ if __name__ == "__main__":
     # sql.create_new_pc_table('CS', '173')
     # sql.delete_pc_table('CS', '172')
     # sql.select_all_table()
-    sql.show_student_id('CS172')
+    # sql.show_student_id('CS172')
+    sql.insert_emb_('CS172', 33, 123)

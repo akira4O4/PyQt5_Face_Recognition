@@ -252,7 +252,7 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
         self.frame_out = 0
 
         # 启动Facenet模块
-        # self.face = face_recognition.face()
+        self.face = face_recognition.face()
 
     # 槽初始化
     def slot_init(self):
@@ -331,11 +331,15 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
         else:
             selectClass = self.comboBox_selectClass.currentText()
             selectid = self.comboBox_selectId.currentText()
-
-            name = '{CLASS}_{id}'.format(CLASS=selectClass, id=selectid)
-            name = '../src_img/{name}.jpg'.format(name=name)
-            print(name)
-            cv2.imwrite(name, self.photo_transmission)
+            if selectid == '' or selectid is None:
+                msg = QtWidgets.QMessageBox.warning(self, u"Warning", u"请选择学号!",
+                                                    buttons=QtWidgets.QMessageBox.Ok,
+                                                    defaultButton=QtWidgets.QMessageBox.Ok)
+            else:
+                name = '{CLASS}_{id}'.format(CLASS=selectClass, id=selectid)
+                name = '../src_img/{name}.jpg'.format(name=name)
+                print(name)
+                cv2.imwrite(name, self.photo_transmission)
 
     # 获取班级列表
     def combobox_init(self, proclass=None):
@@ -377,7 +381,6 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
         else:
             print('开启摄像头')
             self.face.main(False)
-            # self.lab_frame.setText(u"正在加载并启动程序...")
 
 
 if __name__ == "__main__":
