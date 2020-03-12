@@ -393,7 +393,8 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
                                                 defaultButton=QtWidgets.QMessageBox.Ok)
         else:
             print('开启摄像头')
-            self.face.main(False)
+            CLASS = self.comboBox_selectClass.currentText()
+            self.face.main(CLASS)
 
 
 if __name__ == "__main__":
