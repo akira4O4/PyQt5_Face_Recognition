@@ -122,7 +122,7 @@ def computing_emb():
                 info = i.split("_")
                 print(info[0], info[1])
                 id = info[1].split(".")
-                opsql.insert_emb_(info[0], id[0], compare_emb[index])
+                opsql.insert_emb(info[0], id[0], compare_emb[index])
                 index += 1
 
             # 移除已经计算过的image
