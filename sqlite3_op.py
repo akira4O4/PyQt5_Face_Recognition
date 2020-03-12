@@ -262,12 +262,5 @@ class Operate_Sql():
 
 if __name__ == "__main__":
     sql = Operate_Sql()
-    # sql.create_new_pc_table('CS', '172')
-    # sql.create_new_pc_table('CS', '171')
-    # sql.create_new_pc_table('CS', '173')
-    # sql.delete_pc_table('CS', '172')
-    # sql.select_all_table()
-    # sql.show_student_id('CS172')
-    # sql.insert_emb_('CS172', 33, 123)
     sql.get_emb('CS172')
-    # sql.get_sql_emb()
+
