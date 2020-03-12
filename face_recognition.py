@@ -45,8 +45,6 @@ class face():
         self.init_mtcnn()
         self.train = False
         self.opsql = sqlite3_op.Operate_Sql()
-        # if self.train == False:
-        #     self.init_pre_embdading()
 
     # 初始化MTCNN
     def init_mtcnn(self):
@@ -96,7 +94,7 @@ class face():
                 print("pre_embadding计算完成")
         return compare_emb, compare_num, all_obj_name  # 数据库embadding，人数，目录标签
 
-    def main(self, stop):
+    def main(self, CLASS):
         with tf.Graph().as_default():
             with tf.Session() as sess:
                 model = '../20170512-110547/'
@@ -104,72 +102,71 @@ class face():
                 images_placeholder = tf.get_default_graph().get_tensor_by_name("input:0")
                 embeddings = tf.get_default_graph().get_tensor_by_name("embeddings:0")
                 phase_train_placeholder = tf.get_default_graph().get_tensor_by_name("phase_train:0")
-                all_obj_name, compare_emb, compare_num = self.opsql.get_sql_emb()
-                print(compare_emb)
+                # all_obj_name, compare_emb, compare_num = self.opsql.get_sql_emb()
+
+                # 从数据库获取人脸数据
+                '''
+                id:学号
+                compare_emb:特征值
+                compare_num:数据库中的数据条数
+                '''
+                id, compare_emb, compare_num = self.opsql.get_emb(CLASS=CLASS)
                 capture = cv2.VideoCapture(0)
                 cv2.namedWindow("face recognition", 1)
 
                 while True:
-
                     ret, frame = capture.read()
                     frame = cv2.flip(frame, 1)
                     rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
                     # 识别框
-                    cv2.putText(frame, 'Identification Box', (200, 90),
-                                cv2.FONT_HERSHEY_COMPLEX_SMALL,
+                    cv2.putText(frame, 'Identification Box', (200, 90), cv2.FONT_HERSHEY_COMPLEX_SMALL,
                                 1, (0, 0, 255),
                                 thickness=2,
                                 lineType=1)
-                    cv2.rectangle(frame,
-                                  (150, 100),
-                                  (490, 380),
-                                  (165, 245, 25), 2)
+                    cv2.rectangle(frame, (150, 100), (490, 380), (165, 245, 25), 2)
                     box1 = [150, 100, 490, 380]
-                    # 获取视频流中的人脸 判断标识 bounding_box crop_image
+
+                    # 获取视频流中的最大人脸 判断标识 bounding_box crop_image
                     mark, bounding_box, crop_image = self.load_and_align_data(rgb_frame, 160)
 
                     if mark:
                         print('计算视频帧的embadding')
                         emb = sess.run(embeddings, feed_dict={images_placeholder: crop_image,
                                                               phase_train_placeholder: False})
-                        print("emb shape:", emb.shape)
                         pre_person_num = len(emb)
                         find_obj = []
                         print('识别到的人数:', pre_person_num)
-                        cv2.putText(frame, 'Press esc to exit', (10, 30),
+                        cv2.putText(frame,
+                                    'Press esc to exit',
+                                    (10, 30),
                                     cv2.FONT_HERSHEY_COMPLEX_SMALL,
                                     1, (0, 0, 255),
                                     thickness=1,
                                     lineType=1)
+                        # 逐一对比
                         for i in range(pre_person_num):  # 为bounding_box 匹配标签
                             dist_list = []  # 距离列表
-                            if compare_num == 0:
-                                min_value = 1
-                            else:
-                                for j in range(compare_num):
-                                    # 求误差(欧氏距离)，存储每个embadding-compare_embadding对应的distance
-                                    dist = np.sqrt(
-                                        np.sum(np.square(np.subtract(emb[i, :], compare_emb[j, :]))))
-                                    dist_list.append(dist)
+
+                            for j in range(compare_num):
+                                # 求误差(欧氏距离)
+                                dist = np.sqrt(np.sum(np.square(np.subtract(emb[i, :], compare_emb[j, :]))))
+                                dist_list.append(dist)
                                 # 求视频帧和对比图直接最小的差值，即表示为最相似的图片
                                 min_value = min(dist_list)
                                 print("最小差值：", min_value)
                             if min_value > 0.65:
                                 find_obj.append('Unknow')
                             else:
-                                # 从dist.list里面选择最接近的index并在obj_name里面查找对应的name
-                                find_obj.append(
-                                    all_obj_name[dist_list.index(min_value)])
-                        th = 0.6
-                        IOU = iou(box1, bounding_box)
-                        print('IOU:', IOU)
+                                dist_index = dist_list.index(min_value)
+                                find_obj.append(id[dist_index])
+
                         # 在frame上绘制边框和文字
                         cv2.rectangle(frame,
                                       (bounding_box[0], bounding_box[1]),
                                       (bounding_box[2], bounding_box[3]),
                                       (0, 255, 0), 1, 8, 0)
-                        cv2.putText(frame, find_obj[0],
+                        cv2.putText(frame, str(find_obj[0]),
                                     (bounding_box[0], bounding_box[1]),
                                     cv2.FONT_HERSHEY_COMPLEX_SMALL,
                                     1,
@@ -178,8 +175,6 @@ class face():
                                     lineType=2)
                     cv2.imshow('face recognition', frame)
                     key = cv2.waitKey(3)
-                    if stop:
-                        break
                     if key == 27:
                         break
                 capture.release()
@@ -232,19 +227,9 @@ class face():
         face_out = facenet.prewhiten(aligned)
         crop_image = []
         crop_image.append(np.stack(face_out))
-
-        # cv2.imshow('face_out', face_out)
-        # cv2.imshow('crop_image', crop_image)
-        # print('face_out', face_out.shape)
-        # print('crop_image', crop_image.shape)
-        # cv2.waitKey(0)
-        # cv2.destroyAllWindows()
-
         return True, max_face_position, crop_image  # mark标记位置，回归边框，切割图片
 
 
 if __name__ == '__main__':
     face_test = face()
-    face_test.main(False)
-    # img = cv2.imread('../src_img/me.jpg')
-    # face_test.load_and_align_data(img, 160)
+    face_test.main('CS172')
