@@ -76,21 +76,49 @@ class Operate_Sql():
         print("删除完成")
         conn.close()
 
-    def insert_emb_(self, CLASS, id, emb):
+    #插入emb
+    def insert_emb(self, CLASS, id, emb):
         conn = db.connect(self.New_DB_Path)
-        sql_update_emb = 'UPDATE {CLASS} SET features = "{emb}" WHERE id = {id};'.format(CLASS=CLASS, emb=emb, id=id)
+        print(emb)
+        emb_str = ''
+        for i in range(len(emb)):
+            emb_str += str(emb[i]) + ' '
+        print(emb_str)
+        sql_update_emb = 'UPDATE {CLASS} SET features = "{emb}" WHERE id = {id};'.format(CLASS=CLASS, emb=emb_str,
+                                                                                         id=id)
         conn.execute(sql_update_emb)
         conn.commit()
         conn.close()
 
+    # 测试
+    def get_emb(self, CLASS):
+        conn = db.connect(self.New_DB_Path)
+        sql = "select * from {CLASS}".format(CLASS=CLASS)
+        cursor = conn.cursor()
+        conn.row_factory = db.Row
+        cursor.execute(sql)
+        rows = cursor.fetchall()
+
+        id = []
+        num = len(rows)
+        emb_arr = np.zeros([num, 128])
+
+        for lineIndex in range(num):
+            row = rows[lineIndex]  # 获取某一行的数据,类型是tuple
+            id.append(row[3])  # 获取id
+            emb_str = row[5]
+            if emb_str is None:
+                emb_arr[lineIndex] = np.full((1, 128), 10)
+            else:
+                str_list = emb_str.split(' ')  # 以空格分割字符串
+                for i in range(128):
+                    emb_arr[lineIndex][i] = float(str_list[i])  # 'list转ndarray:'，str->float
+        return id, emb_arr, num
+
     def get_sql_emb(self):
-        list_emb = []
-        emb_temp = np.zeros(128)
         num = self.Num_Now_All()
         emb_arr = np.zeros([num, 128])
         name = []
-        str_emb = np.empty([num, 128], dtype=float)
-
         # 获取所有行
         rows = self.readFronSqllite(self.DB_Path, self.sqlStr_SelectAll)
         lineIndex = 0
@@ -99,7 +127,6 @@ class Operate_Sql():
         else:
             while lineIndex < num:
                 row = rows[lineIndex]  # 获取某一行的数据,类型是tuple
-                # print(row[0])
                 name.append(row[0])  # 获取名字
                 if row[1] == 0:
                     emb_arr[lineIndex] = np.full((1, 128), 10)
@@ -108,7 +135,6 @@ class Operate_Sql():
                     for i in range(128):
                         emb_arr[lineIndex][i] = float(str_to_list[i])  # 'list转ndarray:'，str->float
                 lineIndex += 1
-
         return name, emb_arr, num
 
     # 删除班级表
@@ -242,4 +268,6 @@ if __name__ == "__main__":
     # sql.delete_pc_table('CS', '172')
     # sql.select_all_table()
     # sql.show_student_id('CS172')
-    sql.insert_emb_('CS172', 33, 123)
+    # sql.insert_emb_('CS172', 33, 123)
+    sql.get_emb('CS172')
+    # sql.get_sql_emb()
