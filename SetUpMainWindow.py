@@ -10,6 +10,8 @@ from delwin_ui import Ui_Form_Del
 from addClassTable import Ui_AddClassTable
 from deleteClassTable import Ui_DelClassTable
 from help import Ui_help
+from checkTable import Ui_Form_checkTable
+from delCheckTable import Ui_Form_delCheckTable
 from prompt import Ui_For_prompt
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QApplication
@@ -17,14 +19,12 @@ from file_op import File_Operate
 from sqlite3_op import Operate_Sql
 import face_recognition
 import time
-from scipy import misc
 import numpy as np
 import os
 import facenet
 import align.detect_face
 
 
-# 添加删除窗口
 class del_window(QDialog, Ui_Form_Del):
     def __init__(self):
         super(del_window, self).__init__()
@@ -85,6 +85,50 @@ class del_window(QDialog, Ui_Form_Del):
         self.combobox_init()
 
 
+# 删除考勤表
+class DelCheckTable(QDialog, Ui_Form_delCheckTable):
+    def __init__(self):
+        super(DelCheckTable, self).__init__()
+        self.setupUi(self)
+        self.initslot()
+        self.opsql = Operate_Sql()
+        self.opfile = File_Operate()
+        self.comboBox_delCheckTable.clear()
+        self.init_check_table()
+
+    def init_check_table(self):
+        table_name, table_nmu = self.opsql.select_all_table()
+        readlines = table_nmu
+        lineindex = 0
+        while lineindex < readlines:
+            row = table_name[lineindex]  #
+            self.comboBox_delCheckTable.addItem(table_name[lineindex])
+            lineindex += 1
+
+    def initslot(self):
+        self.btn_cancel.clicked.connect(self.btn_hide)
+        self.btn_confirm.clicked.connect(self.confirm)
+
+    def btn_hide(self):
+        self.hide()
+
+    def confirm(self):
+        check_name = self.comboBox_delCheckTable.currentText()
+        flag = self.opsql.delete_check_table(check_name)
+        if flag:
+            print("完成")
+            msg = QtWidgets.QMessageBox.information(self, u"完成", u"删除成功！",
+                                                    buttons=QtWidgets.QMessageBox.Ok,
+                                                    defaultButton=QtWidgets.QMessageBox.Ok)
+            time.sleep(0.2)
+            self.hide()
+        else:
+            print('失败')
+            msg = QtWidgets.QMessageBox.warning(self, u"警告", u"不存在这个表，请更改",
+                                                buttons=QtWidgets.QMessageBox.Ok,
+                                                defaultButton=QtWidgets.QMessageBox.Ok)
+
+
 # 删除班级表
 class DelClassTable(QDialog, Ui_DelClassTable):
     def __init__(self):
@@ -122,6 +166,42 @@ class DelClassTable(QDialog, Ui_DelClassTable):
         else:
             print('失败')
             msg = QtWidgets.QMessageBox.warning(self, u"警告", u"不存在这个表，请更改",
+                                                buttons=QtWidgets.QMessageBox.Ok,
+                                                defaultButton=QtWidgets.QMessageBox.Ok)
+
+
+# 添加考勤表
+class AddCheckTable(QDialog, Ui_Form_checkTable):
+    def __init__(self):
+        super(AddCheckTable, self).__init__()
+        self.setupUi(self)
+        self.initslot()
+        self.opsql = Operate_Sql()
+        self.opfile = File_Operate()
+        self.line_addCheckTable.clear()
+
+    # 初始化信号槽
+    def initslot(self):
+        self.btn_cancel.clicked.connect(self.btn_hide)
+        self.btn_confirm.clicked.connect(self.confirm)
+
+    def btn_hide(self):
+        self.hide()
+
+    def confirm(self):
+        check_table_name = self.line_addCheckTable.text()
+        flag = self.opsql.add_check_table(check_table_name)
+        if flag:
+            print("完成")
+            msg = QtWidgets.QMessageBox.information(self, u"完成", u"创建成功！",
+                                                    buttons=QtWidgets.QMessageBox.Ok,
+                                                    defaultButton=QtWidgets.QMessageBox.Ok)
+            time.sleep(0.3)
+            self.hide()
+
+        else:
+            print('失败')
+            msg = QtWidgets.QMessageBox.warning(self, u"警告", u"存在相同表名，请更改",
                                                 buttons=QtWidgets.QMessageBox.Ok,
                                                 defaultButton=QtWidgets.QMessageBox.Ok)
 
@@ -253,6 +333,8 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
         self.helpWin = HelpWindow()  # 帮助窗口实例
         self.openAddClass = AddClassTable()  # 添加班级表实例
         self.openDelClass = DelClassTable()  # 删除班级表实例
+        self.openAddCheck = AddCheckTable()  # 添加考勤表示例
+        self.openDelCheck = DelCheckTable()  # 添加删除考勤表示例
 
         self.slot_init()
         self.photoNum = 0  # 照片计数
@@ -279,6 +361,11 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
         self.actionHelp.triggered.connect(self.open_help)
         self.actionAddClass.triggered.connect(self.open_add_class)
         self.actionDelClass.triggered.connect(self.open_del_class)
+        self.actionAddCheck.triggered.connect(self.open_add_check_table)
+        self.actionDelCheck.triggered.connect(self.open_del_check)
+
+    def open_del_check(self):
+        self.openDelCheck.show()
 
     def open_help(self):
         self.helpWin.show()
@@ -288,6 +375,9 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
 
     def open_add_class(self):
         self.openAddClass.show()
+
+    def open_add_check_table(self):
+        self.openAddCheck.show()
 
     def opencamera(self):
         if self.timer_camera_test.isActive() == False:
