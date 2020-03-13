@@ -140,7 +140,7 @@ class Operate_Sql():
     # 删除考勤表
     def delete_check_table(self, check_table_name):
         conn = db.connect(self.New_DB_Path)
-        sql = "SELECT COUNT(*) FROM sqlite_master where type='table' and name='{str}';".format(str=check_table_name)
+        sql = "SELECT COUNT(*) FROM sqlite_master where type='table' and name='{str}';".format(str=str(check_table_name))
         conn = db.connect(self.New_DB_Path)
         cursor = conn.cursor()
         conn.row_factory = db.Row
@@ -150,7 +150,7 @@ class Operate_Sql():
             print('不存在这个表')
             return False
 
-        sql_drop = 'drop table {table}'.format(table=check_table_name)
+        sql_drop = 'drop table {table}'.format(table=str(check_table_name))
         print(sql_drop)
         conn.execute(sql_drop)
         conn.commit()
@@ -284,7 +284,7 @@ class Operate_Sql():
     def add_check_table(self, table_name):
         conn = db.connect(self.New_DB_Path)
         sql_check_name = "SELECT COUNT(*) FROM sqlite_master where type='table' and name='{str}';".format(
-            str=table_name)
+            str=str(table_name))
         conn = db.connect(self.New_DB_Path)
         cursor = conn.cursor()
         conn.row_factory = db.Row
@@ -294,7 +294,7 @@ class Operate_Sql():
             print('存在相同名字的表')
             return False
         sql_create_check_table = 'Create table {table}(name varchar(10) not null,sex varchar(1) not null,id int primary key not null);'.format(
-            table=table_name)
+            table=str(table_name))
         print('--:', sql_create_check_table)
         conn.execute(sql_create_check_table)
         conn.commit()
