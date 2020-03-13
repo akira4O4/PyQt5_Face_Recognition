@@ -51,10 +51,8 @@ class face():
         print('初始化MTCNN')
         with tf.Graph().as_default():
             gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=1.0)
-            sess = tf.Session(
-                config=tf.ConfigProto(
-                    gpu_options=gpu_options,
-                    log_device_placement=False))
+            sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options,
+                                                    log_device_placement=False))
             with sess.as_default():
                 global pnet, rnet, onet
                 pnet, rnet, onet = align.detect_face.create_mtcnn(sess, None)
