@@ -76,7 +76,7 @@ class Operate_Sql():
         print("删除完成")
         conn.close()
 
-    #插入emb
+    # 插入emb
     def insert_emb(self, CLASS, id, emb):
         conn = db.connect(self.New_DB_Path)
         print(emb)
@@ -136,6 +136,27 @@ class Operate_Sql():
                         emb_arr[lineIndex][i] = float(str_to_list[i])  # 'list转ndarray:'，str->float
                 lineIndex += 1
         return name, emb_arr, num
+
+    # 删除考勤表
+    def delete_check_table(self, check_table_name):
+        conn = db.connect(self.New_DB_Path)
+        sql = "SELECT COUNT(*) FROM sqlite_master where type='table' and name='{str}';".format(str=check_table_name)
+        conn = db.connect(self.New_DB_Path)
+        cursor = conn.cursor()
+        conn.row_factory = db.Row
+        cursor.execute(sql)
+        rows = cursor.fetchall()
+        if rows[0][0] == 0:
+            print('不存在这个表')
+            return False
+
+        sql_drop = 'drop table {table}'.format(table=check_table_name)
+        print(sql_drop)
+        conn.execute(sql_drop)
+        conn.commit()
+        conn.close()
+        print('删除完成:', check_table_name)
+        return True
 
     # 删除班级表
     def delete_pc_table(self, profession, class_):
@@ -259,8 +280,30 @@ class Operate_Sql():
         print('检索完成')
         return id
 
+    # 检查是否存在相同名字的考勤表
+    def add_check_table(self, table_name):
+        conn = db.connect(self.New_DB_Path)
+        sql_check_name = "SELECT COUNT(*) FROM sqlite_master where type='table' and name='{str}';".format(
+            str=table_name)
+        conn = db.connect(self.New_DB_Path)
+        cursor = conn.cursor()
+        conn.row_factory = db.Row
+        cursor.execute(sql_check_name)
+        rows = cursor.fetchall()
+        if rows[0][0] == 1:
+            print('存在相同名字的表')
+            return False
+        sql_create_check_table = 'Create table {table}(name varchar(10) not null,sex varchar(1) not null,id int primary key not null);'.format(
+            table=table_name)
+        print('--:', sql_create_check_table)
+        conn.execute(sql_create_check_table)
+        conn.commit()
+        conn.close()
+        print('创建完成')
+        return True
+
 
 if __name__ == "__main__":
     sql = Operate_Sql()
-    sql.get_emb('CS172')
-
+    # sql.get_emb('CS172')
+    sql.add_check_table('CS172200313')
