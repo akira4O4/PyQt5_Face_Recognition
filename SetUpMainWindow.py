@@ -108,6 +108,11 @@ class DelCheckTable(QDialog, Ui_Form_delCheckTable):
     def initslot(self):
         self.btn_cancel.clicked.connect(self.btn_hide)
         self.btn_confirm.clicked.connect(self.confirm)
+        self.btn_refresh.clicked.connect(self.refresh)
+
+    def refresh(self):
+        self.comboBox_delCheckTable.clear()
+        self.init_check_table()
 
     def btn_hide(self):
         self.hide()
@@ -120,8 +125,6 @@ class DelCheckTable(QDialog, Ui_Form_delCheckTable):
             msg = QtWidgets.QMessageBox.information(self, u"完成", u"删除成功！",
                                                     buttons=QtWidgets.QMessageBox.Ok,
                                                     defaultButton=QtWidgets.QMessageBox.Ok)
-            time.sleep(0.2)
-            self.hide()
         else:
             print('失败')
             msg = QtWidgets.QMessageBox.warning(self, u"警告", u"不存在这个表，请更改",
