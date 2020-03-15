@@ -135,7 +135,7 @@ class Ui_DelClassTable(object):
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "删除班级表"))
-        self.lab_addTest_8.setText(_translate("Form", "删除班级表"))
+        self.lab_addTest_8.setText(_translate("Form", "删除人脸数据表"))
         self.lab_addTest_6.setText(_translate("Form", "院系"))
         self.lab_addTest_7.setText(_translate("Form", "班级"))
         self.btn_confirm.setText(_translate("Form", "确定"))
