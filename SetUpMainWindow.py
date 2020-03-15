@@ -97,7 +97,7 @@ class DelCheckTable(QDialog, Ui_Form_delCheckTable):
         self.init_check_table()
 
     def init_check_table(self):
-        table_name, table_nmu = self.opsql.select_all_table()
+        table_name, table_nmu = self.opsql.select_all_checktable()
         readlines = table_nmu
         lineindex = 0
         while lineindex < readlines:
@@ -132,7 +132,7 @@ class DelCheckTable(QDialog, Ui_Form_delCheckTable):
                                                 defaultButton=QtWidgets.QMessageBox.Ok)
 
 
-# 删除班级表
+# 删除人脸数据表
 class DelClassTable(QDialog, Ui_DelClassTable):
     def __init__(self):
         super(DelClassTable, self).__init__()
@@ -209,7 +209,7 @@ class AddCheckTable(QDialog, Ui_Form_checkTable):
                                                 defaultButton=QtWidgets.QMessageBox.Ok)
 
 
-# 添加班级表
+# 添加人脸数据表
 class AddClassTable(QDialog, Ui_AddClassTable):
     def __init__(self):
         super(AddClassTable, self).__init__()
@@ -340,10 +340,11 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
         self.openDelCheck = DelCheckTable()  # 添加删除考勤表示例
 
         self.slot_init()
+        self.combobox_init()  # 初始化下拉列表
+        self.check_table_init()
+
         self.photoNum = 0  # 照片计数
         self.CAM_NUM = 0
-        # self.promptWin=prompt()
-        self.combobox_init()  # 初始化下拉列表
         self.pNum = 0  # 照片计数器
         self.photo_transmission = 0  # 图片传输变量
         self.frame_out = 0
@@ -446,7 +447,20 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
                 print(name)
                 cv2.imwrite(name, self.photo_transmission)
 
-    # 获取班级列表
+    # 考勤表初始化
+    def check_table_init(self, checktable=None):
+        self.comboBox_CheckTable.clear()
+        table_name, table_nmu = self.opsql.select_all_checktable()
+        readlines = table_nmu
+        lineindex = 0
+        while lineindex < readlines:
+            row = table_name[lineindex]  #
+            self.comboBox_CheckTable.addItem(table_name[lineindex])
+            lineindex += 1
+        if checktable != '' or checktable is None:
+            self.comboBox_CheckTable.setCurrentText(checktable)
+
+    # 获取人脸数据表
     def combobox_init(self, proclass=None):
         self.comboBox_selectClass.clear()
         table_name, table_nmu = self.opsql.select_all_table()
@@ -455,13 +469,17 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
         while lineindex < readlines:
             self.comboBox_selectClass.addItem(table_name[lineindex])
             lineindex += 1
-        if proclass != '':
+        if proclass != '' or proclass is None:
             self.comboBox_selectClass.setCurrentText(proclass)
 
     # 刷新显示
     def refresh(self):
         proclass = self.comboBox_selectClass.currentText()
+        checktable = self.comboBox_CheckTable.currentText()
+
         self.combobox_init(proclass=proclass)
+        self.check_table_init(checktable=checktable)
+
         id_set = self.opsql.show_student_id(proclass)
         self.comboBox_selectId.clear()
         for i in range(len(id_set)):
