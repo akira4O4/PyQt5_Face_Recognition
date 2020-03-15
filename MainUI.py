@@ -18,7 +18,7 @@ class Ui_Face_Recognition_window(object):
         self.centralwidget = QtWidgets.QWidget(Face_Recognition_window)
         self.centralwidget.setObjectName("centralwidget")
         self.layoutWidget = QtWidgets.QWidget(self.centralwidget)
-        self.layoutWidget.setGeometry(QtCore.QRect(30, 40, 798, 585))
+        self.layoutWidget.setGeometry(QtCore.QRect(30, 40, 798, 591))
         self.layoutWidget.setObjectName("layoutWidget")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.layoutWidget)
         self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
@@ -198,7 +198,7 @@ class Ui_Face_Recognition_window(object):
         _translate = QtCore.QCoreApplication.translate
         Face_Recognition_window.setWindowTitle(_translate("Face_Recognition_window", "人脸识别1.0"))
         self.lab_frame.setText(_translate("Face_Recognition_window", "没有图像输入"))
-        self.lab_selecCalss.setText(_translate("Face_Recognition_window", "选择班级"))
+        self.lab_selecCalss.setText(_translate("Face_Recognition_window", "选择人脸数据表"))
         self.lab_selecLable.setText(_translate("Face_Recognition_window", "选择学号"))
         self.lab_selecLable_2.setText(_translate("Face_Recognition_window", "选择考勤表"))
         self.btn_openCamera.setText(_translate("Face_Recognition_window", "打开摄像头"))
@@ -215,8 +215,8 @@ class Ui_Face_Recognition_window(object):
         self.actionHelp.setText(_translate("Face_Recognition_window", "操作细节"))
         self.actionExit.setText(_translate("Face_Recognition_window", "退出"))
         self.actionauthor.setText(_translate("Face_Recognition_window", "关于作者"))
-        self.actionAddClass.setText(_translate("Face_Recognition_window", "添加新班级"))
-        self.actionDelClass.setText(_translate("Face_Recognition_window", "删除班级表"))
+        self.actionAddClass.setText(_translate("Face_Recognition_window", "添加人脸数据表"))
+        self.actionDelClass.setText(_translate("Face_Recognition_window", "删除人脸数据表"))
         self.actionAddCheck.setText(_translate("Face_Recognition_window", "添加考勤表"))
         self.actionDelCheck.setText(_translate("Face_Recognition_window", "删除考勤表"))
 
