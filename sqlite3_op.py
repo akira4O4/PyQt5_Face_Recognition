@@ -5,7 +5,8 @@ import numpy as np
 class Operate_Sql():
     def __init__(self):
         self.DB_Path = '../DB/FileNameDB.db'
-        self.New_DB_Path = '../DB/StudentCheckWork.db'
+        self.StudentFaceDB = '../DB/StudentFaceDB.db'
+        self.StudentCheckWorkDB = '../DB/StudentCheckWorkDB.db'
         self.sqlStr_SelectAll = "select * from fileName;"
         self.sqlStr_InsertNewName = "insert into fileName(fName) values ("
         self.sqlStr_count = " select count(*) from fileName;"
@@ -69,7 +70,7 @@ class Operate_Sql():
             return True
 
     def Delete_File_Name(self, CLASS, id):
-        conn = db.connect(self.New_DB_Path)  # 该 API 打开一个到 SQLite 数据库文件 database 的链接，如果数据库成功打开，则返回一个连接对象
+        conn = db.connect(self.StudentFaceDB)  # 该 API 打开一个到 SQLite 数据库文件 database 的链接，如果数据库成功打开，则返回一个连接对象
         filename = 'delete from {CLASS} where id="{id}";'.format(CLASS=CLASS, id=id)
         conn.execute(filename)
         conn.commit()
@@ -78,7 +79,7 @@ class Operate_Sql():
 
     # 插入emb
     def insert_emb(self, CLASS, id, emb):
-        conn = db.connect(self.New_DB_Path)
+        conn = db.connect(self.StudentFaceDB)
         print(emb)
         emb_str = ''
         for i in range(len(emb)):
@@ -92,7 +93,7 @@ class Operate_Sql():
 
     # 测试
     def get_emb(self, CLASS):
-        conn = db.connect(self.New_DB_Path)
+        conn = db.connect(self.StudentFaceDB)
         sql = "select * from {CLASS}".format(CLASS=CLASS)
         cursor = conn.cursor()
         conn.row_factory = db.Row
@@ -139,9 +140,10 @@ class Operate_Sql():
 
     # 删除考勤表
     def delete_check_table(self, check_table_name):
-        conn = db.connect(self.New_DB_Path)
-        sql = "SELECT COUNT(*) FROM sqlite_master where type='table' and name='{str}';".format(str=str(check_table_name))
-        conn = db.connect(self.New_DB_Path)
+        conn = db.connect(self.StudentCheckWorkDB)
+        sql = "SELECT COUNT(*) FROM sqlite_master where type='table' and name='{str}';".format(
+            str=str(check_table_name))
+        conn = db.connect(self.StudentFaceDB)
         cursor = conn.cursor()
         conn.row_factory = db.Row
         cursor.execute(sql)
@@ -163,7 +165,7 @@ class Operate_Sql():
         table = profession + class_
         # 先检查是否存在这个表
         sql = "SELECT COUNT(*) FROM sqlite_master where type='table' and name='{str}';".format(str=table)
-        conn = db.connect(self.New_DB_Path)
+        conn = db.connect(self.StudentFaceDB)
         cursor = conn.cursor()
         conn.row_factory = db.Row
         cursor.execute(sql)
@@ -181,11 +183,11 @@ class Operate_Sql():
 
     # 插入新的班级表
     def create_new_pc_table(self, profession, class_):
+        conn = db.connect(self.StudentFaceDB)
         table = profession + class_
         # 先检查是否存在相同名字的表
         sql = "SELECT COUNT(*) FROM sqlite_master where type='table' and name='{str}';".format(str=table)
         # print(sql)
-        conn = db.connect(self.New_DB_Path)
         cursor = conn.cursor()
         conn.row_factory = db.Row
         cursor.execute(sql)
@@ -209,9 +211,9 @@ class Operate_Sql():
         print('创建完成')
         return True
 
-    # 查询所有表名
-    def select_all_table(self):
-        conn = db.connect(self.New_DB_Path)
+    # 查询所有考勤表
+    def select_all_checktable(self):
+        conn = db.connect(self.StudentCheckWorkDB)
         cursor = conn.cursor()
         conn.row_factory = db.Row
 
@@ -231,12 +233,37 @@ class Operate_Sql():
         table_name = []
         for i in range(table_nmu):
             table_name.append(rows[i][0])
+        conn.close()
+        return table_name, table_nmu
 
+    # 查询所有表名
+    def select_all_table(self):
+        conn = db.connect(self.StudentFaceDB)
+        cursor = conn.cursor()
+        conn.row_factory = db.Row
+
+        # 查询所有表名
+        sql_all_table = 'SELECT name FROM sqlite_master WHERE type="table" ORDER BY name;'
+        # 查询表个数
+        sql_all_num = 'select count(*) from sqlite_master where type="table"; '
+
+        cursor.execute(sql_all_num)
+        rows = cursor.fetchall()
+        table_nmu = rows[0][0]
+        print('总共有{num}个表'.format(num=table_nmu))
+
+        cursor.execute(sql_all_table)
+        rows = cursor.fetchall()
+        print(rows)
+        table_name = []
+        for i in range(table_nmu):
+            table_name.append(rows[i][0])
+        conn.close()
         return table_name, table_nmu
 
     # 插入新成员信息
     def insert_new_student(self, student_info):
-        conn = db.connect(self.New_DB_Path)
+        conn = db.connect(self.StudentFaceDB)
 
         # 检测学号是否唯一
         sql_checkid = 'select COUNT(*) from {proclass} where id="{id}";' \
@@ -268,7 +295,7 @@ class Operate_Sql():
 
     # 根据班级显示所有学号
     def show_student_id(self, proclass):
-        conn = db.connect(self.New_DB_Path)
+        conn = db.connect(self.StudentFaceDB)
         sql = 'select id from {proclass} ;'.format(proclass=proclass)
         cursor = conn.cursor()
         conn.row_factory = db.Row
@@ -278,14 +305,14 @@ class Operate_Sql():
         for i in range(len(rows)):
             id.append(rows[i][0])
         print('检索完成')
+        conn.close()
         return id
 
     # 检查是否存在相同名字的考勤表
     def add_check_table(self, table_name):
-        conn = db.connect(self.New_DB_Path)
+        conn = db.connect(self.StudentCheckWorkDB)
         sql_check_name = "SELECT COUNT(*) FROM sqlite_master where type='table' and name='{str}';".format(
             str=str(table_name))
-        conn = db.connect(self.New_DB_Path)
         cursor = conn.cursor()
         conn.row_factory = db.Row
         cursor.execute(sql_check_name)
