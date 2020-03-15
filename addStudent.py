@@ -197,7 +197,7 @@ class Ui_Form_Student(object):
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "添加新用户"))
-        self.lab_addTest_6.setText(_translate("Form", "选择班级"))
+        self.lab_addTest_6.setText(_translate("Form", "选择人脸数据表"))
         self.lab_addTest.setText(_translate("Form", "添加用户标签（姓名拼音）"))
         self.lab_addTest_2.setText(_translate("Form", "添加用户姓名"))
         self.lab_addTest_3.setText(_translate("Form", "添加用户性别"))
