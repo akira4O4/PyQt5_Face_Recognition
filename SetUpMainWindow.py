@@ -505,7 +505,8 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
         else:
             print('开启摄像头')
             CLASS = self.comboBox_selectClass.currentText()
-            self.face.main(CLASS)
+            ct = self.comboBox_CheckTable.currentText()
+            self.face.main(CLASS, ct)
 
 
 if __name__ == "__main__":
