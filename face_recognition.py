@@ -92,7 +92,7 @@ class face():
                 print("pre_embadding计算完成")
         return compare_emb, compare_num, all_obj_name  # 数据库embadding，人数，目录标签
 
-    def main(self, CLASS):
+    def main(self, CLASS, check_table):
         with tf.Graph().as_default():
             with tf.Session() as sess:
                 model = '../20170512-110547/'
@@ -171,6 +171,8 @@ class face():
                                     (0, 0, 255),
                                     thickness=2,
                                     lineType=2)
+                    # 将学号插入到选择的考勤表中
+                    self.opsql.insert_check_table_info(CLASS, check_table, find_obj[0])
                     cv2.imshow('face recognition', frame)
                     key = cv2.waitKey(3)
                     if key == 27:
@@ -230,4 +232,4 @@ class face():
 
 if __name__ == '__main__':
     face_test = face()
-    face_test.main('CS172')
+    face_test.main('cs172','cs172')
