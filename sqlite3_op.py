@@ -329,8 +329,40 @@ class Operate_Sql():
         print('创建完成')
         return True
 
+    # 向考勤表插入识别的数据
+    def insert_check_table_info(self, class_table, check_table, id):
+        # 根据id读取信息
+        sql_show_info = 'select * from {class_table} where id="{id}";'.format(class_table=str(class_table), id=str(id))
+        # print(sql_show_info)
+        conn = db.connect(self.StudentFaceDB)
+        cursor = conn.cursor()
+        conn.row_factory = db.Row
+        cursor.execute(sql_show_info)
+        rows = cursor.fetchall()
+        if len(rows) == 1:
+            row = rows[0]
+            name = row[1]
+            sex = row[2]
+            id = row[3]
+            conn.close()
+
+            conn = db.connect(self.StudentCheckWorkDB)
+            sql_check = 'select count(*) from {class_table} where id="{id}";'.format(class_table=str(check_table),
+                                                                                     id=str(id))
+            cursor = conn.cursor()
+            conn.row_factory = db.Row
+            cursor.execute(sql_check)
+            rows = cursor.fetchall()
+            if rows[0][0] != 1:
+                sql_insert_info = 'INSERT INTO {proclass} (name,sex,id) VALUES ("{name}", "{sex}",{id});'.format(
+                    proclass=str(check_table), name=str(name), sex=str(sex), id=id)
+                conn.execute(sql_insert_info)
+                conn.commit()
+                conn.close()
+                print('考勤插入完成')
+
 
 if __name__ == "__main__":
     sql = Operate_Sql()
     # sql.get_emb('CS172')
-    sql.add_check_table('CS172200313')
+    sql.insert_check_table_info('cs172', 'cs172', 33)
