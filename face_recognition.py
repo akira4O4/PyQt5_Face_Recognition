@@ -200,7 +200,7 @@ class face():
         # 如果未发现目标 直接返回
         if len(bounding_boxes) < 1:
             print('没有发现人脸')
-            return 0, 0, 0
+            return False, 0, 0
 
         for i, face_position in enumerate(bounding_boxes):
             face_position = face_position.astype(int)
@@ -232,4 +232,4 @@ class face():
 
 if __name__ == '__main__':
     face_test = face()
-    face_test.main('cs172','cs172')
+    face_test.main('cs172','考勤表_cs172')

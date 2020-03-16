@@ -140,32 +140,40 @@ class DelClassTable(QDialog, Ui_DelClassTable):
         self.initslot()
         self.opsql = Operate_Sql()
         self.opfile = File_Operate()
-        self.line_profession.clear()
-        self.line_class.clear()
+        self.init_facedate_table()
         # 初始化信号槽
+
+    # 初始化
+    def init_facedate_table(self):
+        table_name, table_nmu = self.opsql.select_all_table()
+        readlines = table_nmu
+        lineindex = 0
+        while lineindex < readlines:
+            row = table_name[lineindex]  #
+            self.comboBox_del_facedata_table.addItem(table_name[lineindex])
+            lineindex += 1
 
     def initslot(self):
         self.btn_cancel.clicked.connect(self.btn_hide)
         self.btn_confirm.clicked.connect(self.confirm)
+        self.btn_refresh.clicked.connect(self.refresh)
+
+    def refresh(self):
+        self.comboBox_del_facedata_table.clear()
+        self.init_facedate_table()
 
     def btn_hide(self):
         self.hide()
 
     def confirm(self):
         # 获取院系班级
-        profession = self.line_profession.text()
-        class_ = self.line_class.text()
-        flag = self.opsql.delete_pc_table(profession, class_)
-        self.line_profession.clear()
-        self.line_class.clear()
+        facedate = self.comboBox_del_facedata_table.currentText()
+        flag = self.opsql.delete_pc_table(facedate)
         if flag:
             print("完成")
             msg = QtWidgets.QMessageBox.information(self, u"完成", u"删除成功！",
                                                     buttons=QtWidgets.QMessageBox.Ok,
                                                     defaultButton=QtWidgets.QMessageBox.Ok)
-            time.sleep(0.2)
-            self.hide()
-
         else:
             print('失败')
             msg = QtWidgets.QMessageBox.warning(self, u"警告", u"不存在这个表，请更改",
@@ -250,7 +258,7 @@ class AddClassTable(QDialog, Ui_AddClassTable):
                                                 defaultButton=QtWidgets.QMessageBox.Ok)
 
 
-# 添加窗口类
+# 添加新用户
 class AddStudent(QDialog, Ui_Form_Student):
     def __init__(self):
         super(AddStudent, self).__init__()
@@ -263,10 +271,15 @@ class AddStudent(QDialog, Ui_Form_Student):
     def slotInit(self):
         self.btn_cancel.clicked.connect(self.btn_hide)
         self.btn_confirm.clicked.connect(self.btn_add_new_student)
+        self.btn_refresh.clicked.connect(self.refresh)
         # 隐藏窗口
 
     def btn_hide(self):
         self.hide()
+
+    def refresh(self):
+        self.SelectClass.clear()
+        self.combobox_init()
 
     # 初始化班级列表
     def combobox_init(self):
@@ -274,7 +287,6 @@ class AddStudent(QDialog, Ui_Form_Student):
         readlines = table_nmu
         lineindex = 0
         while lineindex < readlines:
-            row = table_name[lineindex]  #
             self.SelectClass.addItem(table_name[lineindex])
             lineindex += 1
 
@@ -454,11 +466,11 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
         readlines = table_nmu
         lineindex = 0
         while lineindex < readlines:
-            row = table_name[lineindex]  #
             self.comboBox_CheckTable.addItem(table_name[lineindex])
             lineindex += 1
         if checktable != '' or checktable is None:
             self.comboBox_CheckTable.setCurrentText(checktable)
+        print('check_table_init done')
 
     # 获取人脸数据表
     def combobox_init(self, proclass=None):
@@ -471,6 +483,7 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
             lineindex += 1
         if proclass != '' or proclass is None:
             self.comboBox_selectClass.setCurrentText(proclass)
+        print('combobox_init done')
 
     # 刷新显示
     def refresh(self):
@@ -482,6 +495,7 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
 
         id_set = self.opsql.show_student_id(proclass)
         self.comboBox_selectId.clear()
+        print(len(id_set))
         for i in range(len(id_set)):
             print(id_set[i])
             self.comboBox_selectId.addItem(str(id_set[i]))
