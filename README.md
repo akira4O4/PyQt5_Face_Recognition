@@ -17,7 +17,7 @@
 >**emb_img和src_img文件夹在程序运行时会自动创建**  
 **文件中不包含UI文件，所有UI文件均转换成Python程序文件**  
 
-![5](https://github.com/omega-Lee/PyQt5_Face_Recognition/tree/master/image/5.png)
+![5](hhttps://github.com/omega-Lee/PyQt5_Face_Recognition/tree/master/image/5.png)
 
 ## DB目录讲解
 >**StudentCheckWorkDB.db 为学生考勤数据表**  
