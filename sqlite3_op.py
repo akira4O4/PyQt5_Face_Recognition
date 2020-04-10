@@ -143,7 +143,6 @@ class Operate_Sql():
         conn = db.connect(self.StudentCheckWorkDB)
         sql = "SELECT COUNT(*) FROM sqlite_master where type='table' and name='{str}';".format(
             str=str(check_table_name))
-        conn = db.connect(self.StudentFaceDB)
         cursor = conn.cursor()
         conn.row_factory = db.Row
         cursor.execute(sql)
@@ -151,7 +150,6 @@ class Operate_Sql():
         if rows[0][0] == 0:
             print('不存在这个表')
             return False
-
         sql_drop = 'drop table {table}'.format(table=str(check_table_name))
         print(sql_drop)
         conn.execute(sql_drop)
@@ -160,9 +158,8 @@ class Operate_Sql():
         print('删除完成:', check_table_name)
         return True
 
-    # 删除班级表
-    def delete_pc_table(self, profession, class_):
-        table = profession + class_
+    # 删除人脸数据表
+    def delete_pc_table(self, table):
         # 先检查是否存在这个表
         sql = "SELECT COUNT(*) FROM sqlite_master where type='table' and name='{str}';".format(str=table)
         conn = db.connect(self.StudentFaceDB)
@@ -181,13 +178,13 @@ class Operate_Sql():
         print('删除完成:', table)
         return True
 
-    # 插入新的班级表
+    # 创建新的班级表
     def create_new_pc_table(self, profession, class_):
         conn = db.connect(self.StudentFaceDB)
         table = profession + class_
         # 先检查是否存在相同名字的表
-        sql = "SELECT COUNT(*) FROM sqlite_master where type='table' and name='{str}';".format(str=table)
-        # print(sql)
+        sql = "SELECT COUNT(*) FROM sqlite_master where type='table' and name='{str}';".format(str=table.upper())
+        print(sql)
         cursor = conn.cursor()
         conn.row_factory = db.Row
         cursor.execute(sql)
@@ -195,21 +192,22 @@ class Operate_Sql():
         if rows[0][0] == 1:
             print('存在相同名字的表')
             return False
-        # 插入新表
-        sql_createnewtable = 'CREATE TABLE {tablename}(' \
-                             'lable varchar(10) not null,' \
-                             ' name varchar(10) not null,' \
-                             'sex varchar(1) not null,' \
-                             'id int primary key not null,' \
-                             'profession varchar(50) not null,' \
-                             'features int,' \
-                             'flag int default 0 not null' \
-                             ');'.format(tablename=table)
-        conn.execute(sql_createnewtable)
-        conn.commit()
-        conn.close()
-        print('创建完成')
-        return True
+        else:
+            # 插入新表
+            sql_createnewtable = 'CREATE TABLE {tablename}(' \
+                                 'lable varchar(10) not null,' \
+                                 ' name varchar(10) not null,' \
+                                 'sex varchar(1) not null,' \
+                                 'id int primary key not null,' \
+                                 'profession varchar(50) not null,' \
+                                 'features int,' \
+                                 'flag int default 0 not null' \
+                                 ');'.format(tablename=table)
+            conn.execute(sql_createnewtable)
+            conn.commit()
+            conn.close()
+            print('创建完成')
+            return True
 
     # 查询所有考勤表
     def select_all_checktable(self):
@@ -225,18 +223,18 @@ class Operate_Sql():
         cursor.execute(sql_all_num)
         rows = cursor.fetchall()
         table_nmu = rows[0][0]
-        print('总共有{num}个表'.format(num=table_nmu))
+        print('总共有{num}个考勤表'.format(num=table_nmu))
 
         cursor.execute(sql_all_table)
         rows = cursor.fetchall()
-        print(rows)
         table_name = []
         for i in range(table_nmu):
             table_name.append(rows[i][0])
+            print(rows[i][0])
         conn.close()
         return table_name, table_nmu
 
-    # 查询所有表名
+    # 查询所有人脸数据表名
     def select_all_table(self):
         conn = db.connect(self.StudentFaceDB)
         cursor = conn.cursor()
@@ -250,7 +248,7 @@ class Operate_Sql():
         cursor.execute(sql_all_num)
         rows = cursor.fetchall()
         table_nmu = rows[0][0]
-        print('总共有{num}个表'.format(num=table_nmu))
+        print('总共有{num}个人脸数据表'.format(num=table_nmu))
 
         cursor.execute(sql_all_table)
         rows = cursor.fetchall()
@@ -258,13 +256,15 @@ class Operate_Sql():
         table_name = []
         for i in range(table_nmu):
             table_name.append(rows[i][0])
+            # print(rows[i][0])
         conn.close()
         return table_name, table_nmu
 
     # 插入新成员信息
     def insert_new_student(self, student_info):
         conn = db.connect(self.StudentFaceDB)
-
+        if student_info[4] is None or student_info[4] == '':
+            return False
         # 检测学号是否唯一
         sql_checkid = 'select COUNT(*) from {proclass} where id="{id}";' \
             .format(proclass=student_info[4], id=student_info[3])
@@ -294,9 +294,12 @@ class Operate_Sql():
         return True
 
     # 根据班级显示所有学号
-    def show_student_id(self, proclass):
+    def show_student_id(self, proclass=None):
+        if proclass is None or proclass == '':
+            print('[]')
+            return []
         conn = db.connect(self.StudentFaceDB)
-        sql = 'select id from {proclass} ;'.format(proclass=proclass)
+        sql = 'select id from {proclass} ;'.format(proclass=str(proclass))
         cursor = conn.cursor()
         conn.row_factory = db.Row
         cursor.execute(sql)
@@ -312,7 +315,7 @@ class Operate_Sql():
     def add_check_table(self, table_name):
         conn = db.connect(self.StudentCheckWorkDB)
         sql_check_name = "SELECT COUNT(*) FROM sqlite_master where type='table' and name='{str}';".format(
-            str=str(table_name))
+            str=str(table_name.upper()))
         cursor = conn.cursor()
         conn.row_factory = db.Row
         cursor.execute(sql_check_name)
@@ -365,4 +368,5 @@ class Operate_Sql():
 if __name__ == "__main__":
     sql = Operate_Sql()
     # sql.get_emb('CS172')
-    sql.insert_check_table_info('cs172', 'cs172', 33)
+    # sql.insert_check_table_info('cs172', 'cs172', 33)
+    sql.create_new_pc_table('cs','172')
