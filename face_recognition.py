@@ -123,10 +123,21 @@ class face():
                                 thickness=2,
                                 lineType=1)
                     cv2.rectangle(frame, (150, 100), (490, 380), (165, 245, 25), 2)
-                    box1 = [150, 100, 490, 380]
+                    BOX = [150, 100, 490, 380]
 
                     # 获取视频流中的最大人脸 判断标识 bounding_box crop_image
                     mark, bounding_box, crop_image = self.load_and_align_data(rgb_frame, 160)
+
+                    '''
+                    范围限制
+                    '''
+                    if mark:
+                        if bounding_box[0] < 75:
+                            mark = False
+                            print('left')
+                        if bounding_box[2] > 565:
+                            mark = False
+                            print('right')
 
                     if mark:
                         print('计算视频帧的embadding')
@@ -171,7 +182,7 @@ class face():
                                     (0, 0, 255),
                                     thickness=2,
                                     lineType=2)
-                    # 将学号插入到选择的考勤表中
+                        # 将学号插入到选择的考勤表中
                     self.opsql.insert_check_table_info(CLASS, check_table, find_obj[0])
                     cv2.imshow('face recognition', frame)
                     key = cv2.waitKey(3)
@@ -181,15 +192,10 @@ class face():
                 cv2.destroyWindow("face recognition")
 
     def load_and_align_data(self, img, image_size):
-        minsize = 20
 
+        minsize = 20
         threshold = [0.6, 0.7, 0.7]
         factor = 0.709
-
-        # img = cv2.resize(img, (0, 0), fx=0.5, fy=0.5,
-        #                  interpolation=cv2.INTER_AREA)
-
-        # bounding_boxes shape:(1,5)  type:np.ndarray
         bounding_boxes, _ = align.detect_face.detect_face(img, minsize, pnet, rnet, onet, threshold, factor)
         Index = []  # 序列
         Area = []  # 面积
@@ -222,6 +228,16 @@ class face():
 
         # 裁剪
         temp_crop = img[max_face_position[1]:max_face_position[3], max_face_position[0]:max_face_position[2], :]
+
+        if max_face_position[0] < 75:  # 左边
+            return False, 0, 0
+
+        if max_face_position[2] > 565:  # 右边
+            return False, 0, 0
+
+        if max_face_position[1] < 75:  # 上面
+            return False, 0, 0
+
         aligned = cv2.resize(temp_crop, (image_size, image_size),
                              interpolation=cv2.INTER_CUBIC)
         face_out = facenet.prewhiten(aligned)
@@ -232,4 +248,4 @@ class face():
 
 if __name__ == '__main__':
     face_test = face()
-    face_test.main('cs172','考勤表_cs172')
+    face_test.main('cs172', '考勤表_cs172')
