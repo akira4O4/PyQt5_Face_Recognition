@@ -21,7 +21,7 @@
 
 ![5](https://github.com/omega-Lee/PyQt5_Face_Recognition/blob/master/image/5.png)
 
-## DB目录讲解
+## DB目录讲解(因为涉及个人隐私请各位自己创建两个数据库)
 >**StudentCheckWorkDB.db 为学生考勤数据表**  
 >**StudentFaceDB.db 为学生人脸数据**  
 
