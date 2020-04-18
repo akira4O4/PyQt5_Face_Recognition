@@ -29,6 +29,14 @@
 
 ![6](https://github.com/omega-Lee/PyQt5_Face_Recognition/blob/master/image/6.png)
 
+## 操作步骤
+1、创建班级人脸数据
+2、创建班级考勤表
+3、选择学生学号，与人脸表
+4、录入人脸
+5、提取特征
+5、开始检测
+  
 ## 软件界面细节  
 
 ![1](https://github.com/omega-Lee/PyQt5_Face_Recognition/blob/master/image/1.png) 
