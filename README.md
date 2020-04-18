@@ -13,7 +13,7 @@
 >**20170512-11-547下为FaceNet数据 这个数据太大无法上传，请到百度云下载**   
 >**链接:https://** 
 >**pan.baidu.**
->**com/s/1nMwbahnZ0ZgeIOO6UrATdw**
+>**com/s/1nMwbahnZ0ZgeIOO6UrATdw(请去掉空格)**
 >**提取码：w3it  **    
 >**align文件夹下为MTCNN模型数据**  
 >**src文件夹下为所有主程序文件 SetUpMainWindow.py为启动文件**  
