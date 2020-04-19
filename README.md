@@ -53,5 +53,3 @@
 ![3](https://github.com/omega-Lee/PyQt5_Face_Recognition/blob/master/image/3.png) 
 
 ![4](https://github.com/omega-Lee/PyQt5_Face_Recognition/blob/master/image/4.png) 
-
- 
