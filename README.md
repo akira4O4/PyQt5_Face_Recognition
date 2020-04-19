@@ -2,7 +2,7 @@
  ## 上传前已经通过测试，希望各位认真查阅README，不要做伸手党，不熟悉TensorFlow和python的请提前学习。欢迎给小星星。    
  ## 测试环境：
  >**1.Windows 10**  
- >**2.TensorFlow GPU**  
+ >**2.TensorFlow1.14 GPU版本（没有GPU也可以，CPU版本会慢一些）**  
  >**3.PyQt**  
  >**4.Sqlite3**  
 
