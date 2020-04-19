@@ -19,7 +19,7 @@
 >**align文件夹下为MTCNN模型数据**  
 >**src文件夹下为所有主程序文件 SetUpMainWindow.py为启动文件**  
 >**DB文件夹下为sqlite3数据库**  
->**emb_img和src_img文件夹在程序运行时会自动创建**  
+>**emb_img和src_img文件夹在程序运行时会自动创建（或者可以直接手动创建，两个都是空文件夹）**  
 **文件中不包含UI文件，所有UI文件均转换成Python程序文件**  
 
 ![5](https://github.com/omega-Lee/PyQt5_Face_Recognition/blob/master/image/5.png)  
