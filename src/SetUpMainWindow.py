@@ -24,7 +24,6 @@ import os
 import facenet
 import align.detect_face
 
-
 class del_window(QDialog, Ui_Form_Del):
     def __init__(self):
         super(del_window, self).__init__()
