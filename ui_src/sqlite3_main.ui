@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>969</width>
-    <height>694</height>
+    <width>949</width>
+    <height>574</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,8 +17,8 @@
    <widget class="QPushButton" name="btn_query">
     <property name="geometry">
      <rect>
-      <x>850</x>
-      <y>560</y>
+      <x>840</x>
+      <y>480</y>
       <width>81</width>
       <height>31</height>
      </rect>
@@ -35,8 +35,8 @@
    <widget class="QLineEdit" name="lineEdit_commont">
     <property name="geometry">
      <rect>
-      <x>70</x>
-      <y>560</y>
+      <x>60</x>
+      <y>480</y>
       <width>741</width>
       <height>26</height>
      </rect>
@@ -45,8 +45,8 @@
    <widget class="QLabel" name="label_field_2">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>550</y>
+      <x>10</x>
+      <y>470</y>
       <width>61</width>
       <height>41</height>
      </rect>
@@ -63,8 +63,8 @@
    <widget class="QGroupBox" name="groupBox_table">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>20</y>
+      <x>10</x>
+      <y>10</y>
       <width>101</width>
       <height>421</height>
      </rect>
@@ -84,8 +84,8 @@
    <widget class="QGroupBox" name="groupBox_field">
     <property name="geometry">
      <rect>
-      <x>130</x>
-      <y>20</y>
+      <x>120</x>
+      <y>10</y>
       <width>131</width>
       <height>371</height>
      </rect>
@@ -106,16 +106,16 @@
     <property name="geometry">
      <rect>
       <x>280</x>
-      <y>50</y>
+      <y>30</y>
       <width>541</width>
       <height>411</height>
      </rect>
     </property>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>870</x>
+      <x>830</x>
       <y>100</y>
       <width>82</width>
       <height>88</height>
@@ -153,11 +153,11 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>130</x>
-      <y>410</y>
+      <x>120</x>
+      <y>400</y>
       <width>138</width>
       <height>32</height>
      </rect>
@@ -196,7 +196,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>969</width>
+     <width>949</width>
      <height>23</height>
     </rect>
    </property>
@@ -207,7 +207,6 @@
     <addaction name="actionOpen_File"/>
     <addaction name="actionClose_File"/>
     <addaction name="separator"/>
-    <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
