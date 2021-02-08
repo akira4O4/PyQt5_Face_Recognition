@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>sqlite3_mainWindow</class>
+ <widget class="QMainWindow" name="sqlite3_mainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>969</width>
+    <height>694</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Sqlite3</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QPushButton" name="btn_query">
+    <property name="geometry">
+     <rect>
+      <x>850</x>
+      <y>560</y>
+      <width>81</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>16</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>查询</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_commont">
+    <property name="geometry">
+     <rect>
+      <x>70</x>
+      <y>560</y>
+      <width>741</width>
+      <height>26</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_field_2">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>550</y>
+      <width>61</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>16</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>命令</string>
+    </property>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_table">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>20</y>
+      <width>101</width>
+      <height>421</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>16</pointsize>
+     </font>
+    </property>
+    <property name="title">
+     <string>表</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_field">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>20</y>
+      <width>131</width>
+      <height>371</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>16</pointsize>
+     </font>
+    </property>
+    <property name="title">
+     <string>字段</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QTableView" name="tableView_content">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>50</y>
+      <width>541</width>
+      <height>411</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>870</x>
+      <y>100</y>
+      <width>82</width>
+      <height>88</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>16</pointsize>
+     </font>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <widget class="QPushButton" name="btn_del">
+       <property name="font">
+        <font>
+         <pointsize>16</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>删除</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btn_add">
+       <property name="font">
+        <font>
+         <pointsize>16</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>添加</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>410</y>
+      <width>138</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QRadioButton" name="radioBtn_notall">
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>全不选</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="radioBtn_all">
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>全选</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>969</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menudsfewrfr">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionOpen_File"/>
+    <addaction name="actionClose_File"/>
+    <addaction name="separator"/>
+    <addaction name="actionExit"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+   </widget>
+   <addaction name="menudsfewrfr"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <action name="actionOpen_File">
+   <property name="text">
+    <string>Open File</string>
+   </property>
+  </action>
+  <action name="actionClose_File">
+   <property name="text">
+    <string>Close File</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
