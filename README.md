@@ -22,19 +22,19 @@
 >**emb_img和src_img文件夹在程序运行时会自动创建（或者可以直接手动创建，两个都是空文件夹）**  
 **文件中不包含UI文件，所有UI文件均转换成Python程序文件**  
 
-![5](https://github.com/omega-Lee/PyQt5_Face_Recognition/blob/master/image/5.png)  
+![5](https://github.com/omega-Lee/PyQt5_Face_Recognition/blob/master/markdown_imgs/5.png)  
 
 ## 目录结构
-![目录结构1](https://github.com/omega-Lee/PyQt5_Face_Recognition/blob/master/image/目录结构1.png)  
-![目录结构2](https://github.com/omega-Lee/PyQt5_Face_Recognition/blob/master/image/目录结构2.png)  
-![目录结构3](https://github.com/omega-Lee/PyQt5_Face_Recognition/blob/master/image/目录结构3.png)  
+![目录结构1](https://github.com/omega-Lee/PyQt5_Face_Recognition/blob/master/markdown_imgs/目录结构1.png)  
+![目录结构2](https://github.com/omega-Lee/PyQt5_Face_Recognition/blob/master/markdown_imgs/目录结构2.png)  
+![目录结构3](https://github.com/omega-Lee/PyQt5_Face_Recognition/blob/master/markdown_imgs/目录结构3.png)  
 
 
 ## DB目录讲解
 >**StudentCheckWorkDB.db 为学生考勤数据表**  
 >**StudentFaceDB.db 为学生人脸数据**  
 
-![6](https://github.com/omega-Lee/PyQt5_Face_Recognition/blob/master/image/6.png)
+![6](https://github.com/omega-Lee/PyQt5_Face_Recognition/blob/master/markdown_imgs/6.png)
 
 ## 操作步骤
 1、创建班级人脸数据  
@@ -46,10 +46,10 @@
   
 ## 软件界面细节  
 
-![1](https://github.com/omega-Lee/PyQt5_Face_Recognition/blob/master/image/1.png) 
+![1](https://github.com/omega-Lee/PyQt5_Face_Recognition/blob/master/markdown_imgs/1.png) 
 
-![2](https://github.com/omega-Lee/PyQt5_Face_Recognition/blob/master/image/2.png) 
+![2](https://github.com/omega-Lee/PyQt5_Face_Recognition/blob/master/markdown_imgs/2.png) 
 
-![3](https://github.com/omega-Lee/PyQt5_Face_Recognition/blob/master/image/3.png) 
+![3](https://github.com/omega-Lee/PyQt5_Face_Recognition/blob/master/markdown_imgs/3.png) 
 
-![4](https://github.com/omega-Lee/PyQt5_Face_Recognition/blob/master/image/4.png) 
+![4](https://github.com/omega-Lee/PyQt5_Face_Recognition/blob/master/markdown_imgs/4.png) 

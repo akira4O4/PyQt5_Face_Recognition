@@ -458,10 +458,10 @@ def detect_face(img, minsize, pnet, rnet, onet, threshold, factor):
 #             im_data = imresample(images[index], (hs, ws))
 #             im_data = (im_data - 127.5) * 0.0078125
 #             img_y = np.transpose(im_data, (1, 0, 2))  # caffe uses different dimensions ordering
-#             images_obj_per_resolution[(ws, hs)].append({'scale': scale, 'image': img_y, 'index': index})
+#             images_obj_per_resolution[(ws, hs)].append({'scale': scale, 'markdown_imgs': img_y, 'index': index})
 #
 #     for resolution in images_obj_per_resolution:
-#         images_per_resolution = [i['image'] for i in images_obj_per_resolution[resolution]]
+#         images_per_resolution = [i['markdown_imgs'] for i in images_obj_per_resolution[resolution]]
 #         outs = pnet(images_per_resolution)
 #
 #         for index in range(len(outs[0])):

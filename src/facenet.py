@@ -77,7 +77,7 @@ def random_rotate_image(image):
     return misc.imrotate(image, angle, 'bicubic')
 
 
-# 1: Random rotate 2: Random crop  4: Random flip  8:  Fixed image standardization  16: Flip
+# 1: Random rotate 2: Random crop  4: Random flip  8:  Fixed markdown_imgs standardization  16: Flip
 RANDOM_ROTATE = 1
 RANDOM_CROP = 2
 RANDOM_FLIP = 4

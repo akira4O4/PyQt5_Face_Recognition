@@ -1,28 +1,23 @@
 import cv2
 import sys
-import os
 import get_face
-import tensorflow as tf
 from PyQt5.QtWidgets import *
-from MainUI import Ui_Face_Recognition_window
-from addStudent import Ui_Form_Student
-from delwin_ui import Ui_Form_Del
-from addClassTable import Ui_AddClassTable
-from deleteClassTable import Ui_DelClassTable
-from help import Ui_help
-from checkTable import Ui_Form_checkTable
-from delCheckTable import Ui_Form_delCheckTable
-from prompt import Ui_For_prompt
+from ui_src.MainUI import Ui_Face_Recognition_window
+from ui_src.addStudent import Ui_Form_Student
+from ui_src.delwin_ui import Ui_Form_Del
+from ui_src.addClassTable import Ui_AddClassTable
+from ui_src.deleteClassTable import Ui_DelClassTable
+from ui_src.help import Ui_help
+from ui_src.checkTable import Ui_Form_checkTable
+from ui_src.delCheckTable import Ui_Form_delCheckTable
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QApplication
 from file_op import File_Operate
 from sqlite3_op import Operate_Sql
 import face_recognition
 import time
-import numpy as np
 import os
-import facenet
-import align.detect_face
+
 
 class del_window(QDialog, Ui_Form_Del):
     def __init__(self):

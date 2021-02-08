@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QDialog
 from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtWidgets import QApplication
 
-from src.sqlite3_main import Ui_sqlite3_mainWindow
+from ui_src.sqlite3_main import Ui_sqlite3_mainWindow
 
 
 
@@ -22,6 +22,12 @@ class Sqlite_UI(QDialog, Ui_sqlite3_mainWindow):
         print("打开文件")
         file_name, file_type = QFileDialog.getOpenFileName(self, "select db files", "", "*.db;;*.png;;All Files(*)")
         print("读取到:{}\n文件路径:{}\n".format(file_name, file_type))
+
+    def query(self):
+        pass
+
+    def add(self):
+        pass
 
 
 if __name__ == "__main__":

@@ -41,6 +41,11 @@
       <height>26</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <italic>true</italic>
+     </font>
+    </property>
    </widget>
    <widget class="QLabel" name="label_field_2">
     <property name="geometry">
