@@ -8,6 +8,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+
 class Ui_sqlite3_mainWindow(object):
     def setupUi(self, sqlite3_mainWindow):
         sqlite3_mainWindow.setObjectName("sqlite3_mainWindow")
@@ -85,10 +86,9 @@ class Ui_sqlite3_mainWindow(object):
         self.radioBtn_all.setFont(font)
         self.radioBtn_all.setObjectName("radioBtn_all")
         self.horizontalLayout.addWidget(self.radioBtn_all)
-        sqlite3_mainWindow.setCentralWidget(self.centralwidget)
+        # sqlite3_mainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QtWidgets.QStatusBar(sqlite3_mainWindow)
         self.statusbar.setObjectName("statusbar")
-        sqlite3_mainWindow.setStatusBar(self.statusbar)
         self.menubar = QtWidgets.QMenuBar(sqlite3_mainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 969, 23))
         self.menubar.setObjectName("menubar")
@@ -96,7 +96,6 @@ class Ui_sqlite3_mainWindow(object):
         self.menudsfewrfr.setObjectName("menudsfewrfr")
         self.menuHelp = QtWidgets.QMenu(self.menubar)
         self.menuHelp.setObjectName("menuHelp")
-        sqlite3_mainWindow.setMenuBar(self.menubar)
         self.actionOpen_File = QtWidgets.QAction(sqlite3_mainWindow)
         self.actionOpen_File.setObjectName("actionOpen_File")
         self.actionClose_File = QtWidgets.QAction(sqlite3_mainWindow)
@@ -129,4 +128,3 @@ class Ui_sqlite3_mainWindow(object):
         self.actionOpen_File.setText(_translate("sqlite3_mainWindow", "Open File"))
         self.actionClose_File.setText(_translate("sqlite3_mainWindow", "Close File"))
         self.actionExit.setText(_translate("sqlite3_mainWindow", "Exit"))
-
