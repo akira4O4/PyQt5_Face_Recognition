@@ -29,13 +29,13 @@ class Ui_SqliteMainWindow(object):
         self.groupBox_field.setAlignment(QtCore.Qt.AlignCenter)
         self.groupBox_field.setObjectName("groupBox_field")
         self.label = QtWidgets.QLabel(self.centralwidget)
-        self.label.setGeometry(QtCore.QRect(30, 450, 55, 18))
+        self.label.setGeometry(QtCore.QRect(30, 450, 55, 31))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.label.setFont(font)
         self.label.setObjectName("label")
         self.lineEdit = QtWidgets.QLineEdit(self.centralwidget)
-        self.lineEdit.setGeometry(QtCore.QRect(90, 440, 431, 26))
+        self.lineEdit.setGeometry(QtCore.QRect(80, 460, 431, 26))
         self.lineEdit.setObjectName("lineEdit")
         self.tableView_content = QtWidgets.QTableView(self.centralwidget)
         self.tableView_content.setGeometry(QtCore.QRect(320, 60, 301, 281))
@@ -96,7 +96,7 @@ class Ui_SqliteMainWindow(object):
 
     def retranslateUi(self, SqliteMainWindow):
         _translate = QtCore.QCoreApplication.translate
-        SqliteMainWindow.setWindowTitle(_translate("SqliteMainWindow", "SqliteMainWindow"))
+        SqliteMainWindow.setWindowTitle(_translate("SqliteMainWindow", "Sqlite Main Window"))
         self.groupBox_table.setTitle(_translate("SqliteMainWindow", "表"))
         self.groupBox_field.setTitle(_translate("SqliteMainWindow", "字段"))
         self.label.setText(_translate("SqliteMainWindow", "命令"))
