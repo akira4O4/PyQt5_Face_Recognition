@@ -6,5 +6,6 @@ src/__pycache__/
 
 ui_src/__pycache__/
 
-tools/__pycache__/__init__.cpython-36.pyc
-tools/__pycache__/sqlite_func.cpython-36.pyc
+tools/__pycache__/
+
+test/ui_test.py

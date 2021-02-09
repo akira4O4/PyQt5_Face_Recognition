@@ -20,7 +20,7 @@
       <x>30</x>
       <y>30</y>
       <width>120</width>
-      <height>311</height>
+      <height>81</height>
      </rect>
     </property>
     <property name="font">
@@ -34,6 +34,9 @@
     <property name="alignment">
      <set>Qt::AlignCenter</set>
     </property>
+    <property name="checkable">
+     <bool>false</bool>
+    </property>
    </widget>
    <widget class="QGroupBox" name="groupBox_field">
     <property name="geometry">
@@ -41,7 +44,7 @@
       <x>170</x>
       <y>30</y>
       <width>120</width>
-      <height>311</height>
+      <height>81</height>
      </rect>
     </property>
     <property name="font">

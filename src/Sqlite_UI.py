@@ -1,6 +1,8 @@
 import sys
 
 from PyQt5.QtWidgets import QDialog
+from PyQt5.QtWidgets import QLayout
+from PyQt5.QtWidgets import QVBoxLayout
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtWidgets import QApplication
@@ -14,6 +16,8 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
     def __init__(self, parent=None):
         super(Sqlite_UI, self).__init__(parent)
         self.setupUi(self)
+
+        # slot init
         self.slot_init()
 
         self.sf = Sqlite_Func()
@@ -43,6 +47,23 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
 
         # 设置窗口名字
         QDialog.setWindowTitle(self, self.file_path)
+
+        self.create_radiobox_table()
+
+    def create_radiobox_table(self):
+        self.btn_list=[]
+        self.vboxlayer = QVBoxLayout()
+
+        for data in self.table_list:
+            self.btn_list.append(QtWidgets.QRadioButton("{}".format(data)))
+
+        for btn in self.btn_list:
+            self.vboxlayer.addWidget(btn)
+
+        self.groupBox_table.setLayout(self.vboxlayer)
+
+    def create_checkbox_field(self):
+        pass
 
     def query(self):
         pass
