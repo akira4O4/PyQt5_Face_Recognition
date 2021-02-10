@@ -26,14 +26,19 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
 
         # 表列表
         self.table_list = []
-        # 表字段列表
+        # 字段列表
         self.field_list = []
+        # 按钮字段列表
+        self.btn_field_list = []
+        #选择的字段
+        self.select_field_list=[]
 
     def slot_init(self):
         print("slot init...")
         self.actionOpen_File.triggered.connect(self.open_db)
         self.radioButton_all.clicked.connect(self.selectAll_radiobtn)
         self.radioButton_notall.clicked.connect(self.selectNotAll_radiobtn)
+        self.pushButton_query.clicked.connect(self.query)
 
     def open_db(self):
         print("打开文件")
@@ -67,10 +72,11 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
 
     # 创建多选字段项
     def create_checkbox_field(self, table, ischeck):
+        self.field_list=[]
         print("选择了{}表".format(str(table)))
         ret = self.sf.check_field(self.file_path, table)
         print("当前表含有{}字段:".format(ret))
-        self.field_list = []
+        self.btn_field_list = []
         self.count = 0
         self.btn_layer = QWidget()
         for i, data in enumerate(ret):
@@ -78,32 +84,38 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
             self.btn = QtWidgets.QCheckBox(self.btn_layer)
             self.btn.setText(str(data))
             self.btn.setChecked(ischeck)
+
+            self.btn.clicked.connect(partial(lambda x:self.select_field_list.append(x),self.btn.text()))
+            self.btn.clicked.connect(partial(lambda x:print("选择了{}字段".format(x)),self.btn.text()))
             self.btn.move(10, i * 60)
-            self.field_list.append(self.btn)
+            self.btn_field_list.append(self.btn)
+            self.field_list.append(self.btn.text())
 
         self.btn_layer.setMinimumSize(250, self.count * 60)
         self.scrollArea_field.setWidget(self.btn_layer)
         self.scrollArea_field.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
     def selectAll_radiobtn(self):
-        if self.field_list == []:
+        if self.btn_field_list == []:
             print("没有选择表")
         else:
             print("全选字段")
             self.create_checkbox_field(self.table,True)
-
+            self.select_field_list=[]
+            self.select_field_list=self.field_list
     def selectNotAll_radiobtn(self):
-        if self.field_list == []:
+        if self.btn_field_list == []:
             print("没有选择表")
         else:
             print("全选字段")
             self.create_checkbox_field(self.table, False)
+            self.select_field_list=[]
 
     def show_table(self):
         print("显示表内容")
 
     def query(self):
-        pass
+        print("select field:{}".format(self.select_field_list))
 
     def add(self):
         pass
