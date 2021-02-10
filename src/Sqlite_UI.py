@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtWidgets import QApplication
 from PyQt5.Qt import Qt
 from ui_src.sqlite_main_window import Ui_SqliteMainWindow
+from functools import partial
 
 from tools.sqlite_func import Sqlite_Func
 
@@ -53,18 +54,31 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
             self.count += 1
             self.btn = QtWidgets.QRadioButton(self.btn_layer)
             self.btn.setText(str(data))
+            self.btn.clicked.connect(partial(self.create_checkbox_field, self.btn.text()))
             self.btn.move(10, i * 60)
 
         self.btn_layer.setMinimumSize(250, self.count * 60)
         self.scrollArea_table.setWidget(self.btn_layer)
         self.scrollArea_table.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
-    def radiobtn_func_init(self):
-        pass
+    def create_checkbox_field(self,t):
+        print("选择了{}表".format(str(t)))
+        ret=self.sf.check_field(self.file_path,t)
+        print("当前表含有{}字段:".format(ret))
+        self.count = 0
+        self.btn_layer = QWidget()
+        for i, data in enumerate(ret):
+            self.count += 1
+            self.btn = QtWidgets.QRadioButton(self.btn_layer)
+            self.btn.setText(str(data))
+            # self.btn.clicked.connect(partial(self.show, self.btn.text()))
+            self.btn.move(10, i * 60)
 
-    def create_checkbox_field(self):
-        pass
-
+        self.btn_layer.setMinimumSize(250, self.count * 60)
+        self.scrollArea_field.setWidget(self.btn_layer)
+        self.scrollArea_field.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+    def show_table(self):
+        print("显示表内容")
     def query(self):
         pass
 
