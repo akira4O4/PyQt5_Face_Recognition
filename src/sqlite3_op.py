@@ -51,7 +51,7 @@ class Operate_Sql():
         num_all = self.readFronSqllite(self.DB_Path, self.sqlStr_count)
         return (num_all[0][0])
 
-    # 插入一条信息
+    # 插入一条信息表 字段
     def Insert_New_Name(self, filename):
         conn = db.connect(self.DB_Path)  # 该 API 打开一个到 SQLite 数据库文件 database 的链接，如果数据库成功打开，则返回一个连接对象
         conn.execute(filename)

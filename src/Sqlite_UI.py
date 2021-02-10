@@ -1,12 +1,11 @@
 import sys
 
 from PyQt5.QtWidgets import QDialog
-from PyQt5.QtWidgets import QLayout
-from PyQt5.QtWidgets import QVBoxLayout
 from PyQt5 import QtWidgets
+from PyQt5.QtWidgets import QWidget
 from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtWidgets import QApplication
-
+from PyQt5.Qt import Qt
 from ui_src.sqlite_main_window import Ui_SqliteMainWindow
 
 from tools.sqlite_func import Sqlite_Func
@@ -42,25 +41,26 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
         self.table_list = self.sf.check_table(self.file_path)
         print("当前数据库含有表：", self.table_list)
 
-        ret = self.sf.check_field(self.file_path, self.table_list[0])
-        print("当前{}表字段{}".format(self.table_list[0], ret))
-
         # 设置窗口名字
         QDialog.setWindowTitle(self, self.file_path)
 
         self.create_radiobox_table()
 
     def create_radiobox_table(self):
-        self.btn_list=[]
-        self.vboxlayer = QVBoxLayout()
+        self.count = 0
+        self.btn_layer = QWidget()
+        for i, data in enumerate(self.table_list):
+            self.count += 1
+            self.btn = QtWidgets.QRadioButton(self.btn_layer)
+            self.btn.setText(str(data))
+            self.btn.move(10, i * 60)
 
-        for data in self.table_list:
-            self.btn_list.append(QtWidgets.QRadioButton("{}".format(data)))
+        self.btn_layer.setMinimumSize(250, self.count * 60)
+        self.scrollArea_table.setWidget(self.btn_layer)
+        self.scrollArea_table.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
-        for btn in self.btn_list:
-            self.vboxlayer.addWidget(btn)
-
-        self.groupBox_table.setLayout(self.vboxlayer)
+    def radiobtn_func_init(self):
+        pass
 
     def create_checkbox_field(self):
         pass
