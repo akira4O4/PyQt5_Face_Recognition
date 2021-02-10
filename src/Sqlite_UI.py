@@ -32,6 +32,8 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
     def slot_init(self):
         print("slot init...")
         self.actionOpen_File.triggered.connect(self.open_db)
+        self.radioButton_all.clicked.connect(self.selectAll_radiobtn)
+        self.radioButton_notall.clicked.connect(self.selectNotAll_radiobtn)
 
     def open_db(self):
         print("打开文件")
@@ -47,6 +49,7 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
 
         self.create_radiobox_table()
 
+    # 创建单选表项
     def create_radiobox_table(self):
         self.count = 0
         self.btn_layer = QWidget()
@@ -54,31 +57,51 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
             self.count += 1
             self.btn = QtWidgets.QRadioButton(self.btn_layer)
             self.btn.setText(str(data))
-            self.btn.clicked.connect(partial(self.create_checkbox_field, self.btn.text()))
+            self.table=self.btn.text()
+            self.btn.clicked.connect(partial(self.create_checkbox_field, self.table, False))
             self.btn.move(10, i * 60)
 
         self.btn_layer.setMinimumSize(250, self.count * 60)
         self.scrollArea_table.setWidget(self.btn_layer)
         self.scrollArea_table.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
-    def create_checkbox_field(self,t):
-        print("选择了{}表".format(str(t)))
-        ret=self.sf.check_field(self.file_path,t)
+    # 创建多选字段项
+    def create_checkbox_field(self, table, ischeck):
+        print("选择了{}表".format(str(table)))
+        ret = self.sf.check_field(self.file_path, table)
         print("当前表含有{}字段:".format(ret))
+        self.field_list = []
         self.count = 0
         self.btn_layer = QWidget()
         for i, data in enumerate(ret):
             self.count += 1
-            self.btn = QtWidgets.QRadioButton(self.btn_layer)
+            self.btn = QtWidgets.QCheckBox(self.btn_layer)
             self.btn.setText(str(data))
-            # self.btn.clicked.connect(partial(self.show, self.btn.text()))
+            self.btn.setChecked(ischeck)
             self.btn.move(10, i * 60)
+            self.field_list.append(self.btn)
 
         self.btn_layer.setMinimumSize(250, self.count * 60)
         self.scrollArea_field.setWidget(self.btn_layer)
         self.scrollArea_field.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+
+    def selectAll_radiobtn(self):
+        if self.field_list == []:
+            print("没有选择表")
+        else:
+            print("全选字段")
+            self.create_checkbox_field(self.table,True)
+
+    def selectNotAll_radiobtn(self):
+        if self.field_list == []:
+            print("没有选择表")
+        else:
+            print("全选字段")
+            self.create_checkbox_field(self.table, False)
+
     def show_table(self):
         print("显示表内容")
+
     def query(self):
         pass
 

@@ -147,7 +147,7 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
-           <widget class="QRadioButton" name="radioButton_2">
+           <widget class="QRadioButton" name="radioButton_notall">
             <property name="font">
              <font>
               <pointsize>12</pointsize>
@@ -159,7 +159,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QRadioButton" name="radioButton">
+           <widget class="QRadioButton" name="radioButton_all">
             <property name="font">
              <font>
               <pointsize>12</pointsize>
