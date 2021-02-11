@@ -22,6 +22,7 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
 
         self.sf = Sqlite_Func()
 
+        #数据库路径
         self.file_path = ""
 
         # 表列表
@@ -62,8 +63,7 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
             self.count += 1
             self.btn = QtWidgets.QRadioButton(self.btn_layer)
             self.btn.setText(str(data))
-            self.table=self.btn.text()
-            self.btn.clicked.connect(partial(self.create_checkbox_field, self.table, False))
+            self.btn.clicked.connect(partial(self.create_checkbox_field, self.btn.text(), False))
             self.btn.move(10, i * 60)
 
         self.btn_layer.setMinimumSize(250, self.count * 60)
@@ -73,6 +73,7 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
     # 创建多选字段项
     def create_checkbox_field(self, table, ischeck):
         self.field_list=[]
+        self.table=table
         print("选择了{}表".format(str(table)))
         ret = self.sf.check_field(self.file_path, table)
         print("当前表含有{}字段:".format(ret))
@@ -116,7 +117,10 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
 
     def query(self):
         print("select field:{}".format(self.select_field_list))
-
+        str_sql=self.sf.auto_select(self.select_field_list,self.table)
+        ret=self.sf.executeCMD(self.file_path,str_sql)
+        for i,data in enumerate(ret):
+            print("i:{}->ret:{}\n".format(i,data))
     def add(self):
         pass
 

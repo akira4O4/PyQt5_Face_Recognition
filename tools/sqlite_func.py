@@ -35,6 +35,13 @@ class Sqlite_Func:
             self.field_list.append(i[1])
         return self.field_list
 
+    # 构建普通查询语句
+    def auto_select(self, fields, table):
+        str = ', '.join(list(map(lambda x: x, fields)))
+        str = "select {} from {};".format(str, table)
+        print(str)
+        return str
+
     # 查询
     def query(self, db_path):
         if db_path == None or db_path == "":
@@ -47,4 +54,5 @@ class Sqlite_Func:
 
 
 if __name__ == "__main__":
-    pass
+    args = ['lable', 'name', 'sex', 'id', 'profession', 'features', 'flag']
+    print(in_p)
