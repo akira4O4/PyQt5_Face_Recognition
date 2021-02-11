@@ -4,8 +4,9 @@ from PyQt5.QtWidgets import QDialog
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtWidgets import QFileDialog
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import QApplication,QAbstractItemView
 from PyQt5.Qt import Qt
+from PyQt5.QtGui import QStandardItemModel,QStandardItem
 from ui_src.sqlite_main_window import Ui_SqliteMainWindow
 from functools import partial
 
@@ -111,16 +112,39 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
             print("全选字段")
             self.create_checkbox_field(self.table, False)
             self.select_field_list=[]
-
-    def show_table(self):
+    #param:字段，内容
+    def show_table(self,fields,data):
         print("显示表内容")
+
+        #行数
+        len_row=len(data)
+        #列数
+        len_col=len(fields)
+        print("field:{}\ndata:{}".format(fields,data))
+        print("row:{},col:{}".format(len_row,len_col))
+
+        self.model=QStandardItemModel(len_row,len_col,self)
+        for row in range(len_row):
+            for col in range(len(data[0])):
+                item=QStandardItem("{}".format(data[row][col]))
+                self.model.setItem(row,col,item)
+
+        self.tableView_content.setModel(self.model)
+        self.tableView_content.horizontalHeader().setStretchLastSection(True)
+        self.tableView_content.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.tableView_content.clicked.connect(lambda x:print(self.tableView_content.currentIndex().data()))
+
+
 
     def query(self):
         print("select field:{}".format(self.select_field_list))
         str_sql=self.sf.auto_select(self.select_field_list,self.table)
         ret=self.sf.executeCMD(self.file_path,str_sql)
+        print(ret)
         for i,data in enumerate(ret):
             print("i:{}->ret:{}\n".format(i,data))
+        self.show_table(self.select_field_list,ret)
+
     def add(self):
         pass
 

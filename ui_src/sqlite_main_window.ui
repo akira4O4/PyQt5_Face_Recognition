@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>920</width>
-    <height>674</height>
+    <width>955</width>
+    <height>573</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,8 +17,8 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>40</x>
-      <y>540</y>
+      <x>20</x>
+      <y>470</y>
       <width>55</width>
       <height>31</height>
      </rect>
@@ -35,8 +35,8 @@
    <widget class="QLineEdit" name="lineEdit">
     <property name="geometry">
      <rect>
-      <x>90</x>
-      <y>550</y>
+      <x>70</x>
+      <y>480</y>
       <width>431</width>
       <height>26</height>
      </rect>
@@ -45,9 +45,9 @@
    <widget class="QTableView" name="tableView_content">
     <property name="geometry">
      <rect>
-      <x>430</x>
-      <y>80</y>
-      <width>381</width>
+      <x>390</x>
+      <y>40</y>
+      <width>461</width>
       <height>421</height>
      </rect>
     </property>
@@ -55,8 +55,8 @@
    <widget class="QGroupBox" name="groupBox_table_field">
     <property name="geometry">
      <rect>
-      <x>50</x>
-      <y>60</y>
+      <x>10</x>
+      <y>20</y>
       <width>371</width>
       <height>441</height>
      </rect>
@@ -187,8 +187,8 @@
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>830</x>
-      <y>20</y>
+      <x>860</x>
+      <y>240</y>
       <width>84</width>
       <height>94</height>
      </rect>
@@ -227,7 +227,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>920</width>
+     <width>955</width>
      <height>23</height>
     </rect>
    </property>
