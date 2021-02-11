@@ -7,6 +7,8 @@ class Sqlite_Func:
 
     # 执行语句
     def executeCMD(self, db_path, exectCmd):
+        if exectCmd=="":
+            assert "func executeCMD error"
         conn = db.connect(db_path)  # 该 API 打开一个到 SQLite 数据库文件 database 的链接，如果数据库成功打开，则返回一个连接对象
         if conn == None:
             return None

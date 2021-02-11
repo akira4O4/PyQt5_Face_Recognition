@@ -4,9 +4,9 @@ from PyQt5.QtWidgets import QDialog
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtWidgets import QFileDialog
-from PyQt5.QtWidgets import QApplication,QAbstractItemView
+from PyQt5.QtWidgets import QApplication, QAbstractItemView
 from PyQt5.Qt import Qt
-from PyQt5.QtGui import QStandardItemModel,QStandardItem
+from PyQt5.QtGui import QStandardItemModel, QStandardItem
 from ui_src.sqlite_main_window import Ui_SqliteMainWindow
 from functools import partial
 
@@ -23,7 +23,7 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
 
         self.sf = Sqlite_Func()
 
-        #数据库路径
+        # 数据库路径
         self.file_path = ""
 
         # 表列表
@@ -32,14 +32,15 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
         self.field_list = []
         # 按钮字段列表
         self.btn_field_list = []
-        #选择的字段
-        self.select_field_list=[]
+        # 选择的字段
+        self.select_field_list = []
 
     def slot_init(self):
         print("slot init...")
         self.actionOpen_File.triggered.connect(self.open_db)
         self.radioButton_all.clicked.connect(self.selectAll_radiobtn)
         self.radioButton_notall.clicked.connect(self.selectNotAll_radiobtn)
+        # 查询
         self.pushButton_query.clicked.connect(self.query)
 
     def open_db(self):
@@ -56,7 +57,7 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
 
         self.create_radiobox_table()
 
-    # 创建单选表项
+    # 创建数据库表选项
     def create_radiobox_table(self):
         self.count = 0
         self.btn_layer = QWidget()
@@ -71,27 +72,28 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
         self.scrollArea_table.setWidget(self.btn_layer)
         self.scrollArea_table.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
-    # 创建多选字段项
+    # 创建字段表
     def create_checkbox_field(self, table, ischeck):
-        self.field_list=[]
-        self.table=table
+        # self.field_list.clear()
+        # self.select_field_list.clear()
+        self.btn_field_list.clear()
+        self.count = 0
+
+        self.table = table
         print("选择了{}表".format(str(table)))
         ret = self.sf.check_field(self.file_path, table)
         print("当前表含有{}字段:".format(ret))
-        self.btn_field_list = []
-        self.count = 0
         self.btn_layer = QWidget()
         for i, data in enumerate(ret):
             self.count += 1
             self.btn = QtWidgets.QCheckBox(self.btn_layer)
             self.btn.setText(str(data))
             self.btn.setChecked(ischeck)
-
-            self.btn.clicked.connect(partial(lambda x:self.select_field_list.append(x),self.btn.text()))
-            self.btn.clicked.connect(partial(lambda x:print("选择了{}字段".format(x)),self.btn.text()))
+            # self.btn.clicked.connect(partial(lambda x:self.select_field_list.append(x),self.btn.text()))
             self.btn.move(10, i * 60)
+
             self.btn_field_list.append(self.btn)
-            self.field_list.append(self.btn.text())
+            # self.field_list.append(self.btn.text())
 
         self.btn_layer.setMinimumSize(250, self.count * 60)
         self.scrollArea_field.setWidget(self.btn_layer)
@@ -102,48 +104,54 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
             print("没有选择表")
         else:
             print("全选字段")
-            self.create_checkbox_field(self.table,True)
-            self.select_field_list=[]
-            self.select_field_list=self.field_list
+            self.create_checkbox_field(self.table, True)
+            self.select_field_list.clear()
+            for btn in self.btn_field_list:
+                self.select_field_list.append(btn.text())
+
     def selectNotAll_radiobtn(self):
         if self.btn_field_list == []:
             print("没有选择表")
         else:
             print("全选字段")
             self.create_checkbox_field(self.table, False)
-            self.select_field_list=[]
-    #param:字段，内容
-    def show_table(self,fields,data):
+            self.select_field_list.clear()
+
+    # param:字段，内容
+    def show_table(self, fields, data):
         print("显示表内容")
 
-        #行数
-        len_row=len(data)
-        #列数
-        len_col=len(fields)
-        print("field:{}\ndata:{}".format(fields,data))
-        print("row:{},col:{}".format(len_row,len_col))
-
-        self.model=QStandardItemModel(len_row,len_col,self)
+        # 行数
+        len_row = len(data)
+        # 列数
+        len_col = len(fields)
+        print("field:{}\ndata:{}".format(fields, data))
+        print("row:{},col:{}".format(len_row, len_col))
+        self.model = QStandardItemModel(len_row, len_col, self)
         for row in range(len_row):
             for col in range(len(data[0])):
-                item=QStandardItem("{}".format(data[row][col]))
-                self.model.setItem(row,col,item)
+                item = QStandardItem("{}".format(data[row][col]))
+                self.model.setItem(row, col, item)
 
         self.tableView_content.setModel(self.model)
         self.tableView_content.horizontalHeader().setStretchLastSection(True)
         self.tableView_content.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self.tableView_content.clicked.connect(lambda x:print(self.tableView_content.currentIndex().data()))
+        self.tableView_content.clicked.connect(lambda x: print(self.tableView_content.currentIndex().data()))
 
-
-
+    # 查询
     def query(self):
-        print("select field:{}".format(self.select_field_list))
-        str_sql=self.sf.auto_select(self.select_field_list,self.table)
-        ret=self.sf.executeCMD(self.file_path,str_sql)
+        self.select_field_list.clear()
+        for btn in self.btn_field_list:
+            print(btn.isChecked())
+            if btn.isChecked() == True:
+                self.select_field_list.append(btn.text())
+        str_sql = self.sf.auto_select(self.select_field_list, self.table)
+        print("str sql:{}".format(str_sql))
+        ret = self.sf.executeCMD(self.file_path, str_sql)
         print(ret)
-        for i,data in enumerate(ret):
-            print("i:{}->ret:{}\n".format(i,data))
-        self.show_table(self.select_field_list,ret)
+        for i, data in enumerate(ret):
+            print("{}->{}\n".format(i, data))
+        self.show_table(self.select_field_list, ret)
 
     def add(self):
         pass
