@@ -162,14 +162,21 @@
           </property>
          </widget>
         </item>
+        <item>
+         <widget class="QPushButton" name="pushButton_update">
+          <property name="text">
+           <string>更新</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton_query">
+          <property name="text">
+           <string>查询</string>
+          </property>
+         </widget>
+        </item>
        </layout>
-      </item>
-      <item>
-       <widget class="QPushButton" name="pushButton_query">
-        <property name="text">
-         <string>查询</string>
-        </property>
-       </widget>
       </item>
      </layout>
     </item>

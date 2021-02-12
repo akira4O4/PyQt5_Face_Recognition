@@ -42,6 +42,7 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
         self.radioButton_notall.clicked.connect(self.selectNotAll_radiobtn)
         # 查询
         self.pushButton_query.clicked.connect(self.query)
+        self.pushButton_update.clicked.connect(self.update_data)
 
     def open_db(self):
         print("打开文件")
@@ -89,11 +90,8 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
             self.btn = QtWidgets.QCheckBox(self.btn_layer)
             self.btn.setText(str(data))
             self.btn.setChecked(ischeck)
-            # self.btn.clicked.connect(partial(lambda x:self.select_field_list.append(x),self.btn.text()))
             self.btn.move(10, i * 60)
-
             self.btn_field_list.append(self.btn)
-            # self.field_list.append(self.btn.text())
 
         self.btn_layer.setMinimumSize(250, self.count * 60)
         self.scrollArea_field.setWidget(self.btn_layer)
@@ -120,23 +118,44 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
     # param:字段，内容
     def show_table(self, fields, data):
         print("显示表内容")
+        print("字段:{}\n数据:{}".format(fields, data))
 
         # 行数
-        len_row = len(data)
         # 列数
-        len_col = len(fields)
-        print("field:{}\ndata:{}".format(fields, data))
-        print("row:{},col:{}".format(len_row, len_col))
-        self.model = QStandardItemModel(len_row, len_col, self)
-        for row in range(len_row):
+        self.len_row = len(data)
+        self.len_col = len(fields)
+        print("row:{},col:{}".format(self.len_row, self.len_col))
+        self.model = QStandardItemModel(self.len_row, self.len_col, self)
+        for row in range(self.len_row):
             for col in range(len(data[0])):
                 item = QStandardItem("{}".format(data[row][col]))
+                # print("item:",item.text())
                 self.model.setItem(row, col, item)
 
         self.tableView_content.setModel(self.model)
         self.tableView_content.horizontalHeader().setStretchLastSection(True)
-        self.tableView_content.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.tableView_content.setEditTriggers(QAbstractItemView.DoubleClicked)
         self.tableView_content.clicked.connect(lambda x: print(self.tableView_content.currentIndex().data()))
+
+    # 通过按键更新数据到数据库
+    def update_data(self):
+        if self.btn_field_list == []:
+            print("没有选择表")
+        else:
+            update_data = []
+            for i in range(self.len_row):
+                print("i: ", i)
+                update_data_item = []
+                for j in range(self.len_col):
+                    update_data_item.append(self.model.item(i, j).text())
+                update_data.append(update_data_item)
+                print("update data", update_data)
+        key = self.sf.find_primary_key(self.file_path, self.table)
+        ret = self.sf.update(update_data, key)
+        if ret != 0:
+            print("更新失败\n")
+        else:
+            print("更新完成\n")
 
     # 查询
     def query(self):
@@ -145,13 +164,15 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
             print(btn.isChecked())
             if btn.isChecked() == True:
                 self.select_field_list.append(btn.text())
-        str_sql = self.sf.auto_select(self.select_field_list, self.table)
-        print("str sql:{}".format(str_sql))
-        ret = self.sf.executeCMD(self.file_path, str_sql)
-        print(ret)
-        for i, data in enumerate(ret):
-            print("{}->{}\n".format(i, data))
-        self.show_table(self.select_field_list, ret)
+
+        if self.select_field_list != []:
+            str_sql = self.sf.auto_select(self.select_field_list, self.table)
+            print("str sql:{}".format(str_sql))
+            ret = self.sf.executeCMD(self.file_path, str_sql)
+            print(ret)
+            for i, data in enumerate(ret):
+                print("{}->{}\n".format(i, data))
+            self.show_table(self.select_field_list, ret)
 
     def add(self):
         pass
