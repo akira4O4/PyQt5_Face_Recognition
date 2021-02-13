@@ -95,6 +95,9 @@ class Sqlite_Func:
         print("del cmd:", cmd)
         self.executeCMD(db_path,cmd)
 
+    def insert(self,db_path,table,data):
+        pass
+
 
 if __name__ == "__main__":
     t = Sqlite_Func()

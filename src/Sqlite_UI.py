@@ -45,7 +45,7 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
         self.pushButton_query.clicked.connect(self.query)
         self.pushButton_update.clicked.connect(self.update_data)
         self.pushButton_del.clicked.connect(self.delete)
-
+        self.pushButton_add.clicked.connect(self.add)
     def open_db(self):
         print("打开文件")
         self.db_path, file_type = QFileDialog.getOpenFileName(self, "select db files", "",

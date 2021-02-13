@@ -149,30 +149,44 @@
       <item>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
+         <widget class="QPushButton" name="pushButton_newTable">
+          <property name="text">
+           <string>创建新表</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton_delTable">
+          <property name="text">
+           <string>    删除表</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QPushButton" name="pushButton_del">
           <property name="text">
-           <string>删除</string>
+           <string>删除数据</string>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QPushButton" name="pushButton_add">
           <property name="text">
-           <string>添加</string>
+           <string>添加数据</string>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QPushButton" name="pushButton_update">
           <property name="text">
-           <string>更新</string>
+           <string>更新数据</string>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QPushButton" name="pushButton_query">
           <property name="text">
-           <string>查询</string>
+           <string>查询数据</string>
           </property>
          </widget>
         </item>
