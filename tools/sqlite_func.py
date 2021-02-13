@@ -1,6 +1,6 @@
 import sqlite3 as db
 
-test_file_path = "/home/lee/pyCode/PyQt5_Face_Recognition/DB/StudentFaceDB.db"
+test_db_path = "/home/lee/pyCode/PyQt5_Face_Recognition/DB/StudentFaceDB.db"
 
 
 class Sqlite_Func:
@@ -23,19 +23,19 @@ class Sqlite_Func:
         return rows
 
     # 返回当前当前数据库所有表
-    def check_table(self, file_path):
+    def check_table(self, db_path):
         self._table = "select name from sqlite_master where type='table' order by name"
-        ret = self.executeCMD(file_path, self._table)
+        ret = self.executeCMD(db_path, self._table)
         self.table_list = []
         for i in ret:
             self.table_list.append(i[0])
         return self.table_list
 
     # 查看表结构
-    def check_field(self, file_path, t):
+    def check_field(self, db_path, t):
         self.field_list = []
         self._schema = lambda t: "PRAGMA table_info({})".format(t)
-        ret = self.executeCMD(file_path, self._schema(t))
+        ret = self.executeCMD(db_path, self._schema(t))
         for i in ret:
             self.field_list.append(i[1])
         return self.field_list
@@ -62,24 +62,24 @@ class Sqlite_Func:
             cmd = "delete from {} where {}='{}';".format(str(table), field[primary_key_index],
                                                          data[i][primary_key_index])
             print("execute cmd={}".format(cmd))
-            ret=self.executeCMD(db_path, cmd)
-            print("ret=",ret)
+            ret = self.executeCMD(db_path, cmd)
+            print("ret=", ret)
         for i in range(len(data)):
             # 插入新数据
             # INSERT INTO TABLE_NAME VALUES (value1,value2,value3,...valueN);
-            cmd = ', '.join(list(map(lambda x: "'"+x+"'", data[i])))
+            cmd = ', '.join(list(map(lambda x: "'" + x + "'", data[i])))
             cmd = "INSERT INTO {} VALUES ({});".format(table, cmd)
             print("execute cmd={}\n".format(cmd))
-            ret=self.executeCMD(db_path, cmd)
-            print("ret:",ret)
+            ret = self.executeCMD(db_path, cmd)
+            print("ret:", ret)
         return 0
 
     # 查找一个表中的主键位置
     # para:db路径，表名
     # return primary_key_index,primary_key
-    def find_primary_key(self, file_path, table):
+    def find_primary_key(self, db_path, table):
         cmd = "pragma table_info ({});".format(str(table))
-        ret = self.executeCMD(file_path, cmd)
+        ret = self.executeCMD(db_path, cmd)
         print(ret)
         num = len(ret[0]) - 1
         for i in range(len(ret)):
@@ -88,13 +88,17 @@ class Sqlite_Func:
                 return i, ret[i][1]
 
     # 删除
-    def delete(self, db_path):
-        pass
+    # param:表，主键，参数
+    def delete(self, db_path, table_name, primary_key, primary_key_index, data):
+        # DELETE FROM table_name WHERE [condition];
+        cmd = "DELETE FROM {} WHERE {}='{}';".format(table_name, primary_key, data[primary_key_index])
+        print("del cmd:", cmd)
+        self.executeCMD(db_path,cmd)
 
 
 if __name__ == "__main__":
     t = Sqlite_Func()
-    # t.find_primary_key(test_file_path,"CS172")
+    # t.find_primary_key(test_db_path,"CS172")
     field = ['lable', 'name', 'sex', 'id', 'profession', 'features', 'flag']
     print(field[3])
     t.update("CS172", field, [], 3)

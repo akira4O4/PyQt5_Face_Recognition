@@ -24,15 +24,16 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
         self.sf = Sqlite_Func()
 
         # 数据库路径
-        self.file_path = ""
-
-        # 表列表
+        self.db_path = ""
+        # 选择的表名
+        self.table = ""
+        # 所有数据表
         self.table_list = []
-        # 字段列表
+        # 当前表所有字段
         self.field_list = []
-        # 按钮字段列表
+        # 创建的按钮字段列表
         self.btn_field_list = []
-        # 选择的字段
+        # 被勾选的字段
         self.select_field_list = []
 
     def slot_init(self):
@@ -43,18 +44,19 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
         # 查询
         self.pushButton_query.clicked.connect(self.query)
         self.pushButton_update.clicked.connect(self.update_data)
+        self.pushButton_del.clicked.connect(self.delete)
 
     def open_db(self):
         print("打开文件")
-        self.file_path, file_type = QFileDialog.getOpenFileName(self, "select db files", "",
-                                                                "*.db;;*.png;;All Files(*)")
-        print("文件路径:{}\n文件类型:{}\n".format(self.file_path, file_type))
+        self.db_path, file_type = QFileDialog.getOpenFileName(self, "select db files", "",
+                                                              "*.db;;*.png;;All Files(*)")
+        print("文件路径:{}\n文件类型:{}\n".format(self.db_path, file_type))
 
-        self.table_list = self.sf.check_table(self.file_path)
+        self.table_list = self.sf.check_table(self.db_path)
         print("当前数据库含有表：", self.table_list)
 
         # 设置窗口名字
-        QDialog.setWindowTitle(self, self.file_path)
+        QDialog.setWindowTitle(self, self.db_path)
 
         self.create_radiobox_table()
 
@@ -82,8 +84,8 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
 
         self.table = table
         print("选择了{}表".format(str(table)))
-        ret = self.sf.check_field(self.file_path, table)
-        self.field_list=ret
+        ret = self.sf.check_field(self.db_path, table)
+        self.field_list = ret
         print("当前表含有{}字段:".format(ret))
         self.btn_layer = QWidget()
         for i, data in enumerate(ret):
@@ -130,7 +132,6 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
         for row in range(self.len_row):
             for col in range(len(data[0])):
                 item = QStandardItem("{}".format(data[row][col]))
-                # print("item:",item.text())
                 self.model.setItem(row, col, item)
 
         self.tableView_content.setModel(self.model)
@@ -152,8 +153,8 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
                     update_data_item.append(self.model.item(i, j).text())
                 update_data.append(update_data_item)
             print("update data", update_data)
-            i,key = self.sf.find_primary_key(self.file_path, self.table)
-            ret = self.sf.update(self.file_path,self.table,self.field_list,update_data,i)
+            i, key = self.sf.find_primary_key(self.db_path, self.table)
+            ret = self.sf.update(self.db_path, self.table, self.field_list, update_data, i)
             if ret != 0:
                 print("更新失败\n")
             else:
@@ -167,14 +168,46 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
             if btn.isChecked() == True:
                 self.select_field_list.append(btn.text())
 
+        print("self.select_field_list:",self.select_field_list)
         if self.select_field_list != []:
             str_sql = self.sf.auto_select(self.select_field_list, self.table)
             print("str sql:{}".format(str_sql))
-            ret = self.sf.executeCMD(self.file_path, str_sql)
+            ret = self.sf.executeCMD(self.db_path, str_sql)
             print(ret)
             for i, data in enumerate(ret):
                 print("{}->{}\n".format(i, data))
             self.show_table(self.select_field_list, ret)
+        if self.select_field_list==[]:
+            self.tableView_content.setModel(self.model.clear())
+
+    # 进行删除操作需要选中所有字段
+    def delete(self):
+        # if self.tableView_content.currentIndex().row() != "" and self.table != "" and self.model!=None:
+        if self.table == "":
+            print("未选择表")
+            return
+        if self.select_field_list == []:
+            print("未选择字段")
+            return
+        if self.tableView_content.currentIndex().row() == -1:
+            print("未选择数据")
+            return
+        else:
+            del_row = self.tableView_content.currentIndex().row()
+            print("选择{}行".format(del_row))
+
+            # 主键index和获取主键
+            key_idx, key = self.sf.find_primary_key(self.db_path, self.table)
+            del_data = []
+            for i in range(len(self.field_list)):
+                if self.model.item(del_row, i).text() != None:
+                    del_data.append(self.model.item(del_row, i).text())
+                    if len(del_row) != len(self.field_list):
+                        print("数据不全")
+                    else:
+                        print("del data:", del_data)
+                    self.sf.delete(self.db_path, self.table, key, key_idx, del_data)
+                    self.query()
 
     def add(self):
         pass
