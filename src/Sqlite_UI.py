@@ -83,6 +83,7 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
         self.table = table
         print("选择了{}表".format(str(table)))
         ret = self.sf.check_field(self.file_path, table)
+        self.field_list=ret
         print("当前表含有{}字段:".format(ret))
         self.btn_layer = QWidget()
         for i, data in enumerate(ret):
@@ -139,6 +140,7 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
 
     # 通过按键更新数据到数据库
     def update_data(self):
+        print(self.btn_field_list)
         if self.btn_field_list == []:
             print("没有选择表")
         else:
@@ -149,13 +151,13 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
                 for j in range(self.len_col):
                     update_data_item.append(self.model.item(i, j).text())
                 update_data.append(update_data_item)
-                print("update data", update_data)
-        key = self.sf.find_primary_key(self.file_path, self.table)
-        ret = self.sf.update(update_data, key)
-        if ret != 0:
-            print("更新失败\n")
-        else:
-            print("更新完成\n")
+            print("update data", update_data)
+            i,key = self.sf.find_primary_key(self.file_path, self.table)
+            ret = self.sf.update(self.file_path,self.table,self.field_list,update_data,i)
+            if ret != 0:
+                print("更新失败\n")
+            else:
+                print("更新完成\n")
 
     # 查询
     def query(self):

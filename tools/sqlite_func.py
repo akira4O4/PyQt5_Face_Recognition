@@ -18,6 +18,7 @@ class Sqlite_Func:
         conn.row_factory = db.Row  # 可访问列信息
         cursor.execute(exectCmd)  # 该例程执行一个 SQL 语句
         rows = cursor.fetchall()  # 该例程获取查询结果集中所有（剩余）的行，返回一个列表。当没有可用的行时，则返回一个空的列表。
+        conn.commit()
         conn.close()
         return rows
 
@@ -53,22 +54,38 @@ class Sqlite_Func:
             return None
 
     # 更新
-    def update(self,data,primary_key):
+    def update(self, db_path, table, field, data, primary_key_index):
+        print("upate new date...")
+        for i in range(len(data)):
+            # 删除修改的数据项
+            # DELETE FROM table_name WHERE [condition];
+            cmd = "delete from {} where {}='{}';".format(str(table), field[primary_key_index],
+                                                         data[i][primary_key_index])
+            print("execute cmd={}".format(cmd))
+            ret=self.executeCMD(db_path, cmd)
+            print("ret=",ret)
+        for i in range(len(data)):
+            # 插入新数据
+            # INSERT INTO TABLE_NAME VALUES (value1,value2,value3,...valueN);
+            cmd = ', '.join(list(map(lambda x: "'"+x+"'", data[i])))
+            cmd = "INSERT INTO {} VALUES ({});".format(table, cmd)
+            print("execute cmd={}\n".format(cmd))
+            ret=self.executeCMD(db_path, cmd)
+            print("ret:",ret)
         return 0
 
     # 查找一个表中的主键位置
     # para:db路径，表名
+    # return primary_key_index,primary_key
     def find_primary_key(self, file_path, table):
         cmd = "pragma table_info ({});".format(str(table))
         ret = self.executeCMD(file_path, cmd)
         print(ret)
-        print(len(ret))
-        print(len(ret[0]))
         num = len(ret[0]) - 1
         for i in range(len(ret)):
             if ret[i][num] == 1:
-                print("{}是主键".format(ret[i][1]))
-                return ret[i][1]
+                print("{}:{}是主键".format(i, ret[i][1]))
+                return i, ret[i][1]
 
     # 删除
     def delete(self, db_path):
@@ -76,15 +93,18 @@ class Sqlite_Func:
 
 
 if __name__ == "__main__":
-    s = Sqlite_Func()
-    s.find_primary_key(test_file_path, "CS172")
-
-    l1=[1,2,3]
-    l2=[4,5,6]
-    l3=[]
-    l3.append(l1)
-    print(l3)
-    l1.clear()
-    l1=[5,5,5]
-    l3.append(l1)
-    print(l3)
+    t = Sqlite_Func()
+    # t.find_primary_key(test_file_path,"CS172")
+    field = ['lable', 'name', 'sex', 'id', 'profession', 'features', 'flag']
+    print(field[3])
+    t.update("CS172", field, [], 3)
+'''
+CREATE TABLE table_test(
+    lable   text not null,
+    name    text not null,
+    sex     text not null,
+    id      text primary key not null,
+    profession text not null,
+    featrues text not null
+);
+'''
