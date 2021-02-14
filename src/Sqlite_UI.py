@@ -8,14 +8,63 @@ from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtWidgets import QApplication, QAbstractItemView
 from PyQt5.Qt import Qt
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
+from PyQt5.QtCore import pyqtSignal
 
 from ui_src.sqlite_main_window import Ui_SqliteMainWindow
 from ui_src.Add_Data import Ui_Dialog_Add_Data
+from ui_src.Add_Table import Ui_Dialog_Add_Table
 from functools import partial
 from tools.sqlite_func import Sqlite_Func
 
 
+class Add_Table_UI(QDialog, Ui_Dialog_Add_Table):
+    signal_status = pyqtSignal()
+
+    def __init__(self, db_path, parent=None):
+        super(Add_Table_UI, self).__init__(parent)
+
+        self.db_path = db_path
+
+        self.sf = Sqlite_Func()
+
+        h_layout = QHBoxLayout()
+        label_table_name = QLabel("表名字:")
+        self.lineEdit_table_name = QLineEdit()
+        # 水平放置
+        h_layout.addWidget(label_table_name)
+        h_layout.addWidget(self.lineEdit_table_name)
+
+        btn_ok = QPushButton()
+        btn_ok.setText("OK")
+
+        v_layout = QVBoxLayout()
+
+        # 垂直放置
+        v_layout.addLayout(h_layout)
+        v_layout.addWidget(btn_ok)
+
+        self.setLayout(v_layout)
+
+        btn_ok.clicked.connect(self.create_table)
+
+    def create_table(self):
+        print("创建新表")
+        if self.lineEdit_table_name == "":
+            print("表名字为空")
+        else:
+            self.sf.create_table(self.db_path, self.lineEdit_table_name.text(), table_type=self.sf.TABLE_TYPE_FACE)
+            status = 1
+
+            self.signal_status.emit()
+            self.close()
+
+    def test(self, s):
+        print("s:", s)
+
+
 class Add_Data_UI(QDialog, Ui_Dialog_Add_Data):
+    signal_status = pyqtSignal()
+
     def __init__(self, db_path, table, field, parent=None):
         super(Add_Data_UI, self).__init__(parent)
 
@@ -61,16 +110,18 @@ class Add_Data_UI(QDialog, Ui_Dialog_Add_Data):
 
         # 插入数据库
         self.sf.insert(self.db_path, self.table, lineEdit_data)
+        self.signal_status.emit()
         self.close()
-
-    def close(self):
-        self.hide()
 
 
 class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
     def __init__(self, parent=None):
         super(Sqlite_UI, self).__init__(parent)
         self.setupUi(self)
+
+        # 隐藏两个组件：因为我不想写了
+        self.label_cmd.hide()
+        self.lineEdit_cmd.hide()
 
         # slot init
         self.slot_init()
@@ -89,6 +140,7 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
         self.btn_field_list = []
         # 被勾选的字段
         self.select_field_list = []
+        self.status = 0
         self.len_row = 0
         self.len_col = 0
         self.model = QStandardItemModel()
@@ -104,6 +156,8 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
         self.pushButton_update.clicked.connect(self.update_data)
         self.pushButton_del.clicked.connect(self.delete_data)
         self.pushButton_add.clicked.connect(self.add_data)
+        self.pushButton_delTable.clicked.connect(self.del_table)
+        self.pushButton_newTable.clicked.connect(self.add_table)
 
     def open_db(self):
         print("打开文件")
@@ -116,6 +170,10 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
 
         # 设置窗口名字
         QDialog.setWindowTitle(self, self.db_path)
+        sstr = self.db_path.split('/')
+
+        print(sstr)
+        self.groupBox_table_field.setTitle("数据库：{}".format(sstr[len(sstr) - 1]))
 
         self.create_radiobox_table()
 
@@ -136,8 +194,6 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
 
     # 创建字段表
     def create_checkbox_field(self, table, ischeck):
-        # self.field_list.clear()
-        # self.select_field_list.clear()
         self.btn_field_list.clear()
         self.count = 0
 
@@ -213,11 +269,10 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
 
             # 读取新数据
             for i in range(self.len_row):
-
-                print("i: ", i)
                 update_data_item = []
                 for j in range(self.len_col):
-                    update_data_item.append(self.model.item(i, j).text())
+                    if self.model.item(i, j).text() != None:
+                        update_data_item.append(self.model.item(i, j).text())
                 update_data.append(update_data_item)
             print("update data", update_data)
 
@@ -276,7 +331,7 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
             # 主键index和获取主键
             key_idx, key = self.sf.find_primary_key(self.db_path, self.table)
             del_data = []
-            #读取当前行所有数据
+            # 读取当前行所有数据
             for i in range(self.len_col):
                 if self.model.item(del_row, i).text() != None:
                     del_data.append(self.model.item(del_row, i).text())
@@ -302,13 +357,38 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
         print("添加数据")
         self.add_data_ui = Add_Data_UI(self.db_path, self.table, self.field_list)
         self.add_data_ui.show()
-        self.query()
+        self.add_data_ui.signal_status.connect(self.query)
+        # self.query()
+
+    def flash_table(self):
+        # 刷新数据库表
+        self.table_list = self.sf.check_table(self.db_path)
+        print("当前数据库含有表：", self.table_list)
+        self.create_radiobox_table()
 
     def add_table(self):
-        pass
+
+        if self.db_path == "":
+            print("没有选择数据库")
+        else:
+            self.add_table_ui = Add_Table_UI(self.db_path)
+            self.add_table_ui.show()
+
+            # 子窗口链接主窗口函数
+            self.add_table_ui.signal_status.connect(self.flash_table)
 
     def del_table(self):
-        pass
+        if self.table == "":
+            print("没有选择表")
+            return
+        print("当前选择表:{}".format(self.table))
+        self.sf.delete_table(self.db_path, self.table)
+        self.tableView_content.setModel(self.model.clear())
+
+        # 刷新数据库表
+        self.table_list = self.sf.check_table(self.db_path)
+        print("当前数据库含有表：", self.table_list)
+        self.create_radiobox_table()
 
 
 if __name__ == "__main__":

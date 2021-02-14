@@ -5,7 +5,27 @@ test_db_path = "/home/lee/pyCode/PyQt5_Face_Recognition/DB/StudentFaceDB.db"
 
 class Sqlite_Func:
     def __init__(self):
-        pass
+
+        # 数据表类型
+        self.TABLE_TYPE_FACE = "FACE"
+        self.TABLE_TYPE_CHECKWORK = "CHECKWORK"
+
+        self.dict_cmd = {}
+
+        self.init_cmd()
+
+    def init_cmd(self):
+
+        # 创建人脸数据表
+        self.dict_cmd[self.TABLE_TYPE_FACE] = "CREATE TABLE {}(" \
+                                              "lable       text not null," \
+                                              "name        text not null," \
+                                              "sex         text not null," \
+                                              "id          text primary key not null," \
+                                              "profession  text not null," \
+                                              "featrues    text not null);"
+        # 创建学生考勤表
+        self.dict_cmd[self.TABLE_TYPE_CHECKWORK] = ""
 
     # 执行语句
     def executeCMD(self, db_path, exectCmd):
@@ -47,12 +67,6 @@ class Sqlite_Func:
         print(str)
         return str
 
-    # 查询
-    def query(self, db_path):
-        if db_path == None or db_path == "":
-            print("没有文件")
-            return None
-
     # 更新
     def update(self, db_path, table, field, data, primary_key_index):
         print("upate new date...")
@@ -93,9 +107,9 @@ class Sqlite_Func:
         # DELETE FROM table_name WHERE [condition];
         cmd = "DELETE FROM {} WHERE {}='{}';".format(table_name, primary_key, data[primary_key_index])
         print("del cmd:", cmd)
-        self.executeCMD(db_path,cmd)
+        self.executeCMD(db_path, cmd)
 
-    def insert(self,db_path,table,data):
+    def insert(self, db_path, table, data):
         print("插入新数据")
         # INSERT INTO TABLE_NAME VALUES (value1,value2,value3,...valueN);
         cmd = ', '.join(list(map(lambda x: "'" + x + "'", data)))
@@ -103,19 +117,28 @@ class Sqlite_Func:
         print("execute cmd={}\n".format(cmd))
         ret = self.executeCMD(db_path, cmd)
 
+    def delete_table(self, db_path, table_name):
+        cmd = "DROP TABLE {};".format(table_name)
+        print(cmd)
+        self.executeCMD(db_path, cmd)
+
+    # param->table_type:
+    def create_table(self, db_path, table_name, table_type):
+        print("create_table")
+
+        cmd = self.dict_cmd[table_type].format(table_name)
+        print(cmd)
+        # 检查报名是否重复
+        table_list = self.check_table(db_path)
+        for i in table_list:
+            if i == table_name:
+                print("表名重复")
+                return
+
+        # 检查类型是否正确
+        self.executeCMD(db_path, cmd)
+#
+
 if __name__ == "__main__":
     t = Sqlite_Func()
-    # t.find_primary_key(test_db_path,"CS172")
-    field = ['lable', 'name', 'sex', 'id', 'profession', 'features', 'flag']
-    print(field[3])
-    t.update("CS172", field, [], 3)
-'''
-CREATE TABLE table_test(
-    lable   text not null,
-    name    text not null,
-    sex     text not null,
-    id      text primary key not null,
-    profession text not null,
-    featrues text not null
-);
-'''
+    print(t.dict_cmd)
