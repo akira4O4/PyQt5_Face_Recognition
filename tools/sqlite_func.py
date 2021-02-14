@@ -58,7 +58,7 @@ class Sqlite_Func:
         print("upate new date...")
         for i in range(len(data)):
             # 删除修改的数据项
-            # DELETE FROM table_name WHERE [condition];
+            # DELETE FROM table_name WHERE primary key=val;
             cmd = "delete from {} where {}='{}';".format(str(table), field[primary_key_index],
                                                          data[i][primary_key_index])
             print("execute cmd={}".format(cmd))
@@ -96,8 +96,12 @@ class Sqlite_Func:
         self.executeCMD(db_path,cmd)
 
     def insert(self,db_path,table,data):
-        pass
-
+        print("插入新数据")
+        # INSERT INTO TABLE_NAME VALUES (value1,value2,value3,...valueN);
+        cmd = ', '.join(list(map(lambda x: "'" + x + "'", data)))
+        cmd = "INSERT INTO {} VALUES ({});".format(table, cmd)
+        print("execute cmd={}\n".format(cmd))
+        ret = self.executeCMD(db_path, cmd)
 
 if __name__ == "__main__":
     t = Sqlite_Func()
