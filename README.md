@@ -1,9 +1,9 @@
- #  功能正在完善 
+
  # 基于卷积神经网络的学生人脸识别考勤系统
- ## 上传前已经通过测试，希望各位认真查阅README，不要做伸手党，不熟悉TensorFlow和python的请提前学习。欢迎给小星星。    
+ ## 上传前已经通过测试，希望各位认真查阅README，README中写了许多细节，不熟悉TensorFlow和python的请提前学习。欢迎给小星星。    
  ## 测试环境：
  >**1.Windows 10 Ubuntu 20.04**  
- >**2.TensorFlow1.14 GPU版本（没有GPU也可以，CPU版本会慢一些）**  
+ >**2.TensorFlow1.15 GPU版本（没有GPU也可以，CPU版本会慢一些）**  
  >**3.PyQt5**  
  >**4.Sqlite3**  
 
@@ -22,7 +22,6 @@
 >**DB文件夹下为sqlite3数据库**  
 >**ui_src文件夹下为ui设计文件和转码py文件**  
 >**emb_img和src_img文件夹在程序运行时会自动创建（或者可以直接手动创建，两个都是空文件夹）**  
-**文件中不包含UI文件，所有UI文件均转换成Python程序文件**  
 
 ![5](https://github.com/omega-Lee/PyQt5_Face_Recognition/blob/master/markdown_imgs/5.png)  
 
@@ -39,11 +38,11 @@
 ![6](https://github.com/omega-Lee/PyQt5_Face_Recognition/blob/master/markdown_imgs/6.png)
 
 ## 操作步骤
-1、创建班级人脸数据  
-2、创建班级考勤表  
-3、选择学生学号，与人脸表  
-4、录入人脸  
-5、提取特征  
+1、在数据库管理中添加用户，主要不要修改主键内容，修改主键内容会导致更新错误   
+2、在主界面点击刷新，更新数据表  
+3、选择学号ID  
+4、打开摄像头->录入人脸  
+5、点击生成模型（人脸模型生成过程线程会被阻塞，但是训练完成就没事了）    
 5、开始检测  
   
 ## 软件界面细节  
@@ -52,6 +51,3 @@
 
 ![2](https://github.com/omega-Lee/PyQt5_Face_Recognition/blob/master/markdown_imgs/2.png) 
 
-![3](https://github.com/omega-Lee/PyQt5_Face_Recognition/blob/master/markdown_imgs/3.png) 
-
-![4](https://github.com/omega-Lee/PyQt5_Face_Recognition/blob/master/markdown_imgs/4.png) 

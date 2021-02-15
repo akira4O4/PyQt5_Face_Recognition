@@ -20,3 +20,6 @@ ui_src/__pycache__/MainUI.cpython-36.pyc
 
 src_img/
 emb_img/
+
+src/file_op.py
+src/sqlite3_op.py

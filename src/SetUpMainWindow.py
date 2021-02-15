@@ -357,6 +357,13 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
 
         # 启动Facenet模块
         self.face = face_recognition.face()
+        self.init_db()
+
+    def init_db(self):
+        if os.path.exists("../DB/StudentFaceDB.db") is False:
+            os.mkdir("../DB/StudentFaceDB.db")
+        if os.path.exists("../DB/StudentCheckWorkDB.db.db")is False:
+            os.mkdir("../DB/StudentCheckWorkDB.db.db")
 
     # 槽初始化
     def slot_init(self):
