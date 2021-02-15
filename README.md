@@ -23,19 +23,15 @@
 >**ui_src文件夹下为ui设计文件和转码py文件**  
 >**emb_img和src_img文件夹在程序运行时会自动创建（或者可以直接手动创建，两个都是空文件夹）**  
 
-![5](https://github.com/omega-Lee/PyQt5_Face_Recognition/blob/master/markdown_imgs/5.png)  
 
 ## 目录结构
-![目录结构1](https://github.com/omega-Lee/PyQt5_Face_Recognition/blob/master/markdown_imgs/目录结构1.png)  
-![目录结构2](https://github.com/omega-Lee/PyQt5_Face_Recognition/blob/master/markdown_imgs/目录结构2.png)  
-![目录结构3](https://github.com/omega-Lee/PyQt5_Face_Recognition/blob/master/markdown_imgs/目录结构3.png)  
+![目录结构1](https://github.com/omega-Lee/PyQt5_Face_Recognition/blob/master/markdown_imgs/3.png)  
 
 
 ## DB目录讲解
 >**StudentCheckWorkDB.db 为学生考勤数据表**  
 >**StudentFaceDB.db 为学生人脸数据**  
 
-![6](https://github.com/omega-Lee/PyQt5_Face_Recognition/blob/master/markdown_imgs/6.png)
 
 ## 操作步骤
 1、在数据库管理中添加用户，主要不要修改主键内容，修改主键内容会导致更新错误   
