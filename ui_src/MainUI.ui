@@ -240,7 +240,7 @@
           </font>
          </property>
          <property name="text">
-          <string>提取特征</string>
+          <string>生成模型</string>
          </property>
         </widget>
        </item>

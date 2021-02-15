@@ -1,6 +1,6 @@
 import sys
 
-from PyQt5.QtWidgets import QDialog, QLabel, QTableView, QLineEdit, QPushButton
+from PyQt5.QtWidgets import QDialog, QLabel, QTableView, QLineEdit, QPushButton, QMessageBox
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QWidget
@@ -112,7 +112,10 @@ class Add_Data_UI(QDialog, Ui_Dialog_Add_Data):
             lineEdit_data.append(self.lineEdit_list[i].text())
 
         # 插入数据库
-        self.sf.insert(self.db_path, self.table, lineEdit_data)
+        ret = self.sf.insert(self.db_path, self.table, lineEdit_data)
+        if ret == -1:
+            QMessageBox.about(self, "Error", "有数据为空")
+
         self.signal_status.emit()
         self.close()
 
@@ -292,8 +295,8 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
             i, key = self.sf.find_primary_key(self.db_path, self.table)
             # 更新数据
             ret = self.sf.update(self.db_path, self.table, self.field_list, update_data, i)
-            if ret != 0:
-                print("更新失败\n")
+            if ret == -1:
+                QMessageBox.about(self, "Error", "有数据为空")
             else:
                 print("更新完成\n")
 
@@ -391,13 +394,16 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
             print("没有选择表")
             return
         print("当前选择表:{}".format(self.table))
-        self.sf.delete_table(self.db_path, self.table)
-        self.tableView_content.setModel(self.model.clear())
+        ret = QMessageBox.question(self, "delete table", "sure to delete this table?", QMessageBox.Yes | QMessageBox.No,
+                                   QMessageBox.No)
+        if ret == QMessageBox.Yes:
+            self.sf.delete_table(self.db_path, self.table)
+            self.tableView_content.setModel(self.model.clear())
 
-        # 刷新数据库表
-        self.table_list = self.sf.check_table(self.db_path)
-        print("当前数据库含有表：", self.table_list)
-        self.create_radiobox_table()
+            # 刷新数据库表
+            self.table_list = self.sf.check_table(self.db_path)
+            print("当前数据库含有表：", self.table_list)
+            self.create_radiobox_table()
 
 
 if __name__ == "__main__":

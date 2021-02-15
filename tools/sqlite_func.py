@@ -87,6 +87,10 @@ class Sqlite_Func:
         for i in range(len(data)):
             # 插入新数据
             # INSERT INTO TABLE_NAME VALUES (value1,value2,value3,...valueN);
+            for i in data:
+                if i=="":
+                    print("数据为空")
+                    return -1
             cmd = ', '.join(list(map(lambda x: "'" + x + "'", data[i])))
             cmd = "INSERT INTO {} VALUES ({});".format(table, cmd)
             print("execute cmd={}\n".format(cmd))
@@ -118,10 +122,15 @@ class Sqlite_Func:
     def insert(self, db_path, table, data):
         print("插入新数据")
         # INSERT INTO TABLE_NAME VALUES (value1,value2,value3,...valueN);
+        for i in data:
+            if i == "":
+                print("数据为空")
+                return -1
         cmd = ', '.join(list(map(lambda x: "'" + x + "'", data)))
         cmd = "INSERT INTO {} VALUES ({});".format(table, cmd)
         print("execute cmd={}\n".format(cmd))
         ret = self.executeCMD(db_path, cmd)
+        return 0
 
     def delete_table(self, db_path, table_name):
         cmd = "DROP TABLE {};".format(table_name)

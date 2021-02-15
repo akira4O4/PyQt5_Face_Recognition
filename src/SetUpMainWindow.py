@@ -279,7 +279,7 @@ from Sqlite_UI import Sqlite_UI
 #         self.hide()
 #
 #     def refresh(self):
-#         self.SelectClass.clear()
+#         self.face.clear()
 #         self.combobox_face_init()
 #
 #     # 初始化班级列表
@@ -288,12 +288,12 @@ from Sqlite_UI import Sqlite_UI
 #         readlines = table_nmu
 #         lineindex = 0
 #         while lineindex < readlines:
-#             self.SelectClass.addItem(table_name[lineindex])
+#             self.face.addItem(table_name[lineindex])
 #             lineindex += 1
 #
 #     def btn_add_new_student(self):
 #         student_info = []
-#         checked_table = self.SelectClass.currentText()
+#         checked_table = self.face.currentText()
 #         lable = self.line_addLabel.text()
 #         name = self.line_addName.text()
 #         sex = self.line_addSex.text()
@@ -334,26 +334,14 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
         self.setupUi(self)
-        
-        # self.DB_Path = '../DB/FileNameDB.db'
-        # self.sqlStr_SelectAll = "select * from fileName;"
 
         self.sf = Sqlite_Func()
 
         self.opsql = Operate_Sql()
-        self.opfile = File_Operate()
 
         self.timer_camera_test = QtCore.QTimer()  # qt计数器
         self.timer_camera_face = QtCore.QTimer()  # qt计数器
 
-        # self.openAddWin = AddStudent()  # 添加窗口实例
-        # self.openDelWin = del_window()  # 删除窗口实例
-
-        # self.helpWin = HelpWindow()  # 帮助窗口实例
-        # self.openAddClass = AddClassTable()  # 添加班级表实例
-        # self.openDelClass = DelClassTable()  # 删除班级表实例
-        # self.openAddCheck = AddCheckTable()  # 添加考勤表示例
-        # self.openDelCheck = DelCheckTable()  # 添加删除考勤表示例
 
         self.openSqlite = Sqlite_UI()  # 数据库对象
         self.slot_init()
@@ -378,37 +366,15 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
         self.btn_openCamera.clicked.connect(self.opencamera)
         self.btn_takePhoto.clicked.connect(self.take_photo)
 
-        # self.btn_addNewFace.clicked.connect(self.open_add_win)
-        # self.btn_delFace.clicked.connect(self.open_del_win)
         self.btn_refresh.clicked.connect(self.refresh)
 
         self.btn_train.clicked.connect(self.train)
         self.btn_recogniton.clicked.connect(self.open_recognition_camera)
         self.btn_sqlite.clicked.connect(self.open_sqlite)
 
-        # self.actionHelp.triggered.connect(self.open_help)
-        # self.actionAddClass.triggered.connect(self.open_add_class)
-        # self.actionDelClass.triggered.connect(self.open_del_class)
-        # self.actionAddCheck.triggered.connect(self.open_add_check_table)
-        # self.actionDelCheck.triggered.connect(self.open_del_check)
 
     def open_sqlite(self):
         self.openSqlite.show()
-
-    # def open_del_check(self):
-    # self.openDelCheck.show()
-
-    # def open_help(self):
-    #     self.helpWin.show()
-
-    # def open_del_class(self):
-    #     self.openDelClass.show()
-
-    # def open_add_class(self):
-    #     self.openAddClass.show()
-
-    # def open_add_check_table(self):
-    #     self.openAddCheck.show()
 
     def opencamera(self):
         if self.timer_camera_test.isActive() == False:
@@ -439,13 +405,6 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
         showFrame = QtGui.QImage(frame.data, frame.shape[1], frame.shape[0], QtGui.QImage.Format_RGB888)
         self.lab_frame.setPixmap(QtGui.QPixmap.fromImage(showFrame))
 
-    # 打开添加窗口
-    # def open_add_win(self):
-    #     self.openAddWin.show()
-    #
-    # # 打开删除窗口
-    # def open_del_win(self):
-    #     self.openDelWin.show()
 
     # 拍照
     def take_photo(self):
@@ -462,14 +421,14 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
                                                 buttons=QtWidgets.QMessageBox.Ok,
                                                 defaultButton=QtWidgets.QMessageBox.Ok)
         else:
-            selectClass = self.comboBox_face.currentText()
-            selectid = self.comboBox_id.currentText()
-            if selectid == '' or selectid is None:
+            face = self.comboBox_face.currentText()
+            id = self.comboBox_id.currentText()
+            if id == '' or id is None:
                 msg = QtWidgets.QMessageBox.warning(self, u"Warning", u"请选择学号!",
                                                     buttons=QtWidgets.QMessageBox.Ok,
                                                     defaultButton=QtWidgets.QMessageBox.Ok)
             else:
-                name = '{CLASS}_{id}'.format(CLASS=selectClass, id=selectid)
+                name = '{CLASS}_{id}'.format(CLASS=face, id=id)
                 name = '../src_img/{name}.jpg'.format(name=name)
                 print(name)
                 cv2.imwrite(name, self.photo_transmission)
@@ -527,7 +486,7 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
     # 刷新显示数据库并且显示id号
     def refresh(self):
 
-        #获取当前选中表明
+        # 获取当前选中表明
         checked_face = self.comboBox_face.currentText()
         checked_cw = self.comboBox_checkWork.currentText()
 
@@ -535,35 +494,30 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
 
         self.combobox_face_init(checked_table=checked_face)
         self.combobox_checkWork_init(checktable=checked_cw)
-        #
-        # id_set = self.opsql.show_student_id(checked_table)
-        # self.comboBox_id.clear()
-        # print(len(id_set))
-        # for i in range(len(id_set)):
-        #     print(id_set[i])
-        #     self.comboBox_id.addItem(str(id_set[i]))
 
     def train(self):
-        msg = QtWidgets.QMessageBox.information(self, u"提示", u"训练过程中，画面无法更新。",
-                                                buttons=QtWidgets.QMessageBox.Ok,
-                                                defaultButton=QtWidgets.QMessageBox.Ok)
-        get_face.detection()
+
+        ret = QMessageBox.question(self, "Train", "训练过程中，画面无法更新,训练时间随机器性能决定", QMessageBox.Yes | QMessageBox.No,
+                                   QMessageBox.No)
+        if ret == QMessageBox.Yes:
+            get_face.detection()
 
     # 打开识别摄像头
     def open_recognition_camera(self):
-        msg = QtWidgets.QMessageBox.information(self, u"启动提示", u"1、启动时间根据设备性能强弱决定\n\n2、程序启动后按下esc退出检测窗口",
-                                                buttons=QtWidgets.QMessageBox.Ok,
-                                                defaultButton=QtWidgets.QMessageBox.Ok)
 
         if self.btn_openCamera.text() == '关闭摄像头':
             msg = QtWidgets.QMessageBox.warning(self, u"警告", u"请先关闭摄像头!",
                                                 buttons=QtWidgets.QMessageBox.Ok,
                                                 defaultButton=QtWidgets.QMessageBox.Ok)
         else:
-            print('开启摄像头')
-            CLASS = self.comboBox_face.currentText()
-            ct = self.comboBox_checkWork.currentText()
-            self.face.main(CLASS, ct)
+            ret = QMessageBox.question(self, "Train", "1、启动时间根据设备性能强弱决定\n\n2、程序启动后按下esc退出检测窗口",
+                                       QMessageBox.Yes | QMessageBox.No,
+                                       QMessageBox.No)
+            if ret == QMessageBox.Yes:
+                print('开启摄像头')
+                face = self.comboBox_face.currentText()
+                cw = self.comboBox_checkWork.currentText()
+                self.face.main(face, cw)
 
 
 if __name__ == "__main__":

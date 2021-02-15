@@ -181,7 +181,7 @@ class Ui_Face_Recognition_window(object):
         self.btn_openCamera.setText(_translate("Face_Recognition_window", "打开摄像头"))
         self.btn_sqlite.setText(_translate("Face_Recognition_window", "数据库管理"))
         self.btn_takePhoto.setText(_translate("Face_Recognition_window", "录入人脸"))
-        self.btn_train.setText(_translate("Face_Recognition_window", "提取特征"))
+        self.btn_train.setText(_translate("Face_Recognition_window", "生成模型"))
         self.btn_recogniton.setText(_translate("Face_Recognition_window", "开始检测"))
         self.btn_refresh.setText(_translate("Face_Recognition_window", "刷新"))
         self.actionAdd_Person.setText(_translate("Face_Recognition_window", "添加人脸"))
