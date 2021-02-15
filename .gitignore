@@ -17,3 +17,6 @@ DB/StudentFaceDB.db
 
 
 ui_src/__pycache__/MainUI.cpython-36.pyc
+
+src_img/
+emb_img/

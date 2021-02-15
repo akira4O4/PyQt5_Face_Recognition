@@ -78,11 +78,19 @@ class Add_Data_UI(QDialog, Ui_Dialog_Add_Data):
         self.sf = Sqlite_Func()
 
         v_label_layout = QVBoxLayout()
-        v_lineEdit_layout = QVBoxLayout()
-        h_layout = QHBoxLayout()
         v_layout = QVBoxLayout()
+        v_lineEdit_layout = QVBoxLayout()
+
+        h_layout = QHBoxLayout()
+
         self.lineEdit_list = []
         self.field_len = len(field)
+
+        db_type = str(db_path).split('/')
+        print("db type:", db_type[len(db_type) - 1].upper())
+        if db_type[len(db_type) - 1].upper() == self.sf.DB_TYPE_CHECKWORK:
+            self.field_len = len(field) - 1
+
         for i in range(self.field_len):
             label = QLabel()
             label.setText("{}:".format(str(field[i]).upper()))
@@ -90,7 +98,22 @@ class Add_Data_UI(QDialog, Ui_Dialog_Add_Data):
 
             lineEdit = QLineEdit()
             self.lineEdit_list.append(lineEdit)
+
             v_lineEdit_layout.addWidget(lineEdit)
+
+        if db_type[len(db_type) - 1].upper() == self.sf.DB_TYPE_CHECKWORK:
+            # 对于考勤表 flag不允许手动写入
+
+            label = QLabel()
+            label.setText("{}:".format(str(field[self.field_len]).upper()))
+            v_label_layout.addWidget(label)
+
+            lineEdit_flag = QLineEdit()
+            lineEdit_flag.setReadOnly(True)
+            lineEdit_flag.setText("0")
+
+            self.lineEdit_list.append(lineEdit_flag)
+            v_lineEdit_layout.addWidget(lineEdit_flag)
 
         h_layout.addLayout(v_label_layout)
         h_layout.addLayout(v_lineEdit_layout)
@@ -115,7 +138,8 @@ class Add_Data_UI(QDialog, Ui_Dialog_Add_Data):
         ret = self.sf.insert(self.db_path, self.table, lineEdit_data)
         if ret == -1:
             QMessageBox.about(self, "Error", "有数据为空")
-
+        if ret == -2:
+            QMessageBox.about(self, "Error", "主键重复")
         self.signal_status.emit()
         self.close()
 
@@ -261,6 +285,7 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
         for row in range(self.len_row):
             for col in range(len(data[0])):
                 item = QStandardItem("{}".format(data[row][col]))
+
                 self.model.setItem(row, col, item)
 
         self.tableView_content.setModel(self.model)
@@ -293,10 +318,16 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
                 return
             # 查找主键
             i, key = self.sf.find_primary_key(self.db_path, self.table)
+
             # 更新数据
             ret = self.sf.update(self.db_path, self.table, self.field_list, update_data, i)
             if ret == -1:
                 QMessageBox.about(self, "Error", "有数据为空")
+            if ret==-2:
+                print("更新异常")
+            if ret == -3:
+                print("主键被修改，停止更新")
+                QMessageBox.about(self,"Error","主键被修改")
             else:
                 print("更新完成\n")
 
@@ -313,7 +344,7 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
         if self.select_field_list != []:
 
             # 根据所选字段和表构建查询语句：select field1,field2,...,fieldN from table
-            str_sql = self.sf.auto_select(self.select_field_list, self.table)
+            str_sql = self.sf.auto_select(self.table, self.select_field_list)
             ret = self.sf.executeCMD(self.db_path, str_sql)
             print(ret)
             for i, data in enumerate(ret):

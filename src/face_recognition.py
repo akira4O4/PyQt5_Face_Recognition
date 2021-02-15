@@ -10,7 +10,7 @@ import os
 
 import facenet
 import align.detect_face
-import sqlite3_op
+from tools.sqlite_func import Sqlite_Func
 
 
 # 交并比
@@ -44,7 +44,7 @@ class face():
     def __init__(self):
         self.init_mtcnn()
         self.train = False
-        self.opsql = sqlite3_op.Operate_Sql()
+        self.sqlite = Sqlite_Func()
 
     # 初始化MTCNN
     def init_mtcnn(self):
@@ -92,7 +92,7 @@ class face():
                 print("pre_embadding计算完成")
         return compare_emb, compare_num, all_obj_name  # 数据库embadding，人数，目录标签
 
-    def main(self, CLASS, check_table):
+    def main(self, face, checkwork):
         with tf.Graph().as_default():
             with tf.Session() as sess:
                 model = '../20170512-110547/'
@@ -100,15 +100,42 @@ class face():
                 images_placeholder = tf.get_default_graph().get_tensor_by_name("input:0")
                 embeddings = tf.get_default_graph().get_tensor_by_name("embeddings:0")
                 phase_train_placeholder = tf.get_default_graph().get_tensor_by_name("phase_train:0")
-                # all_obj_name, compare_emb, compare_num = self.opsql.get_sql_emb()
 
-                # 从数据库获取人脸数据
                 '''
                 id:学号
                 compare_emb:特征值
                 compare_num:数据库中的数据条数
                 '''
-                id, compare_emb, compare_num = self.opsql.get_emb(CLASS=CLASS)
+
+                #找到当表主键
+                face_key_idx,face_key=self.sqlite.find_primary_key(self.sqlite.DB_STUDENTFACE_PATH,face)
+                # cw_key_idx,cw_key=self.sqlite.find_primary_key(self.sqlite.DB_STUDENTCHECKWORK_PATH,checkwork)
+
+                # 从数据库获取人脸数据
+                cmd = self.sqlite.auto_select(face)
+                rows = self.sqlite.executeCMD(self.sqlite.DB_STUDENTFACE_PATH, cmd)
+
+                id = []
+
+                num = len(rows)
+                emb_idx=len(rows[0])-1
+
+                compare_num = num
+                compare_emb = np.zeros([num, 128])
+
+                for lineIndex in range(num):
+                    row = rows[lineIndex]  # 获取某一行的数据,类型是tuple
+                    id.append(row[face_key_idx])  # 获取id
+                    emb_str = row[emb_idx]#获取一个组数据中的emb数据
+                    if emb_str is None:
+                        compare_emb[lineIndex] = np.full((1, 128), 10)
+                    else:
+                        str_list = emb_str.split(' ')  # 以空格分割字符串
+                        if len(str_list)<10:
+                            continue
+                        for i in range(128):
+                            compare_emb[lineIndex][i] = float(str_list[i])  # 'list转ndarray:'，str->float
+
                 capture = cv2.VideoCapture(0)
                 cv2.namedWindow("face recognition", 1)
 
@@ -182,8 +209,10 @@ class face():
                                     (0, 0, 255),
                                     thickness=2,
                                     lineType=2)
-                        # 将学号插入到选择的考勤表中
-                    self.opsql.insert_check_table_info(CLASS, check_table, find_obj[0])
+
+                    # 将学号插入到选择的考勤表中
+                    if find_obj[0]!="Unknow":
+                        self.sqlite.update_checkwork(self.sqlite.DB_STUDENTCHECKWORK_PATH,checkwork,find_obj[0])
                     cv2.imshow('face recognition', frame)
                     key = cv2.waitKey(3)
                     if key == 27:
@@ -248,4 +277,4 @@ class face():
 
 if __name__ == '__main__':
     face_test = face()
-    face_test.main('cs172', '考勤表_cs172')
+    face_test.main('cs172', 'cs172')

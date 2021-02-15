@@ -8,7 +8,8 @@ import facenet
 import align.detect_face
 import argparse
 import sys
-import sqlite3_op
+# import sqlite3_op
+from tools.sqlite_func import Sqlite_Func
 import cv2
 import imageio
 
@@ -30,9 +31,11 @@ def align_data(image_path, imgae_size, gpu_memory_faction):
     temp_image_path = copy.copy(image_path)  # 浅拷贝文件目录
     image_list = []  # 图片列表
     for path in temp_image_path:
+
+        print('读取:', path)
+        # os.path.expanduser:展开目录
         img = imageio.imread(os.path.expanduser(path))  # 这样读出来的图片格式为numpy类型，后面就不需要再转换了
         # img_size = np.asarray(img.shape)[0:2]  # 获取数据尺寸类型为ndarray
-        print('读取:', path)
 
         bounding_boxes, _ = align.detect_face.detect_face(img, minsize, pnet, onet, rnet, threshhold, factor)
         if len(bounding_boxes) < 1:
@@ -50,25 +53,33 @@ def align_data(image_path, imgae_size, gpu_memory_faction):
         bb[3] = det[3]
         cropped = img[bb[1]:bb[3], bb[0]:bb[2], :]  # 对角坐标
         cropped = cv2.resize(cropped, (imgae_size, imgae_size), interpolation=cv2.INTER_AREA)  # 默认双三线性插值
-        prewhitened = facenet.prewhiten(cropped)  # 欲白化，取出冗余数据
+
+        prewhitened = facenet.prewhiten(cropped)  # 白化，取出冗余数据
         image_list.append(prewhitened)
+
     images = np.stack(image_list)
+
     return images
 
 
 # 文件夹人脸检测
 def detection():
-    img_src = '../src_img/'  # 图片输入目录
-    emb_file = '../emb_img'  # 人脸目录
-    img_path_set = []
+    src_img = '../src_img/'  # 原图片
+    emb_img = '../emb_img'  # 人脸目录
 
     # 如果不存在这个目录就新建一个
-    if os.path.exists(emb_file) is False:
-        os.mkdir(emb_file)
+    if os.path.exists(emb_img) is False:
+        os.mkdir(emb_img)
+    if os.path.exists(src_img) is False:
+        os.mkdir(src_img)
 
-    for f in os.listdir(img_src):
-        one_img = os.path.join(img_src, f)
+    img_path_set = []
+    # 查看src_img下所有文件
+    for f in os.listdir(src_img):
+        # 拼接图片目录
+        one_img = os.path.join(src_img, f)
         img_path_set.append(one_img)
+
     print(img_path_set)
     if len(img_path_set) != 0:
         # 提取人脸
@@ -76,11 +87,14 @@ def detection():
 
     # 保存切割好的图片
     count = 0
-    for f in os.listdir(img_src):
-        imageio.imwrite(os.path.join(emb_file, f), images_align[count])
+    for f in os.listdir(src_img):
+        # param:path,img
+        imageio.imwrite(os.path.join(emb_img, f), images_align[count])
         count = count + 1
+
         # 删除已经被剪裁的图片
-        os.remove(os.path.join(img_src, f))
+        os.remove(os.path.join(src_img, f))
+
     # 计算特征值
     computing_emb()
     return True
@@ -90,9 +104,12 @@ def detection():
 def computing_emb():
     with tf.Graph().as_default():
         with tf.Session() as sess:
-            opsql = sqlite3_op.Operate_Sql()
+
+            # opsql = sqlite3_op.Operate_Sql()
+            sqlite = Sqlite_Func()
+
             model = '../20170512-110547/'
-            emb_file = '../emb_img'
+            emb_img = '../emb_img'
             # 加载facenet模型
             facenet.load_model(model)
             images_placeholder = tf.get_default_graph().get_tensor_by_name("input:0")
@@ -103,9 +120,9 @@ def computing_emb():
             global compare_emb, compare_num, all_obj_name
 
             all_obj_name = []
-            for i in os.listdir(emb_file):
+            for i in os.listdir(emb_img):
                 all_obj_name.append(i)
-                img = imageio.imread(os.path.join(emb_file, i))
+                img = imageio.imread(os.path.join(emb_img, i))
                 prewhitened = facenet.prewhiten(img)  # 预白化去除冗余信息
                 image.append(prewhitened)
                 nrof_images = nrof_images + 1
@@ -117,17 +134,23 @@ def computing_emb():
             print('compare_emb len:', len(compare_emb[0]))
             print("pre_embadding计算完成")
 
-            for i in os.listdir(emb_file):
+            for i in os.listdir(emb_img):
+                #拆分表名和id号
                 index = 0
-                info = i.split("_")
-                print(info[0], info[1])
+                info = i.split("#")
+                print("info:{}".format(info))
+                table_name=info[0]
                 id = info[1].split(".")
-                opsql.insert_emb(info[0], id[0], compare_emb[index])
+                ID=id[0]
+
+                # opsql.insert_emb(info[0], id[0], compare_emb[index])
+                sqlite.update_face_emb(sqlite.DB_STUDENTFACE_PATH, table_name, ID, compare_emb[index])
                 index += 1
 
             # 移除已经计算过的image
-            for f in os.listdir(emb_file):
-                os.remove(os.path.join(emb_file, f))
+            for f in os.listdir(emb_img):
+                pass
+                os.remove(os.path.join(emb_img, f))
 
 
 def parse_arguments(argv):

@@ -78,23 +78,23 @@ class Operate_Sql():
         conn.close()
 
     # 插入emb
-    def insert_emb(self, CLASS, id, emb):
+    def insert_emb(self, table_name, id, emb):
         conn = db.connect(self.StudentFaceDB)
         print(emb)
         emb_str = ''
         for i in range(len(emb)):
             emb_str += str(emb[i]) + ' '
         print(emb_str)
-        sql_update_emb = 'UPDATE {CLASS} SET features = "{emb}" WHERE id = {id};'.format(CLASS=CLASS, emb=emb_str,
+        sql_update_emb = 'UPDATE {table_name} SET features = "{emb}" WHERE id = {id};'.format(table_name=table_name, emb=emb_str,
                                                                                          id=id)
         conn.execute(sql_update_emb)
         conn.commit()
         conn.close()
 
     # 测试
-    def get_emb(self, CLASS):
+    def get_emb(self, table):
         conn = db.connect(self.StudentFaceDB)
-        sql = "select * from {CLASS}".format(CLASS=CLASS)
+        sql = "select * from {table}".format(table=table)
         cursor = conn.cursor()
         conn.row_factory = db.Row
         cursor.execute(sql)

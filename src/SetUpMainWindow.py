@@ -428,7 +428,7 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
                                                     buttons=QtWidgets.QMessageBox.Ok,
                                                     defaultButton=QtWidgets.QMessageBox.Ok)
             else:
-                name = '{CLASS}_{id}'.format(CLASS=face, id=id)
+                name = '{CLASS}#{id}'.format(CLASS=face, id=id)
                 name = '../src_img/{name}.jpg'.format(name=name)
                 print(name)
                 cv2.imwrite(name, self.photo_transmission)
@@ -474,7 +474,8 @@ class MainWindow(QMainWindow, Ui_Face_Recognition_window):
         # 读取人脸数据库中所有id
         field = []
         field.append("id")
-        cmd = self.sf.auto_select(field, table)
+        cmd = self.sf.auto_select(table,field)
+        print("cmd-->",cmd)
         ret = self.sf.executeCMD(self.sf.DB_STUDENTFACE_PATH, cmd)
         print("ret:", ret)
 
