@@ -50,7 +50,7 @@ class Add_Table_UI(QDialog, Ui_Dialog_Add_Table):
     def create_table(self):
         sstr = self.db_path.split('/')
         self.db_type = sstr[len(sstr) - 1]
-        print("db_type:",self.db_type)
+        print("db_type:", self.db_type)
         print("创建新表")
         if self.lineEdit_table_name == "":
             print("表名字为空")
@@ -143,14 +143,14 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
         self.btn_field_list = []
         # 被勾选的字段
         self.select_field_list = []
-        #当前行列
+        # 当前行列
         self.len_row = 0
         self.len_col = 0
 
         self.model = QStandardItemModel()
 
-        #数据库类型
-        self.db_type=""
+        # 数据库类型
+        self.db_type = ""
 
     def slot_init(self):
         print("slot init...")
@@ -182,7 +182,7 @@ class Sqlite_UI(QtWidgets.QMainWindow, Ui_SqliteMainWindow):
         print(sstr)
         self.groupBox_table_field.setTitle("数据库：{}".format(sstr[len(sstr) - 1]))
 
-        self.db_type=sstr[len(sstr) - 1]
+        self.db_type = sstr[len(sstr) - 1]
 
         self.create_radiobox_table()
 

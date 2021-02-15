@@ -15,3 +15,5 @@ test/
 DB/StudentCheckWorkDB.db
 DB/StudentFaceDB.db
 
+
+ui_src/__pycache__/MainUI.cpython-36.pyc

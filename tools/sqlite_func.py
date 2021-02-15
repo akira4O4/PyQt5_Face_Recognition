@@ -6,13 +6,13 @@ test_db_path = "/home/lee/pyCode/PyQt5_Face_Recognition/DB/StudentFaceDB.db"
 class Sqlite_Func:
     def __init__(self):
 
+        # 数据库数据库地址
+        self.DB_STUDENTFACE_PATH = '../DB/StudentFaceDB.db'
+        self.DB_STUDENTCHECKWORK_PATH = '../DB/StudentCheckWorkDB.db'
+
         # 数据库类型
         self.DB_TYPE_FACE = "studentfacedb.db".upper()
         self.DB_TYPE_CHECKWORK = "studentcheckworkdb.db".upper()
-
-        # 数据表类型
-        self.TABLE_TYPE_FACE = "FACE"
-        self.TABLE_TYPE_CHECKWORK = "CHECKWORK"
 
         self.dict_cmd = {}
 
@@ -71,7 +71,6 @@ class Sqlite_Func:
     def auto_select(self, fields, table):
         str = ', '.join(list(map(lambda x: x, fields)))
         str = "select {} from {};".format(str, table)
-        print(str)
         return str
 
     # 更新
