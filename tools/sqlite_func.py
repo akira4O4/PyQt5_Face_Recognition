@@ -6,6 +6,10 @@ test_db_path = "/home/lee/pyCode/PyQt5_Face_Recognition/DB/StudentFaceDB.db"
 class Sqlite_Func:
     def __init__(self):
 
+        # 数据库类型
+        self.DB_TYPE_FACE = "studentfacedb.db".upper()
+        self.DB_TYPE_CHECKWORK = "studentcheckworkdb.db".upper()
+
         # 数据表类型
         self.TABLE_TYPE_FACE = "FACE"
         self.TABLE_TYPE_CHECKWORK = "CHECKWORK"
@@ -17,17 +21,20 @@ class Sqlite_Func:
     def init_cmd(self):
 
         # 创建人脸数据表
-        self.dict_cmd[self.TABLE_TYPE_FACE] = "CREATE TABLE {}(" \
-                                              "lable       text not null," \
-                                              "name        text not null," \
-                                              "sex         text not null," \
-                                              "id          text primary key not null," \
-                                              "profession  text not null," \
-                                              "featrues    text not null);"
+        self.dict_cmd[self.DB_TYPE_FACE] = "CREATE TABLE {}(" \
+                                           "lable       text not null," \
+                                           "name        text not null," \
+                                           "sex         text not null," \
+                                           "id          text primary key not null," \
+                                           "profession  text not null," \
+                                           "featrues    text not null);"
         # 创建学生考勤表
-        self.dict_cmd[self.TABLE_TYPE_CHECKWORK] = ""
+        self.dict_cmd[self.DB_TYPE_CHECKWORK] = "CREATE TABLE {}(" \
+                                                "id     text primary key not null," \
+                                                "name   text not null," \
+                                                "flag   text not null);"
+        # 执行语句
 
-    # 执行语句
     def executeCMD(self, db_path, exectCmd):
         if exectCmd == "":
             assert "func executeCMD error"
@@ -123,11 +130,12 @@ class Sqlite_Func:
         self.executeCMD(db_path, cmd)
 
     # param->table_type:
-    def create_table(self, db_path, table_name, table_type):
-        print("create_table")
+    def create_table(self, db_path, table_name, db_type):
 
-        cmd = self.dict_cmd[table_type].format(table_name)
+        print("create_table")
+        cmd = self.dict_cmd[db_type].format(table_name)
         print(cmd)
+
         # 检查报名是否重复
         table_list = self.check_table(db_path)
         for i in table_list:
@@ -137,6 +145,8 @@ class Sqlite_Func:
 
         # 检查类型是否正确
         self.executeCMD(db_path, cmd)
+
+
 #
 
 if __name__ == "__main__":
