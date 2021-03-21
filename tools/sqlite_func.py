@@ -43,6 +43,7 @@ class Sqlite_Func:
             return None
         cursor = conn.cursor()  # 该例程创建一个 cursor，将在 Python 数据库编程中用到。
         conn.row_factory = db.Row  # 可访问列信息
+        print("cmd:",cmd)
         cursor.execute(cmd)  # 该例程执行一个 SQL 语句
         rows = cursor.fetchall()  # 该例程获取查询结果集中所有（剩余）的行，返回一个列表。当没有可用的行时，则返回一个空的列表。
         conn.commit()
@@ -51,6 +52,7 @@ class Sqlite_Func:
 
     # 返回当前当前数据库所有表
     def check_table(self, db_path):
+        print("返回当前当前数据库:{}所有表".format(db_path))
         self._table = "select name from sqlite_master where type='table' order by name"
         ret = self.executeCMD(db_path, self._table)
         self.table_list = []
@@ -93,6 +95,7 @@ class Sqlite_Func:
         cmd = 'UPDATE {table_name} SET flag = "{f}" WHERE id = {id};'.format(table_name=table,
                                                                              f="1", id=id)
         self.executeCMD(db_path, cmd)
+        print("update checkwork done")
 
     # 更新
     def update(self, db_path, table, field, data, primary_key_index):

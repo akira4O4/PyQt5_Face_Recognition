@@ -35,7 +35,7 @@ def iou(a, b):
 def max_face(area, position):
     max_face_position = []
     max_area_index = np.argmax(area)
-    print('最大面积索引：', np.argmax(area), '最大面积：', max(area))
+    # print('最大面积索引：', np.argmax(area), '最大面积：', max(area))
     max_face_position = position[max_area_index]
     return max_face_position
 
@@ -107,8 +107,8 @@ class face():
                 compare_num:数据库中的数据条数
                 '''
 
-                #找到当表主键
-                face_key_idx,face_key=self.sqlite.find_primary_key(self.sqlite.DB_STUDENTFACE_PATH,face)
+                # 找到当表主键
+                face_key_idx, face_key = self.sqlite.find_primary_key(self.sqlite.DB_STUDENTFACE_PATH, face)
                 # cw_key_idx,cw_key=self.sqlite.find_primary_key(self.sqlite.DB_STUDENTCHECKWORK_PATH,checkwork)
 
                 # 从数据库获取人脸数据
@@ -118,7 +118,7 @@ class face():
                 id = []
 
                 num = len(rows)
-                emb_idx=len(rows[0])-1
+                emb_idx = len(rows[0]) - 1
 
                 compare_num = num
                 compare_emb = np.zeros([num, 128])
@@ -126,12 +126,12 @@ class face():
                 for lineIndex in range(num):
                     row = rows[lineIndex]  # 获取某一行的数据,类型是tuple
                     id.append(row[face_key_idx])  # 获取id
-                    emb_str = row[emb_idx]#获取一个组数据中的emb数据
+                    emb_str = row[emb_idx]  # 获取一个组数据中的emb数据
                     if emb_str is None:
                         compare_emb[lineIndex] = np.full((1, 128), 10)
                     else:
                         str_list = emb_str.split(' ')  # 以空格分割字符串
-                        if len(str_list)<10:
+                        if len(str_list) < 10:
                             continue
                         for i in range(128):
                             compare_emb[lineIndex][i] = float(str_list[i])  # 'list转ndarray:'，str->float
@@ -161,18 +161,18 @@ class face():
                     if mark:
                         if bounding_box[0] < 75:
                             mark = False
-                            print('left')
+                            # print('left')
                         if bounding_box[2] > 565:
                             mark = False
-                            print('right')
+                            # print('right')
 
                     if mark:
-                        print('计算视频帧的embadding')
+                        # print('计算视频帧的embadding')
                         emb = sess.run(embeddings, feed_dict={images_placeholder: crop_image,
                                                               phase_train_placeholder: False})
                         pre_person_num = len(emb)
                         find_obj = []
-                        print('识别到的人数:', pre_person_num)
+                        # print('识别到的人数:', pre_person_num)
                         cv2.putText(frame,
                                     'Press esc to exit',
                                     (10, 30),
@@ -190,7 +190,7 @@ class face():
                                 dist_list.append(dist)
                                 # 求视频帧和对比图直接最小的差值，即表示为最相似的图片
                                 min_value = min(dist_list)
-                                print("最小差值：", min_value)
+                                # print("最小差值：", min_value)
                             if min_value > 0.65:
                                 find_obj.append('Unknow')
                             else:
@@ -211,8 +211,8 @@ class face():
                                     lineType=2)
 
                     # 将学号插入到选择的考勤表中
-                    if find_obj[0]!="Unknow":
-                        self.sqlite.update_checkwork(self.sqlite.DB_STUDENTCHECKWORK_PATH,checkwork,find_obj[0])
+                    if find_obj[0] != "Unknow":
+                        self.sqlite.update_checkwork(self.sqlite.DB_STUDENTCHECKWORK_PATH, checkwork, find_obj[0])
                     cv2.imshow('face recognition', frame)
                     key = cv2.waitKey(3)
                     if key == 27:
@@ -230,11 +230,11 @@ class face():
         Area = []  # 面积
         Position = []  # 坐标
 
-        print('len(bounding_boxes):', len(bounding_boxes))
+        # print('len(bounding_boxes):', len(bounding_boxes))
 
         # 如果未发现目标 直接返回
         if len(bounding_boxes) < 1:
-            print('没有发现人脸')
+            # print('没有发现人脸')
             return False, 0, 0
 
         for i, face_position in enumerate(bounding_boxes):
@@ -242,9 +242,9 @@ class face():
             w = face_position[2] - face_position[0]
             h = face_position[3] - face_position[1]
             S = w * h
-            print('第:', i)
-            print('w:', w)
-            print('h:', h)
+            # print('第:', i)
+            # print('w:', w)
+            # print('h:', h)
 
             Index.append(i)
             Area.append(S)
@@ -252,8 +252,8 @@ class face():
 
         max_face_position = max_face(Area, Position)
 
-        print('bbox:', (max_face_position[0], max_face_position[1]),
-              (max_face_position[2], max_face_position[3]))
+        # print('bbox:', (max_face_position[0], max_face_position[1]),
+        #       (max_face_position[2], max_face_position[3]))
 
         # 裁剪
         temp_crop = img[max_face_position[1]:max_face_position[3], max_face_position[0]:max_face_position[2], :]

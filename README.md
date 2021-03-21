@@ -1,6 +1,9 @@
 
  # 基于卷积神经网络的学生人脸识别考勤系统
  ## 上传前已经通过测试，希望各位认真查阅README，README中写了许多细节，不熟悉TensorFlow和python的请提前学习。欢迎给小星星。    
+
+**gitee:https://gitee.com/omegalee/PyQt5_Face_Recognition**  
+
  ## 测试环境：
  >**1.Windows 10 Ubuntu 20.04**  
  >**2.TensorFlow1.15 GPU版本（没有GPU也可以，CPU版本会慢一些）**  
@@ -41,7 +44,7 @@
 4、打开摄像头->录入人脸  
 5、点击生成模型（人脸模型生成过程线程会被阻塞，但是训练完成就没事了）    
 5、开始检测  
-  
+
 ## 软件界面细节  
 
 ![1](https://github.com/omega-Lee/PyQt5_Face_Recognition/blob/master/markdown_imgs/1.png) 
